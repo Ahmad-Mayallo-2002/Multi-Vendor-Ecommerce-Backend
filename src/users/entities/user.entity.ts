@@ -11,6 +11,7 @@ import { IdClass } from '../../assets/IdDate.entity';
 import { Role } from '../../assets/enum/role.enum';
 import { Vendor } from './vendor.entity';
 import { Address } from './address.entity';
+import { Cart } from '../../cart/entities/cart.entity';
 
 @Entity({ name: 'users' })
 @ObjectType()
@@ -40,4 +41,8 @@ export class User extends IdClass {
   @JoinTable()
   @Field(() => [Address])
   addresses: Relation<Address[]>;
+
+  @OneToOne(() => Cart, (cart) => cart.user)
+  @Field(() => Cart)
+  cart: Relation<Cart>;
 }

@@ -1,8 +1,16 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../assets/IdDate.entity';
-import { Column, Entity, JoinTable, ManyToOne, Relation } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToOne,
+  OneToMany,
+  Relation,
+} from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { Vendor } from '../../users/entities/vendor.entity';
+import { CartItem } from '../../cart/entities/cart-item.entity';
 
 @Entity({ name: 'products' })
 @ObjectType()
@@ -40,4 +48,8 @@ export class Product extends IdClass {
   @ManyToOne(() => Vendor, (vendor) => vendor.products)
   @Field(() => Vendor)
   vendorId: Relation<Vendor>;
+
+  @OneToMany(() => CartItem, (items) => items.product)
+  @Field(() => [CartItem])
+  items: Relation<CartItem[]>;
 }

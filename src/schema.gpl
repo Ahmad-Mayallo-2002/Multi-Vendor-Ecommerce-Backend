@@ -15,6 +15,19 @@ type Address {
 type Cart {
   createdAt: DateTime!
   id: String!
+  items: [CartItem!]!
+  totalPrice: Float!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type CartItem {
+  cart: Cart!
+  createdAt: DateTime!
+  id: String!
+  priceAtPayment: Float!
+  product: Product!
+  quantity: Int!
   updatedAt: DateTime!
 }
 
@@ -66,6 +79,7 @@ type Product {
   discount: Float!
   id: String!
   image: String!
+  items: [CartItem!]!
   price: Float!
   stock: Int!
   title: String!
@@ -109,6 +123,7 @@ input UpdateProductInput {
 
 type User {
   addresses: [Address!]!
+  cart: Cart!
   createdAt: DateTime!
   email: String!
   id: String!

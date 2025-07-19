@@ -17,6 +17,10 @@ import { CartItem } from './cart/entities/cart-item.entity';
 import { Cart } from './cart/entities/cart.entity';
 import { AuthModule } from './auth/auth.module';
 import { Address } from './users/entities/address.entity';
+import { OrdersModule } from './orders/orders.module';
+import { Order } from './orders/entities/order.entity';
+import { OrderItem } from './orders/entities/order-item.entity';
+import { PaymentMethod } from './orders/entities/payment.entity';
 
 @Module({
   imports: [
@@ -36,13 +40,25 @@ import { Address } from './users/entities/address.entity';
       type: 'postgres',
       host: 'localhost',
       synchronize: true,
-      entities: [User, Vendor, Category, Product, CartItem, Cart, Address],
+      entities: [
+        User,
+        Vendor,
+        Category,
+        Product,
+        CartItem,
+        Cart,
+        Address,
+        Order,
+        OrderItem,
+        PaymentMethod,
+      ],
     }),
     UsersModule,
     CategoriesModule,
     ProductsModule,
     CartModule,
     AuthModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

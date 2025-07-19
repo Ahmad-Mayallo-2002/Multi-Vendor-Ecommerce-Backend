@@ -13,9 +13,9 @@ type Address {
 }
 
 type Cart {
+  cartItems: [CartItem!]!
   createdAt: DateTime!
   id: String!
-  items: [CartItem!]!
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!
@@ -38,6 +38,7 @@ type Category {
   name: String!
   products: [Product!]!
   updatedAt: DateTime!
+  vendor: Vendor!
 }
 
 input CreateCartInput {
@@ -46,6 +47,11 @@ input CreateCartInput {
 }
 
 input CreateCategoryInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateOrderInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
@@ -63,23 +69,57 @@ scalar DateTime
 type Mutation {
   createCart(createCartInput: CreateCartInput!): Cart!
   createCategory(createCategoryInput: CreateCategoryInput!): Category!
+  createOrder(createOrderInput: CreateOrderInput!): Order!
   createProduct(createProductInput: CreateProductInput!): Product!
   removeCart(id: Int!): Cart!
   removeCategory(id: Int!): Category!
+  removeOrder(id: Int!): Order!
   removeProduct(id: Int!): Product!
   updateCart(updateCartInput: UpdateCartInput!): Cart!
   updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
+  updateOrder(updateOrderInput: UpdateOrderInput!): Order!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
 }
 
+type Order {
+  createdAt: DateTime!
+  id: String!
+  orderItems: [OrderItem!]!
+  payment: PaymentMethod!
+  totalPrice: Float!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type OrderItem {
+  createdAt: DateTime!
+  id: String!
+  order: Order!
+  priceAtPayment: Float!
+  product: Product!
+  quantity: Int!
+  updatedAt: DateTime!
+}
+
+type PaymentMethod {
+  createdAt: DateTime!
+  id: String!
+  method: Status!
+  order: Order!
+  totalPrice: Float!
+  updatedAt: DateTime!
+  user: User!
+}
+
 type Product {
+  cartItems: [CartItem!]!
   category: Category!
   createdAt: DateTime!
   description: String!
   discount: Float!
   id: String!
   image: String!
-  items: [CartItem!]!
+  orderItems: [OrderItem!]!
   price: Float!
   stock: Int!
   title: String!
@@ -91,6 +131,8 @@ type Query {
   cart(id: Int!): Cart!
   categories: [Category!]!
   category(id: Int!): Category!
+  order(id: Int!): Order!
+  orders: [Order!]!
   product(id: Int!): Product!
   products: [Product!]!
   sayHello: String!
@@ -103,6 +145,14 @@ enum Role {
   VENDOR
 }
 
+"""Order Status Enum"""
+enum Status {
+  CANCELLED
+  DELIVERED
+  PENDING
+  SHIPPED
+}
+
 input UpdateCartInput {
   """Example field (placeholder)"""
   exampleField: Int
@@ -110,6 +160,12 @@ input UpdateCartInput {
 }
 
 input UpdateCategoryInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateOrderInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
@@ -128,13 +184,16 @@ type User {
   email: String!
   id: String!
   password: String!
+  payment: [PaymentMethod!]!
   role: Role!
   updatedAt: DateTime!
   username: String!
   vendor: Vendor!
+  vendors: [Vendor!]!
 }
 
 type Vendor {
+  categories: [Category!]!
   companyName: String!
   contactEmail: String!
   contactPhone: String!
@@ -147,4 +206,5 @@ type Vendor {
   rating: Float!
   updatedAt: DateTime!
   userId: User!
+  users: [User!]!
 }

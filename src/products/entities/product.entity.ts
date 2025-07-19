@@ -11,6 +11,7 @@ import {
 import { Category } from '../../categories/entities/category.entity';
 import { Vendor } from '../../users/entities/vendor.entity';
 import { CartItem } from '../../cart/entities/cart-item.entity';
+import { OrderItem } from '../../orders/entities/order-item.entity';
 
 @Entity({ name: 'products' })
 @ObjectType()
@@ -49,7 +50,11 @@ export class Product extends IdClass {
   @Field(() => Vendor)
   vendorId: Relation<Vendor>;
 
-  @OneToMany(() => CartItem, (items) => items.product)
+  @OneToMany(() => CartItem, (cartItems) => cartItems.product)
   @Field(() => [CartItem])
-  items: Relation<CartItem[]>;
+  cartItems: Relation<CartItem[]>;
+
+  @OneToMany(() => OrderItem, (orderItems) => orderItems.product)
+  @Field(() => [OrderItem])
+  orderItems: Relation<OrderItem[]>;
 }

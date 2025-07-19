@@ -19,9 +19,9 @@ export class Cart extends IdClass {
   totalPrice: number;
 
   // Relations
-  @OneToMany(() => CartItem, (items) => items.cart)
+  @OneToMany(() => CartItem, (cartItems) => cartItems.cart)
   @Field(() => [CartItem])
-  items: Relation<CartItem[]>;
+  cartItems: Relation<CartItem[]>;
 
   @OneToOne(() => User, (user) => user.cart)
   @JoinColumn()

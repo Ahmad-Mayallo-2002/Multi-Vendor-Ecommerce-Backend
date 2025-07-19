@@ -2,7 +2,9 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
+  ManyToMany,
   OneToMany,
   OneToOne,
   Relation,
@@ -12,6 +14,7 @@ import { Role } from '../../assets/enum/role.enum';
 import { Vendor } from './vendor.entity';
 import { Address } from './address.entity';
 import { Cart } from '../../cart/entities/cart.entity';
+import { PaymentMethod } from '../../orders/entities/payment.entity';
 
 @Entity({ name: 'users' })
 @ObjectType()
@@ -45,4 +48,12 @@ export class User extends IdClass {
   @OneToOne(() => Cart, (cart) => cart.user)
   @Field(() => Cart)
   cart: Relation<Cart>;
+
+  @OneToMany(() => PaymentMethod, (payment) => payment.user)
+  @Field(() => [PaymentMethod])
+  payment: Relation<PaymentMethod[]>;
+
+  @OneToMany(() => Vendor, (vendor) => vendor.users)
+  @Field(() => [Vendor])
+  vendors: Relation<Vendor[]>;
 }

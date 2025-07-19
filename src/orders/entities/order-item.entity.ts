@@ -2,11 +2,11 @@ import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../assets/IdDate.entity';
 import { Column, Entity, JoinTable, ManyToOne, Relation } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
-import { Cart } from './cart.entity';
+import { Order } from './order.entity';
 
-@Entity({ name: 'cartItems' })
+@Entity({ name: 'orderItems' })
 @ObjectType()
-export class CartItem extends IdClass {
+export class OrderItem extends IdClass {
   @Column({ type: 'int', nullable: false, default: 1 })
   @Field(() => Int)
   quantity: number;
@@ -16,12 +16,12 @@ export class CartItem extends IdClass {
   priceAtPayment: number;
 
   // Relations
-  @ManyToOne(() => Product, (product) => product.cartItems)
+  @ManyToOne(() => Product, (product) => product.orderItems)
   @JoinTable()
   @Field(() => Product)
   product: Relation<Product>;
 
-  @ManyToOne(() => Cart, (cart) => cart.cartItems)
-  @Field(() => Cart)
-  cart: Relation<Cart>;
+  @ManyToOne(() => Order, (order) => order.orderItems)
+  @Field(() => Order)
+  order: Relation<Order>;
 }

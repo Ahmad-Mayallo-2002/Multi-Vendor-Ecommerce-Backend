@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Product } from '../../products/entities/product.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 @Entity({ name: 'vendors' })
 @ObjectType()
@@ -51,4 +52,12 @@ export class Vendor extends IdClass {
   @OneToMany(() => Product, (products) => products.vendorId)
   @Field(() => [Product])
   products: Relation<Product[]>;
+
+  @OneToMany(() => User, (user) => user.vendors)
+  @Field(() => [User])
+  users: Relation<User[]>;
+
+  @OneToMany(() => Category, category => category.vendor)
+  @Field(() => [Category])
+  categories: Relation<Category[]>;
 }

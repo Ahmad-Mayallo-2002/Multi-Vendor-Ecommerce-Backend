@@ -23,7 +23,7 @@ export class AddressesResolver {
 
   // Get all addresses for a user
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => [Address], { name: 'getUserAddresses' })
   async getUserAddresses(
     @Args('userId', { type: () => String }) userId: string,
@@ -33,7 +33,7 @@ export class AddressesResolver {
 
   // Get a single address
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => Address, { name: 'getAddress' })
   async getAddress(
     @Args('addressId', { type: () => String }) addressId: string,
@@ -43,7 +43,7 @@ export class AddressesResolver {
 
   // Update address
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => Boolean, { name: 'updateAddress' })
   async updateAddress(
     @Args('addressId', { type: () => String }) addressId: string,
@@ -54,7 +54,7 @@ export class AddressesResolver {
 
   // Delete address
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => Boolean, { name: 'removeAddress' })
   async removeAddress(
     @Args('addressId', { type: () => String }) addressId: string,
@@ -64,7 +64,7 @@ export class AddressesResolver {
 
   // Create Address
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => Address, { name: 'createAddress' })
   async createAddress(@Args('input') input: CreateAddressInput) {
     return await this.addressesService.createAddress(input);

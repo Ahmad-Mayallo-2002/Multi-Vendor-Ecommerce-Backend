@@ -1,6 +1,6 @@
 import { v2 } from 'cloudinary';
 import { Injectable } from '@nestjs/common';
-import { Readable } from 'stream';
+import { FileUpload } from 'graphql-upload-ts';
 
 @Injectable()
 export class CloudinaryService {
@@ -12,17 +12,18 @@ export class CloudinaryService {
     });
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<string> {
-    return new Promise(async (resolve, reject) => {
+  async uploadFile(file: FileUpload) {
+    const { createReadStream, filename } = file;
+    const uploadResult = await new Promise<any>((resolve, reject) => {
       const stream = v2.uploader.upload_stream(
-        { folder: 'uploads/' },
-        (err, result) => {
-          if (err) return reject(err);
-          resolve(result?.secure_url as string);
+        { folder: 'uploads' },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
         },
       );
-
-      Readable.from(file.buffer).pipe(stream);
+      createReadStream().pipe(stream);
     });
+    return uploadResult;
   }
 }

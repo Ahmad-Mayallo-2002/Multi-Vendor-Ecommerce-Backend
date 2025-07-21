@@ -3,13 +3,13 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 @InputType()
 export class LoginInput {
-  @Field(() => String)
+  @Field()
   @IsNotEmpty()
   @IsString()
   @IsEmail()
   email: string;
 
-  @Field(() => String)
+  @Field()
   @IsNotEmpty()
   @IsString()
   password: string;

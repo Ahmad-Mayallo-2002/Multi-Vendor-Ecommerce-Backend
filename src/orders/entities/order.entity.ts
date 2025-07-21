@@ -10,12 +10,15 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
-import { PaymentMethod } from './payment.entity';
+import { PaymentMethod } from '../../payment-method/entities/payment-method.entity';
+import { Address } from '../../addresses/entities/address.entity';
+
+// Search Scalar To Split Float Number
 
 @Entity({ name: 'orders' })
 @ObjectType()
 export class Order extends IdClass {
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'decimal' })
   @Field(() => Float)
   totalPrice: number;
 
@@ -32,4 +35,9 @@ export class Order extends IdClass {
   @OneToOne(() => PaymentMethod, (payment) => payment.order)
   @Field(() => PaymentMethod)
   payment: Relation<Order>;
+
+  @OneToOne(() => Address, (address) => address.order)
+  @JoinColumn()
+  @Field(() => Address)
+  address: Relation<Address>;
 }

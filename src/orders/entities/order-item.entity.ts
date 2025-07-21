@@ -4,14 +4,16 @@ import { Column, Entity, JoinTable, ManyToOne, Relation } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Order } from './order.entity';
 
+// Scalar
+
 @Entity({ name: 'orderItems' })
 @ObjectType()
 export class OrderItem extends IdClass {
-  @Column({ type: 'int', nullable: false, default: 1 })
+  @Column({ type: 'int', default: 1 })
   @Field(() => Int)
   quantity: number;
 
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'decimal' })
   @Field(() => Float)
   priceAtPayment: number;
 

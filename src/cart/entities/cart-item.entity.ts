@@ -1,23 +1,24 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../assets/IdDate.entity';
-import { Column, Entity, JoinTable, ManyToOne, Relation } from 'typeorm';
+import { Column, Entity, ManyToOne, Relation } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Cart } from './cart.entity';
+
+// Scalar
 
 @Entity({ name: 'cartItems' })
 @ObjectType()
 export class CartItem extends IdClass {
-  @Column({ type: 'int', nullable: false, default: 1 })
+  @Column({ type: 'int', default: 1 })
   @Field(() => Int)
   quantity: number;
 
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'decimal' })
   @Field(() => Float)
   priceAtPayment: number;
 
   // Relations
   @ManyToOne(() => Product, (product) => product.cartItems)
-  @JoinTable()
   @Field(() => Product)
   product: Relation<Product>;
 

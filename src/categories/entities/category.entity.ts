@@ -1,17 +1,24 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { IdClass } from '../../assets/IdDate.entity';
-import { Column, Entity, ManyToOne, OneToMany, Relation } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Relation,
+} from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
-import { Vendor } from '../../users/entities/vendor.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'categories' })
 @ObjectType()
 export class Category extends IdClass {
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255 })
   @Field()
   name: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text' })
   @Field()
   description: string;
 
@@ -20,7 +27,7 @@ export class Category extends IdClass {
   @Field(() => [Product])
   products: Relation<Product[]>;
 
-  @ManyToOne(() => Vendor, (vendor) => vendor.categories)
-  @Field(() => Vendor)
-  vendor: Relation<Vendor>;
+  @ManyToOne(() => User, (user) => user.categories)
+  @JoinColumn()
+  user: Relation<User>;
 }

@@ -2,11 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AccessToken {
+  id: String!
+  role: Role!
+  token: String!
+}
+
 type Address {
   city: String!
   country: String!
   createdAt: DateTime!
   id: String!
+  order: Order!
   state: String!
   updatedAt: DateTime!
   user: User!
@@ -38,27 +45,65 @@ type Category {
   name: String!
   products: [Product!]!
   updatedAt: DateTime!
-  vendor: Vendor!
+}
+
+input CreateAddressInput {
+  city: String!
+  country: String!
+  state: String!
+  userId: String!
 }
 
 input CreateCartInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  totalPrice: Float!
 }
 
 input CreateCategoryInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  description: String!
+  name: String!
+  user: String!
+}
+
+input CreateFollowingInput {
+  userId: String!
+  vendorId: String!
 }
 
 input CreateOrderInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  totalPrice: Float!
+}
+
+input CreatePaymentMethodInput {
+  method: Payment!
+  orderId: String!
+  totalPrice: Float!
+  userId: String!
 }
 
 input CreateProductInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  categoryId: String!
+  description: String!
+  discount: Float!
+  image: String!
+  price: Float!
+  stock: Int!
+  title: String!
+  vendorId: String!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  role: Role! = USER
+  username: String!
+}
+
+input CreateVendorInput {
+  companyName: String!
+  contactEmail: String!
+  contactPhone: String!
+  description: String!
+  isApproved: Boolean!
 }
 
 """
@@ -66,22 +111,59 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Following {
+  createdAt: DateTime!
+  id: String!
+  updatedAt: DateTime!
+  user: User!
+  userId: String!
+  vendor: Vendor!
+  vendorId: String!
+}
+
+type FollowingsAndCount {
+  count: Int!
+  followings: [Following!]!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
 type Mutation {
+  addFollowing(input: CreateFollowingInput!): Following!
+  cancelFollowing(vendorId: String!): Boolean!
+  createAddress(createAddressInput: CreateAddressInput!): Address!
   createCart(createCartInput: CreateCartInput!): Cart!
-  createCategory(createCategoryInput: CreateCategoryInput!): Category!
+  createCategory(input: CreateCategoryInput!): Category!
   createOrder(createOrderInput: CreateOrderInput!): Order!
-  createProduct(createProductInput: CreateProductInput!): Product!
+  createPaymentMethod(createPaymentMethodInput: CreatePaymentMethodInput!): PaymentMethod!
+  createProduct(image: Upload!, input: CreateProductInput!): Product!
+  login(input: LoginInput!): AccessToken!
+  removeAddress(id: Int!): Address!
   removeCart(id: Int!): Cart!
-  removeCategory(id: Int!): Category!
+  removeCategory(categoryId: String!): Boolean!
   removeOrder(id: Int!): Order!
-  removeProduct(id: Int!): Product!
+  removePaymentMethod(id: Int!): PaymentMethod!
+  removeProduct(id: String!): Boolean!
+  removeUser(userId: String!): Boolean!
+  removeVendor(vendorId: String!): Boolean!
+  seedAdmin(userId: String!): String!
+  signupUser(input: CreateUserInput!): User!
+  signupVendor(logo: Upload!, user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
+  updateAddress(updateAddressInput: UpdateAddressInput!): Address!
   updateCart(updateCartInput: UpdateCartInput!): Cart!
-  updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
+  updateCategory(categoryId: String!, input: UpdateCategoryInput!): Category!
   updateOrder(updateOrderInput: UpdateOrderInput!): Order!
-  updateProduct(updateProductInput: UpdateProductInput!): Product!
+  updatePaymentMethod(updatePaymentMethodInput: UpdatePaymentMethodInput!): PaymentMethod!
+  updateProduct(id: String!, image: Upload, input: UpdateProductInput!): Product!
+  updateUser(input: UpdateUserInput!, userId: String!): Boolean!
+  updateVendor(input: UpdateVendorInput!, logo: Upload, vendorId: String!): Boolean!
 }
 
 type Order {
+  address: Address!
   createdAt: DateTime!
   id: String!
   orderItems: [OrderItem!]!
@@ -101,19 +183,26 @@ type OrderItem {
   updatedAt: DateTime!
 }
 
+"""Enum for Payment Method"""
+enum Payment {
+  CASH
+  CREDIT_CARD
+  PAYPAL
+}
+
 type PaymentMethod {
   createdAt: DateTime!
   id: String!
-  method: Status!
+  method: Payment!
   order: Order!
   totalPrice: Float!
   updatedAt: DateTime!
-  user: User!
 }
 
 type Product {
   cartItems: [CartItem!]!
   category: Category!
+  categoryId: String!
   createdAt: DateTime!
   description: String!
   discount: Float!
@@ -124,18 +213,28 @@ type Product {
   stock: Int!
   title: String!
   updatedAt: DateTime!
-  vendorId: Vendor!
+  vendor: Vendor!
 }
 
 type Query {
+  address(id: Int!): Address!
+  addresses: [Address!]!
   cart(id: Int!): Cart!
-  categories: [Category!]!
-  category(id: Int!): Category!
+  getAllUsers: [User!]!
+  getCategories: [Category!]!
+  getCategory(categoryId: String!): Category!
+  getProductById(id: String!): Product!
+  getProducts: [Product!]!
+  getProductsByCategory(category: String!): [Product!]!
+  getProductsByVendor(vendorId: String!): [Product!]!
+  getUser(userId: String!): User!
+  getUserFollowings(userId: String!): FollowingsAndCount!
+  getVendor(vendorId: String!): Vendor!
+  getVendorFollowers(vendorId: String!): FollowingsAndCount!
+  getVendors: [Vendor!]!
   order(id: Int!): Order!
   orders: [Order!]!
-  product(id: Int!): Product!
-  products: [Product!]!
-  sayHello: String!
+  paymentMethod(id: Int!): PaymentMethod!
 }
 
 """Role Enum"""
@@ -145,66 +244,90 @@ enum Role {
   VENDOR
 }
 
-"""Order Status Enum"""
-enum Status {
-  CANCELLED
-  DELIVERED
-  PENDING
-  SHIPPED
+input UpdateAddressInput {
+  city: String
+  country: String
+  id: Int!
+  state: String
+  userId: String
 }
 
 input UpdateCartInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  totalPrice: Float
 }
 
 input UpdateCategoryInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  description: String
+  name: String
+  user: String
 }
 
 input UpdateOrderInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  totalPrice: Float
+}
+
+input UpdatePaymentMethodInput {
   id: Int!
+  method: Payment
+  orderId: String
+  totalPrice: Float
+  userId: String
 }
 
 input UpdateProductInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  categoryId: String
+  description: String
+  discount: Float
+  image: String
+  price: Float
+  stock: Int
+  title: String
+  vendorId: String
 }
+
+input UpdateUserInput {
+  email: String
+  password: String
+  role: Role = USER
+  username: String
+}
+
+input UpdateVendorInput {
+  companyName: String
+  contactEmail: String
+  contactPhone: String
+  description: String
+  isApproved: Boolean
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 type User {
   addresses: [Address!]!
   cart: Cart!
   createdAt: DateTime!
   email: String!
+  followings: [Following!]
   id: String!
-  password: String!
-  payment: [PaymentMethod!]!
   role: Role!
   updatedAt: DateTime!
   username: String!
   vendor: Vendor!
-  vendors: [Vendor!]!
 }
 
 type Vendor {
-  categories: [Category!]!
   companyName: String!
   contactEmail: String!
   contactPhone: String!
   createdAt: DateTime!
   description: String!
+  followers: [Following!]
   id: String!
   isApproved: Boolean!
   logo: String!
   products: [Product!]!
   rating: Float!
   updatedAt: DateTime!
-  userId: User!
-  users: [User!]!
+  user: User
 }

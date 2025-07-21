@@ -3,52 +3,56 @@ import { IdClass } from '../../assets/IdDate.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToOne,
   OneToMany,
   Relation,
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
-import { Vendor } from '../../users/entities/vendor.entity';
 import { CartItem } from '../../cart/entities/cart-item.entity';
 import { OrderItem } from '../../orders/entities/order-item.entity';
+import { Vendor } from '../../vendors/entities/vendor.entity';
 
 @Entity({ name: 'products' })
 @ObjectType()
 export class Product extends IdClass {
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255 })
   @Field()
   title: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text' })
   @Field()
   description: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Column({ type: 'text' })
   @Field()
   image: string;
 
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'decimal' })
   @Field(() => Float)
   price: number;
 
-  @Column({ type: 'int', nullable: false, default: 1 })
+  @Column({ type: 'int', default: 1 })
   @Field(() => Int)
   stock: number;
 
-  @Column({ type: 'decimal', nullable: false, default: 0 })
+  @Column({ type: 'decimal', default: 0 })
   @Field(() => Float)
   discount: number;
 
+  @Column({ type: 'varchar', nullable: false })
+  @Field(() => String)
+  categoryId: string;
+
   // Relations
   @ManyToOne(() => Category, (category) => category.products)
-  @JoinTable()
   @Field(() => Category)
   category: Relation<Category>;
 
   @ManyToOne(() => Vendor, (vendor) => vendor.products)
   @Field(() => Vendor)
-  vendorId: Relation<Vendor>;
+  vendor: Relation<Vendor>;
 
   @OneToMany(() => CartItem, (cartItems) => cartItems.product)
   @Field(() => [CartItem])

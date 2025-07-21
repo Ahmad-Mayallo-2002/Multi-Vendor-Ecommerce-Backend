@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
+import { log } from 'console';
 import { Request } from 'express';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class AuthGuard implements CanActivate {
     if (!token)
       throw new UnauthorizedException('Token is not Found or Expired!');
     try {
-      const payload = this.jwtService.signAsync(token, {
+      const payload = this.jwtService.verifyAsync(token, {
         secret: this.configService.get('SECRET_JWT'),
       });
       request['user'] = payload;

@@ -11,10 +11,12 @@ import {
 import { CartItem } from './cart-item.entity';
 import { User } from '../../users/entities/user.entity';
 
+// Scalar
+
 @Entity({ name: 'carts' })
 @ObjectType()
 export class Cart extends IdClass {
-  @Column({ type: 'decimal', nullable: false })
+  @Column({ type: 'decimal' })
   @Field(() => Float)
   totalPrice: number;
 

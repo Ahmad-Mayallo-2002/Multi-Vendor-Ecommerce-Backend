@@ -7,7 +7,6 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
-import { Vendor } from './users/entities/vendor.entity';
 import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/entities/category.entity';
 import { ProductsModule } from './products/products.module';
@@ -16,11 +15,17 @@ import { CartModule } from './cart/cart.module';
 import { CartItem } from './cart/entities/cart-item.entity';
 import { Cart } from './cart/entities/cart.entity';
 import { AuthModule } from './auth/auth.module';
-import { Address } from './users/entities/address.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
-import { PaymentMethod } from './orders/entities/payment.entity';
+import { FollowingModule } from './following/following.module';
+import { Following } from './following/entities/following.entity';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
+import { PaymentMethod } from './payment-method/entities/payment-method.entity';
+import { AddressesModule } from './addresses/addresses.module';
+import { Address } from './addresses/entities/address.entity';
+import { VendorsModule } from './vendors/vendors.module';
+import { Vendor } from './vendors/entities/vendor.entity';
 
 @Module({
   imports: [
@@ -42,7 +47,6 @@ import { PaymentMethod } from './orders/entities/payment.entity';
       synchronize: true,
       entities: [
         User,
-        Vendor,
         Category,
         Product,
         CartItem,
@@ -50,7 +54,9 @@ import { PaymentMethod } from './orders/entities/payment.entity';
         Address,
         Order,
         OrderItem,
+        Following,
         PaymentMethod,
+        Vendor,
       ],
     }),
     UsersModule,
@@ -59,6 +65,10 @@ import { PaymentMethod } from './orders/entities/payment.entity';
     CartModule,
     AuthModule,
     OrdersModule,
+    FollowingModule,
+    PaymentMethodModule,
+    AddressesModule,
+    VendorsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

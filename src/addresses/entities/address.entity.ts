@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../assets/IdDate.entity';
-import { Column, Entity, ManyToOne, Relation } from 'typeorm';
-import { User } from './user.entity';
+import { Column, Entity, ManyToOne, OneToOne, Relation } from 'typeorm';
+import { Order } from '../../orders/entities/order.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'addresses' })
 @ObjectType()
@@ -22,4 +23,8 @@ export class Address extends IdClass {
   @ManyToOne(() => User, (user) => user.addresses)
   @Field(() => User)
   user: Relation<User>;
+
+  @OneToOne(() => Order, (order) => order.address)
+  @Field(() => Order)
+  order: Relation<Order>;
 }

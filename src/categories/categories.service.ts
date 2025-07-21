@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCategoryInput } from './dto/create-category.input';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Category } from './entities/category.entity';
 import { UpdateCategoryInput } from './dto/update-category.input';
+import { CreateCategoryInput } from './dto/create-category.input';
 
 @Injectable()
 export class CategoriesService {
-  create(createCategoryInput: CreateCategoryInput) {
-    return 'This action adds a new category';
+  constructor(
+    @InjectRepository(Category)
+    private readonly categoryRepo: Repository<Category>,
+  ) {}
+
+  async create(input: CreateCategoryInput): Promise<Category> {
+    const category = this.categoryRepo.create({
+      ...input,
+      user: { id: input.user },
+    });
+    return await this.categoryRepo.save(category);
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async findAll(): Promise<Category[]> {
+    const categories = await this.categoryRepo.find();
+    if (!categories.length) throw new NotFoundException('No Categories Here');
+    return categories;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: string): Promise<Category> {
+    const category = await this.categoryRepo.findOne({ where: { id } });
+    if (!category) throw new NotFoundException(`Category is not found`);
+    return category;
   }
 
-  update(id: number, updateCategoryInput: UpdateCategoryInput) {
-    return `This action updates a #${id} category`;
+  async update(input: UpdateCategoryInput, id: string): Promise<Category> {
+    const category = await this.findOne(id);
+    Object.assign(category, input);
+    return this.categoryRepo.save(category);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: string): Promise<Boolean> {
+    await this.findOne(id);
+    await this.categoryRepo.delete(id);
+    return true;
   }
 }

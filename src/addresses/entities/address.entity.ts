@@ -19,6 +19,10 @@ export class Address extends IdClass {
   @Field()
   state: string;
 
+  @Column({ type: 'varchar', nullable: false })
+  @Field()
+  userId: string;
+
   // Relations
   @ManyToOne(() => User, (user) => user.addresses)
   @Field(() => User)

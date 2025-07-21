@@ -48,4 +48,10 @@ export class VendorsService {
     await this.vendorRepo.save(vendor);
     return true;
   }
+
+  async approveVendor(vendorId: string, approve: boolean): Promise<string> {
+    await this.getVendor(vendorId);
+    await this.vendorRepo.update({ id: vendorId }, { isApproved: approve });
+    return approve ? 'This Vendor is Approved' : 'This Vendor is not Approved';
+  }
 }

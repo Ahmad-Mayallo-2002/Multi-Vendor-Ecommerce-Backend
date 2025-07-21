@@ -39,8 +39,4 @@ export class UsersService {
     await this.userRepo.remove(user);
     return true;
   }
-
-  async approveVendor(vendorId: string) {
-    
-  } 
 }

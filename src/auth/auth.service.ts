@@ -25,12 +25,9 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-
     @InjectRepository(Vendor)
     private readonly vendorRepo: Repository<Vendor>,
-
     private readonly jwtService: JwtService,
-
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
@@ -103,6 +100,7 @@ export class AuthService {
         role: user.role,
       },
     };
+    log(user.vendor);
     const accessToken = await this.generateAccessToken(payload);
     return {
       id: user.id,

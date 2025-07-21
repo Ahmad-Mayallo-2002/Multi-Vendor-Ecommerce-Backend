@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from '../cloudinary.service';
+import { Vendor } from '../vendors/entities/vendor.entity';
 
 @Module({
   providers: [ProductsResolver, ProductsService, JwtService, CloudinaryService],
-  imports: [TypeOrmModule.forFeature([Product])],
+  imports: [TypeOrmModule.forFeature([Product, Vendor])],
 })
 export class ProductsModule {}

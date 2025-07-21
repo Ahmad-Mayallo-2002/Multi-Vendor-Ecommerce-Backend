@@ -9,12 +9,15 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+import { CurrentProductGuard } from './guards/currentProduct.guard';
+import { ProductOwnerGuard } from './guards/productOwner.guard';
+import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
 
 @Resolver(() => Product)
 export class ProductsResolver {
   constructor(private readonly productsService: ProductsService) {}
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, VendorIsApprovedGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Product, { name: 'createProduct' })
   async createProduct(
@@ -43,12 +46,13 @@ export class ProductsResolver {
     return this.productsService.getAllByVendor(vendorId);
   }
 
+  @UseGuards(CurrentProductGuard)
   @Query(() => Product, { name: 'getProductById' })
   async product(@Args('id') id: string): Promise<Product> {
     return this.productsService.getById(id);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, CurrentProductGuard, VendorIsApprovedGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Product, { name: 'updateProduct' })
   async updateProduct(
@@ -60,7 +64,7 @@ export class ProductsResolver {
     return this.productsService.update(input, id, image);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, CurrentProductGuard, VendorIsApprovedGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Boolean, { name: 'removeProduct' })
   async deleteProduct(@Args('id') id: string): Promise<boolean> {

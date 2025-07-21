@@ -26,6 +26,8 @@ import { AddressesModule } from './addresses/addresses.module';
 import { Address } from './addresses/entities/address.entity';
 import { VendorsModule } from './vendors/vendors.module';
 import { Vendor } from './vendors/entities/vendor.entity';
+import { log } from 'console';
+import { ErrorResponse } from './assets/types/error.type';
 
 @Module({
   imports: [
@@ -34,6 +36,14 @@ import { Vendor } from './vendors/entities/vendor.entity';
       playground: true,
       sortSchema: true,
       autoSchemaFile: 'src/schema.gpl',
+      formatError: (error) => {
+        const originalError = error?.extensions?.originalError as ErrorResponse;
+        return {
+          message: originalError?.message || error.message,
+          statusCode: originalError?.statusCode || 500,
+          error: originalError?.error || 'Internal Server Error',
+        };
+      },
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({

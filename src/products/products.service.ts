@@ -77,7 +77,6 @@ export class ProductsService {
   }
 
   async delete(id: string): Promise<boolean> {
-    await this.getById(id);
     await this.productRepo.delete(id);
     return true;
   }

@@ -31,7 +31,7 @@ export class Vendor extends IdClass {
   @Field()
   contactPhone: string;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   @Field(() => Boolean)
   isApproved: boolean;
 

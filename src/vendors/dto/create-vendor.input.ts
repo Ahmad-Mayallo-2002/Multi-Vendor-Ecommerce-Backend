@@ -29,8 +29,4 @@ export class CreateVendorInput {
   @IsString()
   @MaxLength(255)
   contactPhone: string;
-
-  @Field(() => Boolean)
-  @IsBoolean()
-  isApproved: boolean;
 }

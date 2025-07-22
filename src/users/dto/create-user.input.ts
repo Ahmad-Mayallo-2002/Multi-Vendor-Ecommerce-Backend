@@ -29,9 +29,4 @@ export class CreateUserInput {
   @IsString()
   @Length(8, 20)
   password: string;
-
-  @Field(() => Role, { defaultValue: Role.USER })
-  @IsNotEmpty()
-  @IsEnum(Role)
-  role: Role;
 }

@@ -16,7 +16,13 @@ import { User } from '../../users/entities/user.entity';
 @Entity({ name: 'carts' })
 @ObjectType()
 export class Cart extends IdClass {
-  @Column({ type: 'decimal' })
+  @Column({
+    type: 'decimal',
+    transformer: {
+      to: (value: number) => Math.round(value * 100),
+      from: (value: number) => value / 100,
+    },
+  })
   @Field(() => Float)
   totalPrice: number;
 

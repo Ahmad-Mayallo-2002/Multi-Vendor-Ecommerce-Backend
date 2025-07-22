@@ -26,8 +26,8 @@ import { AddressesModule } from './addresses/addresses.module';
 import { Address } from './addresses/entities/address.entity';
 import { VendorsModule } from './vendors/vendors.module';
 import { Vendor } from './vendors/entities/vendor.entity';
-import { log } from 'console';
 import { ErrorResponse } from './assets/types/error.type';
+import { PriceScalar } from './scalars/totalPrice.scalar';
 
 @Module({
   imports: [
@@ -81,6 +81,6 @@ import { ErrorResponse } from './assets/types/error.type';
     VendorsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PriceScalar],
 })
 export class AppModule {}

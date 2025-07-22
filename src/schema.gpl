@@ -88,7 +88,6 @@ input CreateProductInput {
 input CreateUserInput {
   email: String!
   password: String!
-  role: Role! = USER
   username: String!
 }
 
@@ -97,7 +96,6 @@ input CreateVendorInput {
   contactEmail: String!
   contactPhone: String!
   description: String!
-  isApproved: Boolean!
 }
 
 """
@@ -208,6 +206,7 @@ type Product {
   title: String!
   updatedAt: DateTime!
   vendor: Vendor!
+  vendorId: String!
 }
 
 type Query {
@@ -285,7 +284,6 @@ input UpdateProductInput {
 input UpdateUserInput {
   email: String
   password: String
-  role: Role = USER
   username: String
 }
 
@@ -320,3 +318,6 @@ type Vendor {
   updatedAt: DateTime!
   user: User
 }
+
+"""Total Price Scalar Stores as Cents"""
+scalar price

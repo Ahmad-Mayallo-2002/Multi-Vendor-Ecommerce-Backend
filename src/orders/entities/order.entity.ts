@@ -19,7 +19,13 @@ import { Status } from '../../assets/enum/order-status.enum';
 @Entity({ name: 'orders' })
 @ObjectType()
 export class Order extends IdClass {
-  @Column({ type: 'decimal' })
+  @Column({
+    type: 'decimal',
+    transformer: {
+      to: (value: number) => Math.round(value * 100),
+      from: (value: number) => value / 100,
+    },
+  })
   @Field(() => Float)
   totalPrice: number;
 
@@ -27,7 +33,7 @@ export class Order extends IdClass {
   @Field()
   userId: string;
 
-  @Column({type: "enum", enum: Status, default: Status.PENDING})
+  @Column({ type: 'enum', enum: Status, default: Status.PENDING })
   @Field(() => Status)
   status: Status;
 

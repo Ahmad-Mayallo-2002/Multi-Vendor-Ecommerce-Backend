@@ -45,6 +45,10 @@ export class Product extends IdClass {
   @Field(() => String)
   categoryId: string;
 
+  @Column({ type: 'varchar', nullable: false })
+  @Field(() => String)
+  vendorId: string;
+
   // Relations
   @ManyToOne(() => Category, (category) => category.products)
   @Field(() => Category)

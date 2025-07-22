@@ -13,7 +13,13 @@ export class CartItem extends IdClass {
   @Field(() => Int)
   quantity: number;
 
-  @Column({ type: 'decimal' })
+  @Column({
+    type: 'decimal',
+    transformer: {
+      to: (value: number) => Math.round(value * 100),
+      from: (value: number) => value / 100,
+    },
+  })
   @Field(() => Float)
   priceAtPayment: number;
 

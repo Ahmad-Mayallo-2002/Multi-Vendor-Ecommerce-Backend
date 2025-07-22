@@ -20,6 +20,10 @@ export class Cart extends IdClass {
   @Field(() => Float)
   totalPrice: number;
 
+  @Column({ type: 'varchar', nullable: false })
+  @Field()
+  userId: string;
+
   // Relations
   @OneToMany(() => CartItem, (cartItems) => cartItems.cart)
   @Field(() => [CartItem])

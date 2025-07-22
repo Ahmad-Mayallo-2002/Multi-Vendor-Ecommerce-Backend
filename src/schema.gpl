@@ -27,6 +27,7 @@ type Cart {
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!
+  userId: String!
 }
 
 type CartItem {
@@ -55,10 +56,6 @@ input CreateAddressInput {
   userId: String!
 }
 
-input CreateCartInput {
-  totalPrice: Float!
-}
-
 input CreateCategoryInput {
   description: String!
   name: String!
@@ -68,10 +65,6 @@ input CreateCategoryInput {
 input CreateFollowingInput {
   userId: String!
   vendorId: String!
-}
-
-input CreateOrderInput {
-  totalPrice: Float!
 }
 
 input CreatePaymentMethodInput {
@@ -137,16 +130,14 @@ type Mutation {
   approveVendor(approve: Boolean!, vendorId: String!): String!
   cancelFollowing(vendorId: String!): Boolean!
   createAddress(input: CreateAddressInput!): Address!
-  createCart(createCartInput: CreateCartInput!): Cart!
   createCategory(input: CreateCategoryInput!): Category!
-  createOrder(createOrderInput: CreateOrderInput!): Order!
   createPaymentMethod(createPaymentMethodInput: CreatePaymentMethodInput!): PaymentMethod!
   createProduct(image: Upload!, input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
   removeAddress(addressId: String!): Boolean!
-  removeCart(id: Int!): Cart!
+  removeCart(userId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
-  removeOrder(id: Int!): Order!
+  removeOrder(id: String!): Boolean!
   removePaymentMethod(id: Int!): PaymentMethod!
   removeProduct(id: String!): Boolean!
   removeUser(userId: String!): Boolean!
@@ -155,9 +146,8 @@ type Mutation {
   signupUser(input: CreateUserInput!): User!
   signupVendor(logo: Upload!, user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
   updateAddress(addressId: String!, input: UpdateAddressInput!): Boolean!
-  updateCart(updateCartInput: UpdateCartInput!): Cart!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): Category!
-  updateOrder(updateOrderInput: UpdateOrderInput!): Order!
+  updateOrderStatus(id: String!, status: Status!): Boolean!
   updatePaymentMethod(updatePaymentMethodInput: UpdatePaymentMethodInput!): PaymentMethod!
   updateProduct(id: String!, image: Upload, input: UpdateProductInput!): Product!
   updateUser(input: UpdateUserInput!, userId: String!): Boolean!
@@ -170,9 +160,11 @@ type Order {
   id: String!
   orderItems: [OrderItem!]!
   payment: PaymentMethod!
+  status: Status!
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!
+  userId: String!
 }
 
 type OrderItem {
@@ -219,24 +211,27 @@ type Product {
 }
 
 type Query {
-  cart(id: Int!): Cart!
   getAddress(addressId: String!): Address!
   getAddresses: [Address!]!
+  getAllCarts: [Cart!]!
+  getAllOrders: [Order!]!
   getAllUsers: [User!]!
+  getCart(id: String!): Cart!
   getCategories: [Category!]!
   getCategory(categoryId: String!): Category!
   getProductById(id: String!): Product!
   getProducts: [Product!]!
   getProductsByCategory(category: String!): [Product!]!
   getProductsByVendor(vendorId: String!): [Product!]!
+  getSingleOrder(id: String!): Order!
   getUser(userId: String!): User!
   getUserAddresses(userId: String!): [Address!]!
+  getUserCart(userId: String!): Cart!
   getUserFollowings(userId: String!): FollowingsAndCount!
+  getUserOrders(userId: String!): [Order!]!
   getVendor(vendorId: String!): Vendor!
   getVendorFollowers(vendorId: String!): FollowingsAndCount!
   getVendors: [Vendor!]!
-  order(id: Int!): Order!
-  orders: [Order!]!
   paymentMethod(id: Int!): PaymentMethod!
 }
 
@@ -247,6 +242,14 @@ enum Role {
   VENDOR
 }
 
+"""Order Status Enum"""
+enum Status {
+  CANCELLED
+  DELIVERED
+  PENDING
+  SHIPPED
+}
+
 input UpdateAddressInput {
   city: String
   country: String
@@ -254,18 +257,10 @@ input UpdateAddressInput {
   userId: String
 }
 
-input UpdateCartInput {
-  totalPrice: Float
-}
-
 input UpdateCategoryInput {
   description: String
   name: String
   user: String
-}
-
-input UpdateOrderInput {
-  totalPrice: Float
 }
 
 input UpdatePaymentMethodInput {

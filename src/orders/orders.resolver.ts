@@ -3,33 +3,58 @@ import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { CreateOrderInput } from './dto/create-order.input';
 import { UpdateOrderInput } from './dto/update-order.input';
+import { Status } from '../assets/enum/order-status.enum';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { Role } from '../assets/enum/role.enum';
+import { RolesGuard } from '../auth/guards/role.guard';
 
 @Resolver(() => Order)
 export class OrdersResolver {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Mutation(() => Order)
-  createOrder(@Args('createOrderInput') createOrderInput: CreateOrderInput) {
-    return this.ordersService.create(createOrderInput);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Query(() => [Order], { name: 'getAllOrders' })
+  async getAllOrders(): Promise<Order[]> {
+    return await this.ordersService.getAllOrders();
   }
 
-  @Query(() => [Order], { name: 'orders' })
-  findAll() {
-    return this.ordersService.findAll();
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Query(() => [Order], { name: 'getUserOrders' })
+  async getUserOrders(
+    @Args('userId', { type: () => String }) userId: string,
+  ): Promise<Order[]> {
+    return await this.ordersService.getUserOrders(userId);
   }
 
-  @Query(() => Order, { name: 'order' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.ordersService.findOne(id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Query(() => Order, { name: 'getSingleOrder' })
+  async getSingleOrder(
+    @Args('id', { type: () => String }) id: string,
+  ): Promise<Order> {
+    return await this.ordersService.getSingleOrder(id);
   }
 
-  @Mutation(() => Order)
-  updateOrder(@Args('updateOrderInput') updateOrderInput: UpdateOrderInput) {
-    return this.ordersService.update(updateOrderInput.id, updateOrderInput);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Mutation(() => Boolean, { name: 'updateOrderStatus' })
+  async updateOrderStatus(
+    @Args('id', { type: () => String }) id: string,
+    @Args('status', { type: () => Status }) status: Status,
+  ): Promise<boolean> {
+    return await this.ordersService.updateOrderStatus(id, status);
   }
 
-  @Mutation(() => Order)
-  removeOrder(@Args('id', { type: () => Int }) id: number) {
-    return this.ordersService.remove(id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Mutation(() => Boolean, { name: 'removeOrder' })
+  async removeOrder(
+    @Args('id', { type: () => String }) id: string,
+  ): Promise<boolean> {
+    return await this.ordersService.removeOrder(id);
   }
 }

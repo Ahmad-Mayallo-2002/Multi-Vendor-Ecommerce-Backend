@@ -12,6 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { PaymentMethod } from '../../payment-method/entities/payment-method.entity';
 import { Address } from '../../addresses/entities/address.entity';
+import { Status } from '../../assets/enum/order-status.enum';
 
 // Search Scalar To Split Float Number
 
@@ -21,6 +22,14 @@ export class Order extends IdClass {
   @Column({ type: 'decimal' })
   @Field(() => Float)
   totalPrice: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  @Field()
+  userId: string;
+
+  @Column({type: "enum", enum: Status, default: Status.PENDING})
+  @Field(() => Status)
+  status: Status;
 
   // Relations
   @OneToMany(() => OrderItem, (orderItems) => orderItems.order)

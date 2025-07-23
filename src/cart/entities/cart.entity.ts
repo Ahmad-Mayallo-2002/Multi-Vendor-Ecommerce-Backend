@@ -11,8 +11,6 @@ import {
 import { CartItem } from './cart-item.entity';
 import { User } from '../../users/entities/user.entity';
 
-// Scalar
-
 @Entity({ name: 'carts' })
 @ObjectType()
 export class Cart extends IdClass {
@@ -31,7 +29,10 @@ export class Cart extends IdClass {
   userId: string;
 
   // Relations
-  @OneToMany(() => CartItem, (cartItems) => cartItems.cart)
+  @OneToMany(() => CartItem, (cartItems) => cartItems.cart, {
+    eager: false,
+    cascade: true,
+  })
   @Field(() => [CartItem])
   cartItems: Relation<CartItem[]>;
 

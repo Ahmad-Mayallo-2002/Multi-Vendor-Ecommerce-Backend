@@ -3,10 +3,10 @@ import { IsInt, Min, IsNumber, IsNotEmpty, IsUUID } from 'class-validator';
 
 @InputType()
 export class CreateCartItemInput {
-  @Field(() => Int)
+  @Field(() => Int, { defaultValue: 1 })
   @IsInt()
   @Min(1)
-  quantity: number;
+  quantity?: number = 1;
 
   @Field(() => Float)
   @IsNumber()
@@ -21,5 +21,5 @@ export class CreateCartItemInput {
   @Field()
   @IsNotEmpty()
   @IsUUID()
-  cartId: string;
+  userId: string;
 }

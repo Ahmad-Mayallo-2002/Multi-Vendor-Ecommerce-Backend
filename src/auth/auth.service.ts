@@ -54,6 +54,7 @@ export class AuthService {
     logoFile: FileUpload,
   ): Promise<Vendor> {
     const user = await this.signupUser({ ...userInput, role: Role.VENDOR });
+    user.role = Role.VENDOR;
     const vendor = await this.vendorRepo.findOne({
       where: [
         { companyName: vendorInput.companyName },

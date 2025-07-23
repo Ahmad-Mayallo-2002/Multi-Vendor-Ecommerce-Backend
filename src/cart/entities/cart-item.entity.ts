@@ -4,9 +4,7 @@ import { Column, Entity, ManyToOne, Relation } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Cart } from './cart.entity';
 
-// Scalar
-
-@Entity({ name: 'cartItems' })
+@Entity({ name: 'cart_items' })
 @ObjectType()
 export class CartItem extends IdClass {
   @Column({ type: 'int', default: 1 })
@@ -23,12 +21,18 @@ export class CartItem extends IdClass {
   @Field(() => Float)
   priceAtPayment: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  cartId: string;
+
+  @Column({ type: 'varchar' })
+  productId: string;
+
   // Relations
   @ManyToOne(() => Product, (product) => product.cartItems)
   @Field(() => Product)
   product: Relation<Product>;
 
-  @ManyToOne(() => Cart, (cart) => cart.cartItems)
+  @ManyToOne(() => Cart, (cart) => cart.cartItems, { onDelete: 'CASCADE' })
   @Field(() => Cart)
   cart: Relation<Cart>;
 }

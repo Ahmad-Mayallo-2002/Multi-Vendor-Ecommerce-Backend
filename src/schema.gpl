@@ -56,6 +56,13 @@ input CreateAddressInput {
   userId: String!
 }
 
+input CreateCartItemInput {
+  priceAtPayment: Float!
+  productId: String!
+  quantity: Int! = 1
+  userId: String!
+}
+
 input CreateCategoryInput {
   description: String!
   name: String!
@@ -125,8 +132,10 @@ input LoginInput {
 
 type Mutation {
   addFollowing(input: CreateFollowingInput!): Following!
+  addItemsToCart(input: CreateCartItemInput!): Cart!
   approveVendor(approve: Boolean!, vendorId: String!): String!
   cancelFollowing(vendorId: String!): Boolean!
+  clearCart(cartId: String!): Cart!
   createAddress(input: CreateAddressInput!): Address!
   createCategory(input: CreateCategoryInput!): Category!
   createPaymentMethod(createPaymentMethodInput: CreatePaymentMethodInput!): PaymentMethod!
@@ -135,6 +144,7 @@ type Mutation {
   removeAddress(addressId: String!): Boolean!
   removeCart(userId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
+  removeItemFromCart(cartId: String!, productId: String!): Boolean!
   removeOrder(id: String!): Boolean!
   removePaymentMethod(id: Int!): PaymentMethod!
   removeProduct(id: String!): Boolean!
@@ -149,7 +159,7 @@ type Mutation {
   updatePaymentMethod(updatePaymentMethodInput: UpdatePaymentMethodInput!): PaymentMethod!
   updateProduct(id: String!, image: Upload, input: UpdateProductInput!): Product!
   updateUser(input: UpdateUserInput!, userId: String!): Boolean!
-  updateVendor(approve: Boolean!, vendorId: String!): Boolean!
+  updateVendor(vendorId: String!): Boolean!
 }
 
 type Order {
@@ -158,7 +168,6 @@ type Order {
   id: String!
   orderItems: [OrderItem!]!
   payment: PaymentMethod!
-  status: Status!
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!

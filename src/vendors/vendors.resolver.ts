@@ -48,7 +48,6 @@ export class VendorsResolver {
 
   @Mutation(() => String, { name: 'approveVendor' })
   @Roles(Role.SUPER_ADMIN)
-  @Mutation(() => Boolean, { name: 'updateVendor' })
   async approveVendor(
     @Args('vendorId', { type: () => String }) vendorId: string,
     @Args('approve', { type: () => Boolean }) approve: boolean,

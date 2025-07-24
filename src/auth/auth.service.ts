@@ -19,6 +19,7 @@ import { FileUpload } from 'graphql-upload-ts';
 import { log } from 'console';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
+import { Cart } from '../cart/entities/cart.entity';
 
 @Injectable()
 export class AuthService {
@@ -27,11 +28,12 @@ export class AuthService {
     private readonly userRepo: Repository<User>,
     @InjectRepository(Vendor)
     private readonly vendorRepo: Repository<Vendor>,
+    @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
     private readonly jwtService: JwtService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async signupUser(input: CreateUserInput): Promise<User> {
+  async signupUser(input: CreateUserInput, role?: Role): Promise<User> {
     const existingUser = await this.userRepo.findOne({
       where: { email: input.email },
     });
@@ -43,18 +45,22 @@ export class AuthService {
     const user = this.userRepo.create({
       ...input,
       password: hashedPassword,
+      role: role ?? Role.USER,
     });
 
-    return this.userRepo.save(user);
+    const newUser = await this.userRepo.save(user);
+
+    const newCart = this.cartRepo.create({ userId: newUser.id, totalPrice: 0 });
+
+    await this.cartRepo.save(newCart);
+
+    return newUser;
   }
 
   async signupVendor(
     userInput: CreateUserInput,
     vendorInput: CreateVendorInput,
-    logoFile: FileUpload,
   ): Promise<Vendor> {
-    const user = await this.signupUser({ ...userInput, role: Role.VENDOR });
-    user.role = Role.VENDOR;
     const vendor = await this.vendorRepo.findOne({
       where: [
         { companyName: vendorInput.companyName },
@@ -67,11 +73,16 @@ export class AuthService {
         'Vendor with the same company name, email, or phone already exists',
       );
 
-    const fileUrl = await this.cloudinaryService.uploadFile(logoFile);
+    const user = await this.signupUser(userInput, Role.VENDOR);
+
+    const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
+      await vendorInput.logo,
+    );
     const newVendor = this.vendorRepo.create({
       ...vendorInput,
-      logo: fileUrl.secure_url,
+      logo: secure_url,
       user,
+      public_id,
     });
     return await this.vendorRepo.save(newVendor);
   }
@@ -101,7 +112,6 @@ export class AuthService {
         role: user.role,
       },
     };
-    log(user.vendor);
     const accessToken = await this.generateAccessToken(payload);
     return {
       id: user.id,

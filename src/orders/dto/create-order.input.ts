@@ -1,21 +1,8 @@
-import { Field, Float, InputType } from '@nestjs/graphql';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsPositive,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { InputType } from '@nestjs/graphql';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 @InputType()
 export class CreateOrderInput {
-  @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  @Field(() => Float)
-  totalPrice: number;
-
   @IsNotEmpty()
   @IsUUID()
   @IsString()

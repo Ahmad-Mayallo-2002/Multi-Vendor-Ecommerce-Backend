@@ -51,8 +51,11 @@ export class AddressesService {
     return true;
   }
 
-  async createAddress(input: CreateAddressInput) {
-    const address = this.addressRepo.create(input);
+  async createAddress(input: CreateAddressInput, userId: string) {
+    const address = this.addressRepo.create({
+      ...input,
+      userId,
+    });
     return await this.addressRepo.save(address);
   }
 }

@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { FileUpload } from 'graphql-upload-ts';
 import { CloudinaryService } from '../cloudinary.service';
+import { v2 } from 'cloudinary';
 
 @Injectable()
 export class ProductsService {
@@ -15,14 +16,14 @@ export class ProductsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async create(input: CreateProductInput, image: FileUpload) {
-    const { secure_url } = await this.cloudinaryService.uploadFile(image);
-    input.image = secure_url;
+  async createProduct(input: CreateProductInput) {
+    const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
+      await input.image,
+    );
     const product = this.productRepo.create({
       ...input,
       image: secure_url,
-      category: { id: input.categoryId },
-      vendor: { id: input.vendorId },
+      public_id,
     });
     return await this.productRepo.save(product);
   }
@@ -33,14 +34,8 @@ export class ProductsService {
     return products;
   }
 
-  async getAllByCategory(category: string) {
-    const products = await this.productRepo.find({
-      where: {
-        category: {
-          name: category,
-        },
-      },
-    });
+  async getAllByCategoryId(categoryId: string) {
+    const products = await this.productRepo.find({ where: { categoryId } });
     if (!products.length)
       throw new NotFoundException('No Products from this Category');
     return products;
@@ -61,23 +56,25 @@ export class ProductsService {
     return product;
   }
 
-  async update(
-    input: UpdateProductInput,
-    productId: string,
-    image?: FileUpload,
-  ): Promise<Product> {
+  async update(input: UpdateProductInput, productId: string): Promise<Product> {
     const existing = await this.getById(productId);
-    if (!input && !image) throw new Error('You Can not Send Empty Data');
-    if (image) {
-      const { secure_url } = await this.cloudinaryService.uploadFile(image);
+    if (!input) throw new Error('You Can not Send Empty Data');
+    if (input.image) {
+      v2.api.delete_resources([existing.public_id]);
+      const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
+        await input.image,
+      );
       input.image = secure_url;
+      existing.public_id = public_id;
     }
-    const updated = this.productRepo.merge(existing, input);
+    const updated = this.productRepo.merge(existing, input.data);
     return await this.productRepo.save(updated);
   }
 
   async delete(id: string): Promise<boolean> {
+    const product = await this.getById(id);
     await this.productRepo.delete(id);
+    v2.api.delete_resources([product.public_id]);
     return true;
   }
 }

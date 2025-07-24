@@ -11,7 +11,6 @@ import {
 @InputType()
 export class CreateOrderItemInput {
   @IsInt()
-  @IsNumber()
   @Min(1)
   @Field(() => Int)
   quantity: number;
@@ -30,5 +29,5 @@ export class CreateOrderItemInput {
   @IsNotEmpty()
   @IsUUID()
   @Field(() => String)
-  orderId: string;
+  userId: string;
 }

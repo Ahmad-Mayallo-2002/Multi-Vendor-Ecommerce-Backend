@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateVendorInput } from './dto/update-vendor.input';
-import { FileUpload } from 'graphql-upload-ts';
+import { UpdateVendorInput, UpdateVendorInputData } from './dto/update-vendor.input';
 import { CloudinaryService } from '../cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
 import { Repository } from 'typeorm';
+import { v2 } from 'cloudinary';
 
 @Injectable()
 export class VendorsService {
@@ -29,20 +29,24 @@ export class VendorsService {
   }
 
   async deleteVendor(id: string): Promise<boolean> {
-    await this.getVendor(id);
+    const vendor = await this.getVendor(id);
+    v2.api.delete_resources([vendor.public_id]);
     await this.vendorRepo.delete(id);
     return true;
   }
 
   async updateVendor(
     id: string,
-    input: UpdateVendorInput,
-    logoFile?: FileUpload,
+    input: UpdateVendorInputData,
   ): Promise<boolean> {
     const vendor = await this.getVendor(id);
-    if (logoFile) {
-      const secure_url = await this.cloudinaryService.uploadFile(logoFile);
+    if (input.logo) {
+      v2.api.delete_resources([vendor.public_id]);
+      const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
+        await input.logo,
+      );
       input.logo = secure_url;
+      vendor.public_id = public_id;
     }
     Object.assign(vendor, input);
     await this.vendorRepo.save(vendor);

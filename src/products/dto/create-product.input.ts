@@ -7,6 +7,7 @@ import {
   Min,
   IsInt,
 } from 'class-validator';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 @InputType()
 export class CreateProductInput {
@@ -21,9 +22,8 @@ export class CreateProductInput {
   @IsNotEmpty()
   description: string;
 
-  @Field(() => String)
-  @IsString()
-  image: string;
+  @Field(() => GraphQLUpload)
+  image: Promise<FileUpload>;
 
   @Field(() => Float)
   @IsNumber()

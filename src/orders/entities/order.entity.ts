@@ -32,6 +32,10 @@ export class Order extends IdClass {
   @Field()
   userId: string;
 
+  @Column({ type: 'varchar', nullable: false })
+  @Field()
+  addressId: string;
+
   // Relations
   @OneToMany(() => OrderItem, (orderItems) => orderItems.order)
   @Field(() => [OrderItem])

@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
-import { Status } from '../assets/enum/order-status.enum';
+import { Cart } from '../cart/entities/cart.entity';
+import { CreateOrderInput } from './dto/create-order.input';
 
 @Injectable()
 export class OrdersService {
@@ -13,6 +12,7 @@ export class OrdersService {
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
+    @InjectRepository(Cart) cartRepo: Repository<Cart>
   ) {}
 
   async getAllOrders(): Promise<Order[]> {
@@ -34,10 +34,9 @@ export class OrdersService {
     return order;
   }
 
-  async updateOrderStatus(id: string, status: Status): Promise<boolean> {
-    await this.getSingleOrder(id);
-    await this.orderRepo.update(id, { status });
-    return true;
+  async createOrder(input: CreateOrderInput): Promise<Order> {
+    const order =  this.orderRepo.create();
+    return await this.orderRepo.save(order);
   }
 
   async removeOrder(id: string): Promise<boolean> {

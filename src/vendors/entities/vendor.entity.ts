@@ -43,6 +43,10 @@ export class Vendor extends IdClass {
   @Field()
   logo: string;
 
+  @Column({ type: 'text', nullable: true })
+  @Field()
+  public_id: string;
+
   // Relations
   @OneToOne(() => User, (user) => user.vendor, { onDelete: 'CASCADE' })
   @JoinColumn()
@@ -54,6 +58,6 @@ export class Vendor extends IdClass {
   products: Relation<Product[]>;
 
   @OneToMany(() => Following, (following) => following.vendor)
-  @Field(() => [Following], { nullable: true })
+  @Field(() => [Following])
   followers: Relation<Following[]>;
 }

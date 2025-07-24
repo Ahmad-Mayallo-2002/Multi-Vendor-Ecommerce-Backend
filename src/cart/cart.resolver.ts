@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { CartService } from './cart.service';
 import { Cart } from './entities/cart.entity';
 import { UseGuards } from '@nestjs/common';
@@ -7,6 +7,8 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { CreateCartItemInput } from './dto/create-cart-item.input';
+import { CartItem } from './entities/cart-item.entity';
+import { UpdateCartItemInput } from './dto/update-cart-item.input';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -22,10 +24,9 @@ export class CartResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => Cart, { name: 'getUserCart' })
-  async getUserCart(
-    @Args('userId', { type: () => String }) userId: string,
-  ): Promise<Cart> {
-    return await this.cartService.getUserCart(userId);
+  async getUserCart(@Context() context: any): Promise<Cart> {
+    const { sub } = await context.req.user;
+    return await this.cartService.getUserCart(sub.userId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -37,32 +38,29 @@ export class CartResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'removeCart' })
-  async removeCart(@Args('userId', { type: () => String }) userId: string) {
-    return await this.cartService.removeCart(userId);
-  }
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Cart, { name: 'addItemsToCart' })
-  async addItemsToCart(@Args('input') input: CreateCartItemInput) {
-    return await this.cartService.addItemsToUserCart(input);
-  }
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Cart, { name: 'clearCart' })
-  async clearCart(@Args('cartId', { type: () => String }) cartId: string) {
-    return await this.cartService.clearCart(cartId);
+  @Mutation(() => CartItem, { name: 'addItemToCart' })
+  async addItemToCart(
+    @Context() context: any,
+    @Args('input') input: CreateCartItemInput,
+  ): Promise<CartItem> {
+    const { sub } = await context.req.user;
+    return await this.cartService.addItemToCart(input, sub.userId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => Boolean, { name: 'removeItemFromCart' })
-  async removeItemFromCart(
-    @Args('cartId', { type: () => String }) cartId: string,
-    @Args('productId', { type: () => String }) productId: string,
-  ) {
-    return await this.cartService.removeItemFromCart(cartId, productId);
+  async removeItemFromCart(@Args('itemId') itemId: string): Promise<boolean> {
+    return await this.cartService.removeItemFromCart(itemId);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Mutation(() => Boolean, { name: 'updateItemCart' })
+  async updateItemCart(
+    @Args('itemId') itemId: string,
+    @Args('input') input: UpdateCartItemInput,
+  ): Promise<boolean> {
+    return await this.cartService.updateItemCart(itemId, input);
   }
 }

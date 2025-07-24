@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsString, IsNotEmpty, MaxLength, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength } from 'class-validator';
 
 @InputType()
 export class CreateAddressInput {
@@ -20,10 +20,4 @@ export class CreateAddressInput {
   @IsNotEmpty()
   @MaxLength(255)
   state: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  @IsUUID()
-  userId: string;
 }

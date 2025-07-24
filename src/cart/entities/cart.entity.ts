@@ -20,8 +20,11 @@ export class Cart extends IdClass {
       to: (value: number) => Math.round(value * 100),
       from: (value: number) => value / 100,
     },
+    scale: 2,
+    precision: 10,
+    default: 0,
   })
-  @Field(() => Float)
+  @Field(() => Float, { defaultValue: 0 })
   totalPrice: number;
 
   @Column({ type: 'varchar', nullable: false })
@@ -30,7 +33,6 @@ export class Cart extends IdClass {
 
   // Relations
   @OneToMany(() => CartItem, (cartItems) => cartItems.cart, {
-    eager: false,
     cascade: true,
   })
   @Field(() => [CartItem])
@@ -40,4 +42,5 @@ export class Cart extends IdClass {
   @JoinColumn()
   @Field(() => User)
   user: Relation<User>;
+
 }

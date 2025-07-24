@@ -1,11 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import {
-  IsString,
-  IsNotEmpty,
-  IsEmail,
-  IsBoolean,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, MaxLength } from 'class-validator';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 @InputType()
 export class CreateVendorInput {
@@ -29,4 +24,8 @@ export class CreateVendorInput {
   @IsString()
   @MaxLength(255)
   contactPhone: string;
+
+  @Field(() => GraphQLUpload)
+  @IsNotEmpty()
+  logo: Promise<FileUpload>;
 }

@@ -53,14 +53,11 @@ input CreateAddressInput {
   city: String!
   country: String!
   state: String!
-  userId: String!
 }
 
 input CreateCartItemInput {
-  priceAtPayment: Float!
   productId: String!
   quantity: Int! = 1
-  userId: String!
 }
 
 input CreateCategoryInput {
@@ -85,7 +82,7 @@ input CreateProductInput {
   categoryId: String!
   description: String!
   discount: Float!
-  image: String!
+  image: Upload!
   price: Float!
   stock: Int!
   title: String!
@@ -103,6 +100,7 @@ input CreateVendorInput {
   contactEmail: String!
   contactPhone: String!
   description: String!
+  logo: Upload!
 }
 
 """
@@ -132,38 +130,37 @@ input LoginInput {
 
 type Mutation {
   addFollowing(input: CreateFollowingInput!): Following!
-  addItemsToCart(input: CreateCartItemInput!): Cart!
+  addItemToCart(input: CreateCartItemInput!): CartItem!
   approveVendor(approve: Boolean!, vendorId: String!): String!
   cancelFollowing(vendorId: String!): Boolean!
-  clearCart(cartId: String!): Cart!
   createAddress(input: CreateAddressInput!): Address!
   createCategory(input: CreateCategoryInput!): Category!
   createPaymentMethod(createPaymentMethodInput: CreatePaymentMethodInput!): PaymentMethod!
-  createProduct(image: Upload!, input: CreateProductInput!): Product!
+  createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
   removeAddress(addressId: String!): Boolean!
-  removeCart(userId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
-  removeItemFromCart(cartId: String!, productId: String!): Boolean!
+  removeItemFromCart(itemId: String!): Boolean!
   removeOrder(id: String!): Boolean!
   removePaymentMethod(id: Int!): PaymentMethod!
   removeProduct(id: String!): Boolean!
-  removeUser(userId: String!): Boolean!
+  removeUser: Boolean!
   removeVendor(vendorId: String!): Boolean!
   seedAdmin(userId: String!): String!
   signupUser(input: CreateUserInput!): User!
   signupVendor(logo: Upload!, user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
   updateAddress(addressId: String!, input: UpdateAddressInput!): Boolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): Category!
-  updateOrderStatus(id: String!, status: Status!): Boolean!
+  updateItemCart(input: UpdateCartItemInput!, itemId: String!): Boolean!
   updatePaymentMethod(updatePaymentMethodInput: UpdatePaymentMethodInput!): PaymentMethod!
-  updateProduct(id: String!, image: Upload, input: UpdateProductInput!): Product!
-  updateUser(input: UpdateUserInput!, userId: String!): Boolean!
+  updateProduct(id: String!, input: UpdateProductInput!): Product!
+  updateUser(input: UpdateUserInput!): Boolean!
   updateVendor(vendorId: String!): Boolean!
 }
 
 type Order {
   address: Address!
+  addressId: String!
   createdAt: DateTime!
   id: String!
   orderItems: [OrderItem!]!
@@ -211,6 +208,7 @@ type Product {
   image: String!
   orderItems: [OrderItem!]!
   price: Float!
+  public_id: String!
   stock: Int!
   title: String!
   updatedAt: DateTime!
@@ -232,9 +230,9 @@ type Query {
   getProductsByCategory(category: String!): [Product!]!
   getProductsByVendor(vendorId: String!): [Product!]!
   getSingleOrder(id: String!): Order!
-  getUser(userId: String!): User!
-  getUserAddresses(userId: String!): [Address!]!
-  getUserCart(userId: String!): Cart!
+  getUser: User!
+  getUserAddresses: [Address!]!
+  getUserCart: Cart!
   getUserFollowings(userId: String!): FollowingsAndCount!
   getUserOrders(userId: String!): [Order!]!
   getVendor(vendorId: String!): Vendor!
@@ -250,19 +248,14 @@ enum Role {
   VENDOR
 }
 
-"""Order Status Enum"""
-enum Status {
-  CANCELLED
-  DELIVERED
-  PENDING
-  SHIPPED
-}
-
 input UpdateAddressInput {
   city: String
   country: String
   state: String
-  userId: String
+}
+
+input UpdateCartItemInput {
+  quantity: Int! = 1
 }
 
 input UpdateCategoryInput {
@@ -280,14 +273,17 @@ input UpdatePaymentMethodInput {
 }
 
 input UpdateProductInput {
+  data: UpdateProductInputData!
+  image: Upload
+}
+
+input UpdateProductInputData {
   categoryId: String
   description: String
   discount: Float
-  image: String
   price: Float
   stock: Int
   title: String
-  vendorId: String
 }
 
 input UpdateUserInput {
@@ -318,11 +314,12 @@ type Vendor {
   contactPhone: String!
   createdAt: DateTime!
   description: String!
-  followers: [Following!]
+  followers: [Following!]!
   id: String!
   isApproved: Boolean!
   logo: String!
   products: [Product!]!
+  public_id: String!
   rating: Float!
   updatedAt: DateTime!
   user: User

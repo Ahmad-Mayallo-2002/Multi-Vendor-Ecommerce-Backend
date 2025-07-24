@@ -1,14 +1,11 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { CreateCartItemInput } from './dto/create-cart-item.input';
 import { Product } from '../products/entities/product.entity';
+import { UpdateCartItemInput } from './dto/update-cart-item.input';
 import { log } from 'console';
 
 @Injectable()
@@ -29,6 +26,15 @@ export class CartService {
     return product;
   }
 
+  private async getCartItem(cartItemId: string): Promise<CartItem> {
+    const item = await this.cartItemRepo.findOne({
+      where: { id: cartItemId },
+      relations: ['product'],
+    });
+    if (!item) throw new NotFoundException('This Item is not Found');
+    return item;
+  }
+
   async getAllCarts(): Promise<Cart[]> {
     const carts = await this.cartRepo.find({
       relations: ['cartItems', 'cartItems.product', 'user'],
@@ -42,6 +48,7 @@ export class CartService {
       where: { userId },
       relations: ['cartItems', 'cartItems.product'],
     });
+    console.log('Get Time');
     if (!cart) throw new NotFoundException('This Cart is not Found');
     return cart;
   }
@@ -55,104 +62,71 @@ export class CartService {
     return cart;
   }
 
-  async removeCart(userId: string): Promise<boolean> {
-    await this.getUserCart(userId);
-    await this.cartRepo.delete({ userId });
+  async addItemToCart(
+    input: CreateCartItemInput,
+    userId: string,
+  ): Promise<CartItem> {
+    const product = await this.getProduct(input.productId);
+    const cart = await this.getUserCart(userId);
+    const priceAtPayment =
+      product.price * input.quantity * (1 - product.discount / 100);
+    const currentItem = await this.cartItemRepo.findOne({
+      where: { productId: input.productId },
+    });
+    if (!currentItem) {
+      const item = this.cartItemRepo.create({
+        ...input,
+        priceAtPayment,
+        cartId: cart.id,
+      });
+      cart.totalPrice = priceAtPayment;
+      await this.cartRepo.save(cart);
+      return await this.cartItemRepo.save(item);
+    } else {
+      currentItem.priceAtPayment += priceAtPayment;
+      currentItem.quantity += input.quantity;
+      cart.totalPrice += priceAtPayment;
+      await this.cartRepo.save(cart);
+      return await this.cartItemRepo.save(currentItem);
+    }
+  }
+
+  async removeItemFromCart(itemId: string): Promise<boolean> {
+    const item = await this.getCartItem(itemId);
+    const cartId = item.cartId;
+    const priceAtPayment = item.priceAtPayment;
+    await this.cartItemRepo.delete({ id: itemId });
+    const cart = await this.getCart(cartId);
+    cart.totalPrice -= priceAtPayment;
+    await this.cartRepo.save(cart);
     return true;
   }
 
-  async addItemsToUserCart(input: CreateCartItemInput): Promise<Cart> {
-    const product = await this.getProduct(input.productId);
-
-    input.quantity = input.quantity || 1;
-    if (product.stock < input.quantity)
-      throw new BadRequestException('Insufficient stock');
-
-    const priceAtPayment =
-      input.quantity * product.price * (1 - product.discount / 100);
-
-    let cart = await this.cartRepo.findOne({
-      where: { userId: input.userId },
-      relations: ['cartItems', 'cartItems.product'],
-    });
-
-    const newItem = this.cartItemRepo.create({ ...input, priceAtPayment });
-
-    product.stock -= input.quantity;
-    await this.productRepo.save(product);
-    await this.cartItemRepo.save({
-      ...newItem,
-      cartId: cart?.id,
-    });
-
-    if (!cart) {
-      cart = this.cartRepo.create({
-        userId: input.userId,
-        totalPrice: priceAtPayment,
-        cartItems: [newItem],
-      });
-    } else {
-      const index = cart.cartItems.findIndex(
-        (item) => item.productId === input.productId,
-      );
-      if (index !== -1) {
-        const existingItem = cart.cartItems[index];
-        existingItem.quantity += input.quantity;
-        existingItem.priceAtPayment =
-          existingItem.quantity *
-          (1 - existingItem.product.discount / 100) *
-          existingItem.product.price;
-
-        await this.cartItemRepo.save(existingItem);
-      } else {
-        await this.cartItemRepo.save({
-          ...newItem,
-          cartId: cart.id,
-        });
-        cart.cartItems.push(newItem);
-      }
-      cart.totalPrice = cart.cartItems.reduce(
-        (sum, item) =>
-          sum + item.quantity * product.price * (1 - product.discount / 100),
-        0,
-      );
-    }
-
-    return await this.cartRepo.save(cart);
-  }
-
-  async clearCart(cartId: string): Promise<Cart> {
-    const cart = await this.getCart(cartId);
-    if (!cart.cartItems.length) throw new BadRequestException('Cart is Empty');
-
-    const cartItems = cart.cartItems;
-    for (let i = 0; i < cartItems.length; i++) {
-      const product = await this.getProduct(cartItems[i].productId);
-      product.stock += cartItems[i].quantity;
-      await this.productRepo.save(product);
-    }
-    cart.totalPrice = 0;
-    cart.cartItems = [];
-    return await this.cartRepo.save(cart);
-  }
-
-  async removeItemFromCart(
-    cartId: string,
-    productId: string,
+  async updateItemCart(
+    itemId: string,
+    input: UpdateCartItemInput,
   ): Promise<boolean> {
-    const cart = await this.getCart(cartId);
-    const product = await this.getProduct(productId);
-
-    const item = await this.cartItemRepo.findOne({ where: { productId } });
-    if (!item) throw new NotFoundException('Item is not Found');
-
-    product.stock += item.quantity;
-    cart.cartItems = cart.cartItems.filter(
-      (item) => item.productId !== productId,
+    const item = await this.getCartItem(itemId);
+    item.quantity = input.quantity;
+    const priceAtPayment =
+      item.product.price * input.quantity * (1 - item.product.discount / 100);
+    item.priceAtPayment = priceAtPayment;
+    await this.cartItemRepo.save(item);
+    const cartItems = await this.cartItemRepo.find({
+      where: { cartId: item.cartId },
+      relations: ['product'],
+    });
+    let newTotalPrice: number = 0;
+    for (let i = 0; i < cartItems.length; i++) {
+      newTotalPrice +=
+        cartItems[i].quantity *
+        cartItems[i].product.price *
+        (1 - cartItems[i].product.discount / 100);
+    }
+    await this.cartRepo.update(
+      { id: item.cartId },
+      { totalPrice: newTotalPrice },
     );
-    await this.productRepo.save(product);
-    await this.cartItemRepo.delete({ productId });
-    await this.cartRepo.save(cart);
     return true;
   }
 }

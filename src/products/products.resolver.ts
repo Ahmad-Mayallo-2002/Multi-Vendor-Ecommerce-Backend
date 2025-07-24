@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput } from './dto/create-product.input';
@@ -8,10 +8,9 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
-import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { CurrentProductGuard } from './guards/currentProduct.guard';
-import { ProductOwnerGuard } from './guards/productOwner.guard';
 import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
+import { log } from 'console';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -22,9 +21,8 @@ export class ProductsResolver {
   @Mutation(() => Product, { name: 'createProduct' })
   async createProduct(
     @Args('input') input: CreateProductInput,
-    @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
   ): Promise<Product> {
-    return this.productsService.create(input, image);
+    return this.productsService.createProduct(input);
   }
 
   @Query(() => [Product], { name: 'getProducts' })
@@ -36,7 +34,7 @@ export class ProductsResolver {
   async productsByCategory(
     @Args('category') category: string,
   ): Promise<Product[]> {
-    return this.productsService.getAllByCategory(category);
+    return this.productsService.getAllByCategoryId(category);
   }
 
   @Query(() => [Product], { name: 'getProductsByVendor' })
@@ -58,10 +56,8 @@ export class ProductsResolver {
   async updateProduct(
     @Args('id') id: string,
     @Args('input') input: UpdateProductInput,
-    @Args('image', { type: () => GraphQLUpload, nullable: true })
-    image?: FileUpload,
   ): Promise<Product> {
-    return this.productsService.update(input, id, image);
+    return this.productsService.update(input, id);
   }
 
   @UseGuards(AuthGuard, RolesGuard, CurrentProductGuard, VendorIsApprovedGuard)

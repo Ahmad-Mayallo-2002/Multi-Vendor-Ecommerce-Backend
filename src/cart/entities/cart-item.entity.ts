@@ -21,7 +21,7 @@ export class CartItem extends IdClass {
   @Field(() => Float)
   priceAtPayment: number;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar' })
   cartId: string;
 
   @Column({ type: 'varchar' })

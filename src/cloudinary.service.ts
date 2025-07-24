@@ -13,7 +13,7 @@ export class CloudinaryService {
   }
 
   async uploadFile(file: FileUpload) {
-    const { createReadStream, filename } = file;
+    const { createReadStream } = file;
     const uploadResult = await new Promise<any>((resolve, reject) => {
       const stream = v2.uploader.upload_stream(
         { folder: 'uploads' },

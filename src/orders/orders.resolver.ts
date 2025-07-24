@@ -1,9 +1,6 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
-import { CreateOrderInput } from './dto/create-order.input';
-import { UpdateOrderInput } from './dto/update-order.input';
-import { Status } from '../assets/enum/order-status.enum';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { Roles } from '../auth/decorators/role.decorator';
@@ -37,16 +34,6 @@ export class OrdersResolver {
     @Args('id', { type: () => String }) id: string,
   ): Promise<Order> {
     return await this.ordersService.getSingleOrder(id);
-  }
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'updateOrderStatus' })
-  async updateOrderStatus(
-    @Args('id', { type: () => String }) id: string,
-    @Args('status', { type: () => Status }) status: Status,
-  ): Promise<boolean> {
-    return await this.ordersService.updateOrderStatus(id, status);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

@@ -7,11 +7,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '../cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
+import { Cart } from '../cart/entities/cart.entity';
 
 @Module({
   providers: [AuthResolver, AuthService, CloudinaryService],
   imports: [
-    TypeOrmModule.forFeature([User, Vendor]),
+    TypeOrmModule.forFeature([User, Vendor, Cart]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

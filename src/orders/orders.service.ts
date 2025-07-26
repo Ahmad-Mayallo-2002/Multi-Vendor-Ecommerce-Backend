@@ -10,6 +10,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { Cart } from '../cart/entities/cart.entity';
 import { CreateOrderInput } from './dto/create-order.input';
 import Stripe from 'stripe';
+import { SortEnum } from '../assets/enum/sort.enum';
 
 @Injectable()
 export class OrdersService {
@@ -32,14 +33,32 @@ export class OrdersService {
     });
   }
 
-  async getAllOrders(): Promise<Order[]> {
-    const orders = await this.orderRepo.find();
+  async getAllOrders(
+    take: number,
+    skip: number,
+    sortByCreated: SortEnum,
+  ): Promise<Order[]> {
+    let order: Record<string, string> = {};
+    if (sortByCreated) order.createdAt = sortByCreated;
+    const orders = await this.orderRepo.find({ take, skip, order });
     if (!orders.length) throw new NotFoundException('No Orders Here');
     return orders;
   }
 
-  async getUserOrders(userId: string): Promise<Order[]> {
-    const orders = await this.orderRepo.find({ where: { userId } });
+  async getUserOrders(
+    userId: string,
+    take: number,
+    skip: number,
+    sortByCreated: SortEnum,
+  ): Promise<Order[]> {
+    let order: Record<string, string> = {};
+    if (sortByCreated) order.createdAt = sortByCreated;
+    const orders = await this.orderRepo.find({
+      where: { userId },
+      take,
+      skip,
+      order,
+    });
     if (!orders.length)
       throw new NotFoundException('This User do not have Orders');
     return orders;
@@ -62,7 +81,6 @@ export class OrdersService {
     const newOrder = this.orderRepo.create({
       ...input,
       totalPrice: cart.totalPrice,
-      
     });
   }
 

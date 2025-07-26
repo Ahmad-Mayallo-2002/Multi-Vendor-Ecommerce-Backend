@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation, Context } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Context, Int } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -7,6 +7,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
+import { SortEnum } from '../assets/enum/sort.enum';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -15,8 +16,13 @@ export class UsersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @Query(() => [User], { name: 'getAllUsers' })
-  async getAllUsers(): Promise<User[]> {
-    return await this.usersService.getAllUsers();
+  async getAllUsers(
+    @Args('take', { type: () => Int }) take: number,
+    @Args('skip', { type: () => Int }) skip: number,
+    @Args('sortByCreated', { type: () => SortEnum, nullable: true })
+    sortByCreated: SortEnum,
+  ): Promise<User[]> {
+    return await this.usersService.getAllUsers(take, skip, sortByCreated);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

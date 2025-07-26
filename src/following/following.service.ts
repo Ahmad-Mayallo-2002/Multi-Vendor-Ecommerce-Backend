@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateFollowingInput } from './dto/create-following.input';
 import { FollowingsAndCount } from 'src/assets/objectTypes/following.type';
 import { log } from 'console';
+import { SortEnum } from '../assets/enum/sort.enum';
 
 @Injectable()
 export class FollowingService {
@@ -17,10 +18,20 @@ export class FollowingService {
     private readonly followingRepo: Repository<Following>,
   ) {}
 
-  async getVendorFollowers(vendorId: string): Promise<FollowingsAndCount> {
+  async getVendorFollowers(
+    vendorId: string,
+    take: number,
+    skip: number,
+    sortByCreated: SortEnum,
+  ): Promise<FollowingsAndCount> {
+    let order: Record<string, string> = {};
+    if (sortByCreated) order.createdAt = sortByCreated;
     const followers = await this.followingRepo.find({
       where: { vendorId },
       relations: ['user'],
+      take,
+      skip,
+      order,
     });
     if (!followers.length) throw new NotFoundException('You Have no Followers');
     log(followers.length);
@@ -30,10 +41,20 @@ export class FollowingService {
     };
   }
 
-  async getUserFollowings(userId: string): Promise<FollowingsAndCount> {
+  async getUserFollowings(
+    userId: string,
+    take: number,
+    skip: number,
+    sortByCreated: SortEnum,
+  ): Promise<FollowingsAndCount> {
+    let order: Record<string, string> = {};
+    if (sortByCreated) order.createdAt = sortByCreated;
     const followings = await this.followingRepo.find({
       where: { userId },
       relations: ['vendor'],
+      take,
+      skip,
+      order,
     });
     if (!followings.length)
       throw new NotFoundException('You not Follow any Vendor.');

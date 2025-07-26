@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { Role } from '../assets/enum/role.enum';
 import { UpdateUserInput } from './dto/update-user.input';
+import { SortEnum } from '../assets/enum/sort.enum';
 
 @Injectable()
 export class UsersService {
@@ -11,9 +12,18 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(
+    take: number,
+    skip: number,
+    sortByCreated: SortEnum,
+  ): Promise<User[]> {
+    let order: Record<string, string> = {};
+    if (sortByCreated) order.createdAt = sortByCreated;
     const users = await this.userRepo.find({
       where: { role: Role.USER },
+      take,
+      skip,
+      order,
     });
     if (!users.length) throw new NotFoundException('No Users Here');
     return users;

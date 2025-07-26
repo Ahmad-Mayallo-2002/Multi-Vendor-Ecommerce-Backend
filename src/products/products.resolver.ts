@@ -11,7 +11,6 @@ import { Role } from '../assets/enum/role.enum';
 import { CurrentProductGuard } from './guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
 import { log } from 'console';
-import { SortInput } from '../assets/inputTypes/sort.input';
 import { SortEnum } from '../assets/enum/sort.enum';
 
 @Resolver(() => Product)

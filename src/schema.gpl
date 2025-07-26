@@ -211,8 +211,8 @@ type Query {
   getAddress(addressId: String!): Address!
   getAddresses: [Address!]!
   getAllCarts: [Cart!]!
-  getAllOrders: [Order!]!
-  getAllUsers: [User!]!
+  getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
+  getAllUsers(skip: Int!, sortByCreated: Sort, take: Int!): [User!]!
   getCart(id: String!): Cart!
   getCategories: [Category!]!
   getCategory(categoryId: String!): Category!
@@ -224,10 +224,10 @@ type Query {
   getUser: User!
   getUserAddresses: [Address!]!
   getUserCart: Cart!
-  getUserFollowings(userId: String!): FollowingsAndCount!
-  getUserOrders(userId: String!): [Order!]!
+  getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): FollowingsAndCount!
+  getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): [Order!]!
   getVendor(vendorId: String!): Vendor!
-  getVendorFollowers(vendorId: String!): FollowingsAndCount!
+  getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!, vendorId: String!): FollowingsAndCount!
   getVendors: [Vendor!]!
 }
 

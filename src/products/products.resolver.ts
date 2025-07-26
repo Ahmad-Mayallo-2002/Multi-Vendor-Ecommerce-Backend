@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 import { CreateProductInput } from './dto/create-product.input';
@@ -11,6 +11,8 @@ import { Role } from '../assets/enum/role.enum';
 import { CurrentProductGuard } from './guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
 import { log } from 'console';
+import { SortInput } from '../assets/inputTypes/sort.input';
+import { SortEnum } from '../assets/enum/sort.enum';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -26,8 +28,29 @@ export class ProductsResolver {
   }
 
   @Query(() => [Product], { name: 'getProducts' })
-  async products(): Promise<Product[]> {
-    return this.productsService.getAll();
+  async products(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('take', { type: () => Int }) take: number,
+    @Args('skip', { type: () => Int }) skip: number,
+    @Args('sortByFollowings', {
+      type: () => Boolean,
+      defaultValue: false,
+      nullable: true,
+    })
+    sortByFollowings: boolean,
+    @Args('sortByPrice', { type: () => SortEnum, nullable: true })
+    sortByPrice: SortEnum,
+    @Args('sortByCreated', { type: () => SortEnum, nullable: true })
+    sortByCreated: SortEnum,
+  ): Promise<Product[]> {
+    return this.productsService.getAll(
+      userId,
+      take,
+      skip,
+      sortByFollowings,
+      sortByPrice,
+      sortByCreated,
+    );
   }
 
   @Query(() => [Product], { name: 'getProductsByCategory' })

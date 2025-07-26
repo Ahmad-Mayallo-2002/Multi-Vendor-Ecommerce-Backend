@@ -23,7 +23,7 @@ export class FollowingResolver {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.VENDOR)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => FollowingsAndCount, { name: 'getUserFollowings' })
   async getUserFollowings(
     @Args('userId', { type: () => String }) userId: string,
@@ -32,7 +32,7 @@ export class FollowingResolver {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.VENDOR)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => Following, { name: 'addFollowing' })
   async addFollowing(@Args('input') input: CreateFollowingInput) {
     return await this.followingService.addFollowing(input);

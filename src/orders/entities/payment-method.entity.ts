@@ -7,7 +7,7 @@ import { Order } from '../../orders/entities/order.entity';
 @Entity({ name: 'paymentMethods' })
 @ObjectType()
 export class PaymentMethod extends IdClass {
-  @Column({ type: 'enum', enum: Payment })
+  @Column({ type: 'enum', enum: Payment, default: Payment.CARD })
   @Field(() => Payment)
   method: Payment;
 

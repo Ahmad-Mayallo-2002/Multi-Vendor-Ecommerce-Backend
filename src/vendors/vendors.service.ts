@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateVendorInput, UpdateVendorInputData } from './dto/update-vendor.input';
+import { UpdateVendorInput } from './dto/update-vendor.input';
 import { CloudinaryService } from '../cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
@@ -35,10 +35,7 @@ export class VendorsService {
     return true;
   }
 
-  async updateVendor(
-    id: string,
-    input: UpdateVendorInputData,
-  ): Promise<boolean> {
+  async updateVendor(id: string, input: UpdateVendorInput): Promise<boolean> {
     const vendor = await this.getVendor(id);
     if (input.logo) {
       v2.api.delete_resources([vendor.public_id]);
@@ -48,7 +45,7 @@ export class VendorsService {
       input.logo = secure_url;
       vendor.public_id = public_id;
     }
-    Object.assign(vendor, input);
+    Object.assign(vendor, input.data);
     await this.vendorRepo.save(vendor);
     return true;
   }

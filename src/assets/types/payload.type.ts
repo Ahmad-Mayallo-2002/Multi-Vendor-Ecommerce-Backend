@@ -4,5 +4,6 @@ export type Payload = {
   sub: {
     userId: string;
     role: Role;
+    vendorId?: string;
   };
 };

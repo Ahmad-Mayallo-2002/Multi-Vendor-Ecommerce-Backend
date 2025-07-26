@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { Cart } from '../cart/entities/cart.entity';
 import { CreateOrderInput } from './dto/create-order.input';
+import Stripe from 'stripe';
 
 @Injectable()
 export class OrdersService {
@@ -12,8 +17,20 @@ export class OrdersService {
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
-    @InjectRepository(Cart) cartRepo: Repository<Cart>
+    @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
   ) {}
+
+  private stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    apiVersion: '2025-06-30.basil',
+  });
+
+  async createPaymentIntent(totalPrice: number, currency: string = 'usd') {
+    return this.stripe.paymentIntents.create({
+      amount: Math.round(totalPrice * 100),
+      currency,
+      payment_method_types: ['card'],
+    });
+  }
 
   async getAllOrders(): Promise<Order[]> {
     const orders = await this.orderRepo.find();
@@ -35,8 +52,18 @@ export class OrdersService {
   }
 
   async createOrder(input: CreateOrderInput): Promise<Order> {
-    const order =  this.orderRepo.create();
-    return await this.orderRepo.save(order);
+    const cart = await this.cartRepo.findOne({
+      where: { userId: input.userId },
+      relations: ['cartItems', 'cartItems.products'],
+    });
+    if (!cart || !cart.cartItems.length)
+      throw new BadRequestException('Cart is Empty');
+
+    const newOrder = this.orderRepo.create({
+      ...input,
+      totalPrice: cart.totalPrice,
+      
+    });
   }
 
   async removeOrder(id: string): Promise<boolean> {

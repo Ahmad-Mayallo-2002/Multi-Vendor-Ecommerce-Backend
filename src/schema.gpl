@@ -6,6 +6,7 @@ type AccessToken {
   id: String!
   role: Role!
   token: String!
+  vendorId: String
 }
 
 type Address {
@@ -71,13 +72,6 @@ input CreateFollowingInput {
   vendorId: String!
 }
 
-input CreatePaymentMethodInput {
-  method: Payment!
-  orderId: String!
-  totalPrice: Float!
-  userId: String!
-}
-
 input CreateProductInput {
   categoryId: String!
   description: String!
@@ -135,27 +129,24 @@ type Mutation {
   cancelFollowing(vendorId: String!): Boolean!
   createAddress(input: CreateAddressInput!): Address!
   createCategory(input: CreateCategoryInput!): Category!
-  createPaymentMethod(createPaymentMethodInput: CreatePaymentMethodInput!): PaymentMethod!
   createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
   removeAddress(addressId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
   removeItemFromCart(itemId: String!): Boolean!
   removeOrder(id: String!): Boolean!
-  removePaymentMethod(id: Int!): PaymentMethod!
   removeProduct(id: String!): Boolean!
   removeUser: Boolean!
   removeVendor(vendorId: String!): Boolean!
   seedAdmin(userId: String!): String!
   signupUser(input: CreateUserInput!): User!
-  signupVendor(logo: Upload!, user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
+  signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
   updateAddress(addressId: String!, input: UpdateAddressInput!): Boolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): Category!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): Boolean!
-  updatePaymentMethod(updatePaymentMethodInput: UpdatePaymentMethodInput!): PaymentMethod!
   updateProduct(id: String!, input: UpdateProductInput!): Product!
   updateUser(input: UpdateUserInput!): Boolean!
-  updateVendor(vendorId: String!): Boolean!
+  updateVendor(input: UpdateVendorInput!, vendorId: String!): Boolean!
 }
 
 type Order {
@@ -183,8 +174,8 @@ type OrderItem {
 
 """Enum for Payment Method"""
 enum Payment {
+  CARD
   CASH
-  CREDIT_CARD
   PAYPAL
 }
 
@@ -226,7 +217,7 @@ type Query {
   getCategories: [Category!]!
   getCategory(categoryId: String!): Category!
   getProductById(id: String!): Product!
-  getProducts: [Product!]!
+  getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!, userId: String!): [Product!]!
   getProductsByCategory(category: String!): [Product!]!
   getProductsByVendor(vendorId: String!): [Product!]!
   getSingleOrder(id: String!): Order!
@@ -238,7 +229,6 @@ type Query {
   getVendor(vendorId: String!): Vendor!
   getVendorFollowers(vendorId: String!): FollowingsAndCount!
   getVendors: [Vendor!]!
-  paymentMethod(id: Int!): PaymentMethod!
 }
 
 """Role Enum"""
@@ -246,6 +236,12 @@ enum Role {
   SUPER_ADMIN
   USER
   VENDOR
+}
+
+"""Enum for Sort By ASC or DESC"""
+enum Sort {
+  ASC
+  DESC
 }
 
 input UpdateAddressInput {
@@ -262,14 +258,6 @@ input UpdateCategoryInput {
   description: String
   name: String
   user: String
-}
-
-input UpdatePaymentMethodInput {
-  id: Int!
-  method: Payment
-  orderId: String
-  totalPrice: Float
-  userId: String
 }
 
 input UpdateProductInput {
@@ -290,6 +278,18 @@ input UpdateUserInput {
   email: String
   password: String
   username: String
+}
+
+input UpdateVendorInput {
+  data: UpdateVendorInputData!
+  logo: Upload
+}
+
+input UpdateVendorInputData {
+  companyName: String
+  contactEmail: String
+  contactPhone: String
+  description: String
 }
 
 """The `Upload` scalar type represents a file upload."""

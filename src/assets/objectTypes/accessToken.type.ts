@@ -11,4 +11,7 @@ export class AccessToken {
 
   @Field(() => Role)
   role: Role;
+
+  @Field({ nullable: true })
+  vendorId?: string;
 }

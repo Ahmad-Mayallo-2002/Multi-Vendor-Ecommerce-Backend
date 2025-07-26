@@ -4,8 +4,6 @@ import { Column, Entity, JoinTable, ManyToOne, Relation } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Order } from './order.entity';
 
-// Scalar
-
 @Entity({ name: 'orderItems' })
 @ObjectType()
 export class OrderItem extends IdClass {

@@ -7,8 +7,6 @@ export class UpdateVendorInputData {
   @Field({ nullable: true }) description?: string;
   @Field({ nullable: true }) contactEmail?: string;
   @Field({ nullable: true }) contactPhone?: string;
-  @Field(() => GraphQLUpload, { nullable: true })
-  logo?: Promise<FileUpload>;
 }
 
 @InputType()

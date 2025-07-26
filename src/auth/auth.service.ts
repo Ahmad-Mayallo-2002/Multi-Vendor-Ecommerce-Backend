@@ -8,7 +8,7 @@ import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { compare, hash } from 'bcryptjs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoginInput } from '../assets/inputTypes/input.type';
+import { LoginInput } from '../assets/inputTypes/login.input';
 import { CreateUserInput } from '../users/dto/create-user.input';
 import { Role } from '../assets/enum/role.enum';
 import { Payload } from '../assets/types/payload.type';
@@ -90,6 +90,7 @@ export class AuthService {
   async validateUser(input: LoginInput): Promise<User> {
     const user = await this.userRepo.findOne({
       where: { email: input.email },
+      relations: ['vendor'],
     });
     if (!user) throw new UnauthorizedException('Invalid Email');
 
@@ -113,11 +114,12 @@ export class AuthService {
       },
     };
     const accessToken = await this.generateAccessToken(payload);
-    return {
+    let response = {
       id: user.id,
       role: user.role,
       token: String(accessToken),
     };
+    return !user.vendor ? response : { ...response, vendorId: user.vendor.id };
   }
 
   async seedAdmin(userId: string): Promise<string> {

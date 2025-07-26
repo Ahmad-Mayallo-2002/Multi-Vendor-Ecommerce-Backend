@@ -2,9 +2,8 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { CreateUserInput } from '../users/dto/create-user.input';
 import { User } from '../users/entities/user.entity';
-import { LoginInput } from '../assets/inputTypes/input.type';
+import { LoginInput } from '../assets/inputTypes/login.input';
 import { AccessToken } from '../assets/objectTypes/accessToken.type';
-import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
 import { Vendor } from '../vendors/entities/vendor.entity';
 
@@ -21,10 +20,8 @@ export class AuthResolver {
   async signupVendor(
     @Args('user') user: CreateUserInput,
     @Args('vendor') vendor: CreateVendorInput,
-    @Args('logo', { type: () => GraphQLUpload, nullable: false })
-    logo: FileUpload,
   ): Promise<Vendor> {
-    return await this.authService.signupVendor(user, vendor, logo);
+    return await this.authService.signupVendor(user, vendor);
   }
 
   @Mutation(() => AccessToken, { name: 'login' })

@@ -51,6 +51,6 @@ export class User extends IdClass {
   @Field(() => [Following], { nullable: true })
   followings: Relation<Following[]>;
 
-  @OneToMany(() => Category, category => category.user)
+  @OneToMany(() => Category, (category) => category.user)
   categories: Relation<Category[]>;
 }

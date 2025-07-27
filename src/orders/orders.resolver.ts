@@ -10,6 +10,7 @@ import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OrderAndPaymentClientSecret } from '../assets/objectTypes/orderAndPaymentClientSecret.type';
 import { Payload } from '../assets/types/payload.type';
+import { OrderExistPipes } from './pipes/order-exist.pipe';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -50,9 +51,9 @@ export class OrdersResolver {
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => Order, { name: 'getSingleOrder' })
   async getSingleOrder(
-    @Args('id', { type: () => String }) id: string,
+    @Args('orderId', { type: () => String }, OrderExistPipes) orderId: string,
   ): Promise<Order> {
-    return await this.ordersService.getSingleOrder(id);
+    return await this.ordersService.getSingleOrder(orderId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

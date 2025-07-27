@@ -22,7 +22,8 @@ export class VendorsResolver {
 
   @Query(() => Vendor, { name: 'getVendor' })
   async getVendor(
-    @Args('vendorId', VendorExistsPipe) vendorId: string,
+    @Args('vendorId', { type: () => String }, VendorExistsPipe)
+    vendorId: string,
   ): Promise<Vendor> {
     return await this.vendorsService.getVendor(vendorId);
   }

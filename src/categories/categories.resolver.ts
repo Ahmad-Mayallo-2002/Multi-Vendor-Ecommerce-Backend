@@ -8,6 +8,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
+import { CategoryExistPipes } from './pipes/category-exist.pipe';
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -48,7 +49,7 @@ export class CategoriesResolver {
 
   @Query(() => Category, { name: 'getCategory' })
   async getCategory(
-    @Args('categoryId', { type: () => String })
+    @Args('categoryId', { type: () => String }, CategoryExistPipes)
     categoryId: string,
   ) {
     return await this.categoriesService.findOne(categoryId);

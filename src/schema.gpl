@@ -253,7 +253,7 @@ type Query {
   getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): [Product!]!
   getProductsByCategory(category: String!): [Product!]!
   getProductsByVendor(vendorId: String!): [Product!]!
-  getSingleOrder(id: String!): Order!
+  getSingleOrder(orderId: String!): Order!
   getUser: User!
   getUserAddresses: [Address!]!
   getUserCart: Cart!

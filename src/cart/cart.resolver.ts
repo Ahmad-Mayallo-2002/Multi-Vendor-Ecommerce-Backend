@@ -11,6 +11,7 @@ import { CartItem } from './entities/cart-item.entity';
 import { UpdateCartItemInput } from './dto/update-cart-item.input';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Payload } from '../assets/types/payload.type';
+import { CartExistPipes } from './pipes/cart-exist.pipe';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -34,7 +35,9 @@ export class CartResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => Cart, { name: 'getCart' })
-  async getCart(@Args('id', { type: () => String }) id: string): Promise<Cart> {
+  async getCart(
+    @Args('id', { type: () => String }, CartExistPipes) id: string,
+  ): Promise<Cart> {
     return await this.cartService.getCart(id);
   }
 

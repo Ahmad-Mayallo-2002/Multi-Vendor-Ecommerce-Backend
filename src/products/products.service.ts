@@ -20,7 +20,7 @@ export class ProductsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  async createProduct(input: CreateProductInput) {
+  async createProduct(input: CreateProductInput, vendorId: string) {
     const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
       await input.image,
     );
@@ -28,6 +28,7 @@ export class ProductsService {
       ...input,
       image: secure_url,
       public_id,
+      vendorId,
     });
     return await this.productRepo.save(product);
   }

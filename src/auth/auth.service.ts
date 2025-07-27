@@ -15,8 +15,6 @@ import { Payload } from '../assets/types/payload.type';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken } from 'src/assets/objectTypes/accessToken.type';
 import { CloudinaryService } from '../cloudinary.service';
-import { FileUpload } from 'graphql-upload-ts';
-import { log } from 'console';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
 import { Cart } from '../cart/entities/cart.entity';

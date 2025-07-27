@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { CartService } from './cart.service';
 import { Cart } from './entities/cart.entity';
 import { UseGuards } from '@nestjs/common';
@@ -9,6 +9,7 @@ import { Role } from '../assets/enum/role.enum';
 import { CreateCartItemInput } from './dto/create-cart-item.input';
 import { CartItem } from './entities/cart-item.entity';
 import { UpdateCartItemInput } from './dto/update-cart-item.input';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -24,8 +25,8 @@ export class CartResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => Cart, { name: 'getUserCart' })
-  async getUserCart(@Context() context: any): Promise<Cart> {
-    const { sub } = await context.req.user;
+  async getUserCart(@CurrentUser() currentUser: any): Promise<Cart> {
+    const { sub } = await currentUser;
     return await this.cartService.getUserCart(sub.userId);
   }
 
@@ -40,10 +41,10 @@ export class CartResolver {
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => CartItem, { name: 'addItemToCart' })
   async addItemToCart(
-    @Context() context: any,
     @Args('input') input: CreateCartItemInput,
+    @CurrentUser() currentUser: any,
   ): Promise<CartItem> {
-    const { sub } = await context.req.user;
+    const { sub } = await currentUser;
     return await this.cartService.addItemToCart(input, sub.userId);
   }
 

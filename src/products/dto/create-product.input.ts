@@ -44,9 +44,4 @@ export class CreateProductInput {
   @IsNotEmpty()
   @IsString()
   categoryId: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  vendorId: string;
 }

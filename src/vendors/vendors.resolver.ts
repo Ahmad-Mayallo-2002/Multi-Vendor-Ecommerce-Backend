@@ -7,6 +7,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -18,29 +19,28 @@ export class VendorsResolver {
   }
 
   @Query(() => Vendor, { name: 'getVendor' })
-  async getVendor(
-    @Args('vendorId', { type: () => String }) vendorId: string,
-  ): Promise<Vendor> {
-    return await this.vendorsService.getVendor(vendorId);
+  async getVendor(@CurrentUser() currentUser: any): Promise<Vendor> {
+    const { sub } = await currentUser;
+    return await this.vendorsService.getVendor(sub.vendorId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Boolean, { name: 'updateVendor' })
   async updateVendor(
-    @Args('vendorId', { type: () => String }) vendorId: string,
+    @CurrentUser() currentUser: any,
     @Args('input', { type: () => UpdateVendorInput })
     input: UpdateVendorInput,
   ): Promise<boolean> {
-    return await this.vendorsService.updateVendor(vendorId, input);
+    const { sub } = await currentUser;
+    return await this.vendorsService.updateVendor(sub.vendorId, input);
   }
 
   @Mutation(() => Boolean, { name: 'removeVendor' })
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
-  async removeVendor(
-    @Args('vendorId', { type: () => String }) vendorId: string,
-  ) {
-    return await this.vendorsService.deleteVendor(vendorId);
+  async removeVendor(@CurrentUser() currentUser: any) {
+    const { sub } = await currentUser;
+    return await this.vendorsService.deleteVendor(sub.vendorId);
   }
 
   @Mutation(() => String, { name: 'approveVendor' })

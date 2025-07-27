@@ -12,6 +12,7 @@ import { CurrentProductGuard } from './guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
 import { log } from 'console';
 import { SortEnum } from '../assets/enum/sort.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -22,13 +23,15 @@ export class ProductsResolver {
   @Mutation(() => Product, { name: 'createProduct' })
   async createProduct(
     @Args('input') input: CreateProductInput,
+    @CurrentUser() currentUser: any,
   ): Promise<Product> {
-    return this.productsService.createProduct(input);
+    const { sub } = await currentUser;
+    return this.productsService.createProduct(input, sub.vendorId);
   }
 
   @Query(() => [Product], { name: 'getProducts' })
   async products(
-    @Args('userId', { type: () => String }) userId: string,
+    @CurrentUser() currentUser: any,
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
     @Args('sortByFollowings', {
@@ -42,8 +45,9 @@ export class ProductsResolver {
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
   ): Promise<Product[]> {
+    const { sub } = await currentUser;
     return this.productsService.getAll(
-      userId,
+      sub.userId,
       take,
       skip,
       sortByFollowings,

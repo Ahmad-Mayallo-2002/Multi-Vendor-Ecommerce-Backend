@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { AddressesService } from './addresses.service';
 import { Address } from './entities/address.entity';
 import { UpdateAddressInput } from './dto/update-address.input';
@@ -8,6 +8,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Resolver(() => Address)
 export class AddressesResolver {
@@ -25,8 +26,8 @@ export class AddressesResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => [Address], { name: 'getUserAddresses' })
-  async getUserAddresses(@Context() context: any): Promise<Address[]> {
-    const { sub } = await context.req.user;
+  async getUserAddresses(@CurrentUser() currentUser: any): Promise<Address[]> {
+    const { sub } = await currentUser;
     return this.addressesService.getUserAddresses(sub.userId);
   }
 
@@ -67,9 +68,9 @@ export class AddressesResolver {
   @Mutation(() => Address, { name: 'createAddress' })
   async createAddress(
     @Args('input') input: CreateAddressInput,
-    @Context() context: any,
+    @CurrentUser() currentUser: any,
   ) {
-    const { sub } = await context.req.user;
+    const { sub } = await currentUser;
     return await this.addressesService.createAddress(input, sub.userId);
   }
 }

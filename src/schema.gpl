@@ -80,7 +80,6 @@ input CreateProductInput {
   price: Float!
   stock: Int!
   title: String!
-  vendorId: String!
 }
 
 input CreateUserInput {
@@ -137,7 +136,7 @@ type Mutation {
   removeOrder(id: String!): Boolean!
   removeProduct(id: String!): Boolean!
   removeUser: Boolean!
-  removeVendor(vendorId: String!): Boolean!
+  removeVendor: Boolean!
   seedAdmin(userId: String!): String!
   signupUser(input: CreateUserInput!): User!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
@@ -146,7 +145,7 @@ type Mutation {
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): Boolean!
   updateProduct(id: String!, input: UpdateProductInput!): Product!
   updateUser(input: UpdateUserInput!): Boolean!
-  updateVendor(input: UpdateVendorInput!, vendorId: String!): Boolean!
+  updateVendor(input: UpdateVendorInput!): Boolean!
 }
 
 type Order {
@@ -217,7 +216,7 @@ type Query {
   getCategories: [Category!]!
   getCategory(categoryId: String!): Category!
   getProductById(id: String!): Product!
-  getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!, userId: String!): [Product!]!
+  getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): [Product!]!
   getProductsByCategory(category: String!): [Product!]!
   getProductsByVendor(vendorId: String!): [Product!]!
   getSingleOrder(id: String!): Order!
@@ -226,7 +225,7 @@ type Query {
   getUserCart: Cart!
   getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): FollowingsAndCount!
   getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): [Order!]!
-  getVendor(vendorId: String!): Vendor!
+  getVendor: Vendor!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!, vendorId: String!): FollowingsAndCount!
   getVendors: [Vendor!]!
 }

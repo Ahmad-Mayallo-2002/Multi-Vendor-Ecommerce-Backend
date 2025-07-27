@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation, Context, Int } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Int } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -8,6 +8,9 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { SortEnum } from '../assets/enum/sort.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { log } from 'console';
+import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -28,16 +31,16 @@ export class UsersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Query(() => User, { name: 'getUser' })
-  async getUser(@Context() context: any): Promise<User> {
-    const { sub } = await context.req.user;
+  async getUser(@CurrentUser() currentUser: any): Promise<User> {
+    const { sub } = await currentUser;
     return await this.usersService.getUser(sub.userId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Mutation(() => Boolean, { name: 'removeUser' })
-  async removeUser(@Context() context: any) {
-    const { sub } = await context.req.user;
+  async removeUser(@CurrentUser() currentUser: any) {
+    const { sub } = await currentUser;
     return await this.usersService.deleteUser(sub.userId);
   }
 
@@ -45,10 +48,10 @@ export class UsersResolver {
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Mutation(() => Boolean, { name: 'updateUser' })
   async updateUser(
-    @Context() context: any,
+    @CurrentUser() currentUser: any,
     @Args('input') input: UpdateUserInput,
   ) {
-    const { sub } = await context.req.user;
+    const { sub } = await currentUser;
     return await this.usersService.updateUser(sub.userId, input);
   }
 }

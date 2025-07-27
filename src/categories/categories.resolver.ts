@@ -15,7 +15,7 @@ export class CategoriesResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Mutation(() => Category, {name: "createCategory"})
+  @Mutation(() => Category, { name: 'createCategory' })
   async createCategory(@Args('input') input: CreateCategoryInput) {
     return await this.categoriesService.create(input);
   }
@@ -25,7 +25,7 @@ export class CategoriesResolver {
   @Mutation(() => Category, { name: 'updateCategory' })
   async updateCategory(
     @Args('input') input: UpdateCategoryInput,
-    @Args('categoryId', { type: () => String, nullable: false })
+    @Args('categoryId', { type: () => String })
     categoryId: string,
   ): Promise<Category> {
     return await this.categoriesService.update(input, categoryId);
@@ -35,7 +35,7 @@ export class CategoriesResolver {
   @Roles(Role.SUPER_ADMIN)
   @Mutation(() => Boolean, { name: 'removeCategory' })
   async removeCategory(
-    @Args('categoryId', { type: () => String, nullable: false })
+    @Args('categoryId', { type: () => String })
     categoryId: string,
   ): Promise<Boolean> {
     return await this.categoriesService.remove(categoryId);
@@ -48,7 +48,7 @@ export class CategoriesResolver {
 
   @Query(() => Category, { name: 'getCategory' })
   async getCategory(
-    @Args('categoryId', { type: () => String, nullable: false })
+    @Args('categoryId', { type: () => String })
     categoryId: string,
   ) {
     return await this.categoriesService.findOne(categoryId);

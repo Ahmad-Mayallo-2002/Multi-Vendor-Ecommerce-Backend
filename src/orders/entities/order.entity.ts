@@ -12,6 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { Address } from '../../addresses/entities/address.entity';
 import { PaymentMethod } from './payment-method.entity';
+import { Status } from '../../assets/enum/order-status.enum';
 
 @Entity({ name: 'orders' })
 @ObjectType()
@@ -26,13 +27,21 @@ export class Order extends IdClass {
   @Field(() => Float)
   totalPrice: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'uuid' })
   @Field()
   userId: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'uuid' })
   @Field()
   addressId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  @Field()
+  paymentId: string;
+
+  @Column({ type: 'enum', enum: Status, default: Status.PENDING })
+  @Field(() => Status)
+  status: Status;
 
   // Relations
   @OneToMany(() => OrderItem, (orderItems) => orderItems.order)

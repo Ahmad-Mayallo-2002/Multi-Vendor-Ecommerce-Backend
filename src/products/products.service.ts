@@ -41,6 +41,8 @@ export class ProductsService {
     sortByPrice: SortEnum,
     sortByCreated: SortEnum,
   ): Promise<Product[]> {
+    if (!userId) return await this.productRepo.find({ take, skip });
+
     const userFollowings = await this.followingsRepo.find({
       where: { userId },
     });

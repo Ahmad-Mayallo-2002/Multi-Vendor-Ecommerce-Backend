@@ -45,9 +45,10 @@ export class ProductsResolver {
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
   ): Promise<Product[]> {
-    const { sub } = await currentUser;
+    let userId = '';
+    (await currentUser) ? (userId = await currentUser.sub.userId) : null;
     return this.productsService.getAll(
-      sub.userId,
+      userId,
       take,
       skip,
       sortByFollowings,

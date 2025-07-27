@@ -1,7 +1,7 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export enum Payment {
-  CARD = 'CARD',
+  STRIPE = 'STRIPE',
   PAYPAL = 'PAYPAL',
   CASH = 'CASH',
 }

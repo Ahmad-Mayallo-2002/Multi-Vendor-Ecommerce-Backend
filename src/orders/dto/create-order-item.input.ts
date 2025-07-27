@@ -29,5 +29,5 @@ export class CreateOrderItemInput {
   @IsNotEmpty()
   @IsUUID()
   @Field(() => String)
-  userId: string;
+  orderId: string;
 }

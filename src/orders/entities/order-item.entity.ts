@@ -21,6 +21,14 @@ export class OrderItem extends IdClass {
   @Field(() => Float)
   priceAtPayment: number;
 
+  @Column({ type: 'uuid', nullable: false })
+  @Field()
+  productId: string;
+
+  @Column({ type: 'uuid', nullable: false })
+  @Field()
+  orderId: string;
+
   // Relations
   @ManyToOne(() => Product, (product) => product.orderItems)
   @JoinTable()

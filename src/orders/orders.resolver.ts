@@ -7,6 +7,8 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { SortEnum } from '../assets/enum/sort.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OrderAndPaymentClientSecret } from '../assets/objectTypes/orderAndPaymentClientSecret.type';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -28,14 +30,15 @@ export class OrdersResolver {
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => [Order], { name: 'getUserOrders' })
   async getUserOrders(
-    @Args('userId', { type: () => String }) userId: string,
+    @CurrentUser() currentUser: any,
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
   ): Promise<Order[]> {
+    const { sub } = await currentUser;
     return await this.ordersService.getUserOrders(
-      userId,
+      sub.userId,
       take,
       skip,
       sortByCreated,
@@ -58,5 +61,16 @@ export class OrdersResolver {
     @Args('id', { type: () => String }) id: string,
   ): Promise<boolean> {
     return await this.ordersService.removeOrder(id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Mutation(() => OrderAndPaymentClientSecret, { name: 'createOrder' })
+  async createOrder(
+    @Args('addressId', { type: () => String }) addressId: string,
+    @CurrentUser() currentUser: any,
+  ): Promise<OrderAndPaymentClientSecret> {
+    const { sub } = await currentUser;
+    return await this.ordersService.createOrder(addressId, sub.userId);
   }
 }

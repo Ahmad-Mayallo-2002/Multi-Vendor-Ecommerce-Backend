@@ -128,6 +128,7 @@ type Mutation {
   cancelFollowing(vendorId: String!): Boolean!
   createAddress(input: CreateAddressInput!): Address!
   createCategory(input: CreateCategoryInput!): Category!
+  createOrder(addressId: String!): OrderAndPaymentClientSecret!
   createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
   removeAddress(addressId: String!): Boolean!
@@ -155,27 +156,36 @@ type Order {
   id: String!
   orderItems: [OrderItem!]!
   payment: PaymentMethod!
+  paymentId: String!
+  status: Status!
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!
   userId: String!
 }
 
+type OrderAndPaymentClientSecret {
+  clientSecret: String!
+  order: Order!
+}
+
 type OrderItem {
   createdAt: DateTime!
   id: String!
   order: Order!
+  orderId: String!
   priceAtPayment: Float!
   product: Product!
+  productId: String!
   quantity: Int!
   updatedAt: DateTime!
 }
 
 """Enum for Payment Method"""
 enum Payment {
-  CARD
   CASH
   PAYPAL
+  STRIPE
 }
 
 type PaymentMethod {
@@ -183,6 +193,7 @@ type PaymentMethod {
   id: String!
   method: Payment!
   order: Order!
+  orderId: String!
   totalPrice: Float!
   updatedAt: DateTime!
 }
@@ -224,7 +235,7 @@ type Query {
   getUserAddresses: [Address!]!
   getUserCart: Cart!
   getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): FollowingsAndCount!
-  getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): [Order!]!
+  getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
   getVendor: Vendor!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!, vendorId: String!): FollowingsAndCount!
   getVendors: [Vendor!]!
@@ -241,6 +252,14 @@ enum Role {
 enum Sort {
   ASC
   DESC
+}
+
+"""Order Status Enum"""
+enum Status {
+  FAILED
+  PAID
+  PENDING
+  UNPAID
 }
 
 input UpdateAddressInput {

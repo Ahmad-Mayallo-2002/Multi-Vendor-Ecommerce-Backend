@@ -7,13 +7,17 @@ import { Order } from '../../orders/entities/order.entity';
 @Entity({ name: 'paymentMethods' })
 @ObjectType()
 export class PaymentMethod extends IdClass {
-  @Column({ type: 'enum', enum: Payment, default: Payment.CARD })
+  @Column({ type: 'enum', enum: Payment, default: Payment.STRIPE })
   @Field(() => Payment)
   method: Payment;
 
   @Column({ type: 'decimal' })
   @Field(() => Float)
   totalPrice: number;
+
+  @Column({ type: 'uuid', nullable: false })
+  @Field()
+  orderId: string;
 
   // Relations
   @OneToOne(() => Order, (order) => order.payment)

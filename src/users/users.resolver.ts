@@ -9,6 +9,7 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -30,7 +31,7 @@ export class UsersResolver {
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Query(() => User, { name: 'getUser' })
   async getUser(@CurrentUser() currentUser: Payload): Promise<User> {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return await this.usersService.getUser(sub.userId);
   }
 
@@ -38,7 +39,7 @@ export class UsersResolver {
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Mutation(() => Boolean, { name: 'removeUser' })
   async removeUser(@CurrentUser() currentUser: Payload) {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return await this.usersService.deleteUser(sub.userId);
   }
 
@@ -49,7 +50,7 @@ export class UsersResolver {
     @CurrentUser() currentUser: Payload,
     @Args('input') input: UpdateUserInput,
   ) {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return await this.usersService.updateUser(sub.userId, input);
   }
 }

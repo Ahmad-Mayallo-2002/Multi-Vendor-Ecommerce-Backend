@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int, Float } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { VendorReviewService } from './vendor-review.service';
 import { VendorReview } from './entities/vendor-review.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -7,6 +7,8 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
+import { Payload } from '../assets/types/payload.type';
+import { CreateVendorReviewInput } from './dto/create-vendor-review.input';
 
 @Resolver(() => VendorReview)
 export class VendorReviewResolver {
@@ -17,15 +19,11 @@ export class VendorReviewResolver {
   @Mutation(() => VendorReview, { name: 'addVendorReview' })
   async addReview(
     @Args('vendorId', { type: () => String }) vendorId: string,
-    @Args('value', { type: () => Float }) value: number,
+    @Args('input') input: CreateVendorReviewInput,
     @CurrentUser() currentUser: Payload,
   ): Promise<VendorReview> {
-    const { sub } = await currentUser;
-    return await this.vendorReviewService.addOrUpdateReview(
-      sub.userId,
-      vendorId,
-      value,
-    );
+    const { sub } = currentUser;
+    return await this.vendorReviewService.addOrUpdateReview(sub.userId, input);
   }
 
   @Query(() => Number, { name: 'getAverageVendorReview' })

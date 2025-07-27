@@ -6,7 +6,6 @@ import { CartItem } from './entities/cart-item.entity';
 import { CreateCartItemInput } from './dto/create-cart-item.input';
 import { Product } from '../products/entities/product.entity';
 import { UpdateCartItemInput } from './dto/update-cart-item.input';
-import { log } from 'console';
 
 @Injectable()
 export class CartService {
@@ -48,7 +47,6 @@ export class CartService {
       where: { userId },
       relations: ['cartItems', 'cartItems.product'],
     });
-    console.log('Get Time');
     if (!cart) throw new NotFoundException('This Cart is not Found');
     return cart;
   }

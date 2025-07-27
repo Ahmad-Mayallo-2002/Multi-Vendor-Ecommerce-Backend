@@ -3,7 +3,6 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Role } from '../../assets/enum/role.enum';
 import { ROLES_KEY } from '../decorators/role.decorator';
-import { log } from 'console';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

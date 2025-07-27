@@ -9,6 +9,7 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VendorExistsPipe } from './pipes/vendor-exists.pipe';
+import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -34,15 +35,15 @@ export class VendorsResolver {
     @Args('input', { type: () => UpdateVendorInput })
     input: UpdateVendorInput,
   ): Promise<boolean> {
-    const { sub } = await currentUser;
-    return await this.vendorsService.updateVendor(sub.vendorId, input);
+    const { sub } = currentUser;
+    return await this.vendorsService.updateVendor(`${sub.vendorId}`, input);
   }
 
   @Mutation(() => Boolean, { name: 'removeVendor' })
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   async removeVendor(@CurrentUser() currentUser: Payload) {
-    const { sub } = await currentUser;
-    return await this.vendorsService.deleteVendor(sub.vendorId);
+    const { sub } = currentUser;
+    return await this.vendorsService.deleteVendor(`${sub.vendorId}`);
   }
 
   @Mutation(() => String, { name: 'approveVendor' })

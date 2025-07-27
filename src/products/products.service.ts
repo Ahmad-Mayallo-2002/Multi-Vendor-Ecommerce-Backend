@@ -6,7 +6,6 @@ import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary.service';
 import { v2 } from 'cloudinary';
-import { log } from 'console';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../assets/enum/sort.enum';
 
@@ -63,7 +62,6 @@ export class ProductsService {
     if (!allProducts.length) throw new NotFoundException('No Products');
 
     if (sortByFollowings) {
-      log(sortByFollowings);
       const followedProducts: Product[] = [];
       const otherProducts: Product[] = [];
       for (const product of allProducts)

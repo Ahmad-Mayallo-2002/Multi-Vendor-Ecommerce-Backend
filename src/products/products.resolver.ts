@@ -10,9 +10,10 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { CurrentProductGuard } from './guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
-import { log } from 'console';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Payload } from '../assets/types/payload.type';
+import { VendorOwnsProductGuard } from './guards/productOwner.guard';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -25,8 +26,8 @@ export class ProductsResolver {
     @Args('input') input: CreateProductInput,
     @CurrentUser() currentUser: Payload,
   ): Promise<Product> {
-    const { sub } = await currentUser;
-    return this.productsService.createProduct(input, sub.vendorId);
+    const { sub } = currentUser;
+    return this.productsService.createProduct(input, `${sub.vendorId}`);
   }
 
   @Query(() => [Product], { name: 'getProducts' })
@@ -46,7 +47,7 @@ export class ProductsResolver {
     sortByCreated: SortEnum,
   ): Promise<Product[]> {
     let userId = '';
-    (await currentUser) ? (userId = await currentUser.sub.userId) : null;
+    currentUser ? (userId = currentUser.sub.userId) : null;
     return this.productsService.getAll(
       userId,
       take,
@@ -77,20 +78,32 @@ export class ProductsResolver {
     return this.productsService.getById(id);
   }
 
-  @UseGuards(AuthGuard, RolesGuard, CurrentProductGuard, VendorIsApprovedGuard)
+  @UseGuards(
+    AuthGuard,
+    RolesGuard,
+    VendorIsApprovedGuard,
+    CurrentProductGuard,
+    VendorOwnsProductGuard,
+  )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Product, { name: 'updateProduct' })
   async updateProduct(
-    @Args('id') id: string,
+    @Args('productId') productId: string,
     @Args('input') input: UpdateProductInput,
   ): Promise<Product> {
-    return this.productsService.update(input, id);
+    return this.productsService.update(input, productId);
   }
 
-  @UseGuards(AuthGuard, RolesGuard, CurrentProductGuard, VendorIsApprovedGuard)
+  @UseGuards(
+    AuthGuard,
+    RolesGuard,
+    VendorIsApprovedGuard,
+    CurrentProductGuard,
+    VendorOwnsProductGuard,
+  )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Boolean, { name: 'removeProduct' })
-  async deleteProduct(@Args('id') id: string): Promise<boolean> {
-    return this.productsService.delete(id);
+  async deleteProduct(@Args('productId') productId: string): Promise<boolean> {
+    return this.productsService.delete(productId);
   }
 }

@@ -7,7 +7,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
-import { log } from 'console';
 import { Request } from 'express';
 
 @Injectable()

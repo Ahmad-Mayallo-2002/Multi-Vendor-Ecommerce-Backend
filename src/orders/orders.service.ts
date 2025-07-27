@@ -9,7 +9,6 @@ import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { Cart } from '../cart/entities/cart.entity';
-import { CreateOrderInput } from './dto/create-order.input';
 import Stripe from 'stripe';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { PaymentMethod } from './entities/payment-method.entity';

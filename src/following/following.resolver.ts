@@ -9,6 +9,8 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { Role } from '../assets/enum/role.enum';
 import { Roles } from '../auth/decorators/role.decorator';
 import { SortEnum } from '../assets/enum/sort.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => Following)
 export class FollowingResolver {
@@ -18,13 +20,13 @@ export class FollowingResolver {
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Query(() => FollowingsAndCount, { name: 'getVendorFollowers' })
   async getVendorFollowers(
-    @Args('vendorId', { type: () => String }) vendorId: string,
+    @CurrentUser() currentUser: Payload,
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
     @Args('sortByCreated', { type: () => SortEnum }) sortByCreated: SortEnum,
   ): Promise<FollowingsAndCount> {
     return await this.followingService.getVendorFollowers(
-      vendorId,
+      `${currentUser.sub.vendorId}`,
       take,
       skip,
       sortByCreated,
@@ -35,13 +37,14 @@ export class FollowingResolver {
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => FollowingsAndCount, { name: 'getUserFollowings' })
   async getUserFollowings(
-    @Args('userId', { type: () => String }) userId: string,
+    @CurrentUser() currentUser: Payload,
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
-    @Args('sortByCreated', { type: () => SortEnum, nullable: true }) sortByCreated: SortEnum,
+    @Args('sortByCreated', { type: () => SortEnum, nullable: true })
+    sortByCreated: SortEnum,
   ) {
     return await this.followingService.getUserFollowings(
-      userId,
+      currentUser.sub.userId,
       take,
       skip,
       sortByCreated,

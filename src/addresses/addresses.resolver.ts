@@ -29,7 +29,7 @@ export class AddressesResolver {
   async getUserAddresses(
     @CurrentUser() currentUser: Payload,
   ): Promise<Address[]> {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return this.addressesService.getUserAddresses(sub.userId);
   }
 
@@ -72,7 +72,7 @@ export class AddressesResolver {
     @Args('input') input: CreateAddressInput,
     @CurrentUser() currentUser: Payload,
   ) {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return await this.addressesService.createAddress(input, sub.userId);
   }
 }

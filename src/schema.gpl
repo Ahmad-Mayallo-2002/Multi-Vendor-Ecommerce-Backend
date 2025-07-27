@@ -101,6 +101,10 @@ input CreateVendorInput {
   logo: Upload!
 }
 
+input CreateVendorReviewInput {
+  value: Float!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -130,7 +134,7 @@ type Mutation {
   addFollowing(input: CreateFollowingInput!): Following!
   addItemToCart(input: CreateCartItemInput!): CartItem!
   addProductReview(input: CreateProductReviewInput!): ProductReview!
-  addVendorReview(value: Float!, vendorId: String!): VendorReview!
+  addVendorReview(input: CreateVendorReviewInput!, vendorId: String!): VendorReview!
   approveVendor(approve: Boolean!, vendorId: String!): String!
   cancelFollowing(vendorId: String!): Boolean!
   createAddress(input: CreateAddressInput!): Address!
@@ -142,7 +146,7 @@ type Mutation {
   removeCategory(categoryId: String!): Boolean!
   removeItemFromCart(itemId: String!): Boolean!
   removeOrder(id: String!): Boolean!
-  removeProduct(id: String!): Boolean!
+  removeProduct(productId: String!): Boolean!
   removeUser: Boolean!
   removeVendor: Boolean!
   seedAdmin(userId: String!): String!
@@ -151,7 +155,7 @@ type Mutation {
   updateAddress(addressId: String!, input: UpdateAddressInput!): Boolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): Category!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): Boolean!
-  updateProduct(id: String!, input: UpdateProductInput!): Product!
+  updateProduct(input: UpdateProductInput!, productId: String!): Product!
   updateUser(input: UpdateUserInput!): Boolean!
   updateVendor(input: UpdateVendorInput!): Boolean!
 }
@@ -253,10 +257,10 @@ type Query {
   getUser: User!
   getUserAddresses: [Address!]!
   getUserCart: Cart!
-  getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): FollowingsAndCount!
+  getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!): FollowingsAndCount!
   getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
   getVendor(vendorId: String!): Vendor!
-  getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!, vendorId: String!): FollowingsAndCount!
+  getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCount!
   getVendors: [Vendor!]!
 }
 
@@ -361,7 +365,8 @@ type Vendor {
   public_id: String!
   reviews: [VendorReview!]!
   updatedAt: DateTime!
-  user: User
+  user: User!
+  userId: String!
 }
 
 type VendorReview {

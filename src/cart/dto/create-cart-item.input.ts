@@ -1,12 +1,5 @@
-import { InputType, Field, Int, Float } from '@nestjs/graphql';
-import {
-  IsInt,
-  Min,
-  IsNumber,
-  IsNotEmpty,
-  IsUUID,
-  IsOptional,
-} from 'class-validator';
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsInt, Min, IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateCartItemInput {

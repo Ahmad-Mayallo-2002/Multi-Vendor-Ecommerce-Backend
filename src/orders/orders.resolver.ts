@@ -9,6 +9,7 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OrderAndPaymentClientSecret } from '../assets/objectTypes/orderAndPaymentClientSecret.type';
+import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -36,7 +37,7 @@ export class OrdersResolver {
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
   ): Promise<Order[]> {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return await this.ordersService.getUserOrders(
       sub.userId,
       take,
@@ -70,7 +71,7 @@ export class OrdersResolver {
     @Args('addressId', { type: () => String }) addressId: string,
     @CurrentUser() currentUser: Payload,
   ): Promise<OrderAndPaymentClientSecret> {
-    const { sub } = await currentUser;
+    const { sub } = currentUser;
     return await this.ordersService.createOrder(addressId, sub.userId);
   }
 }

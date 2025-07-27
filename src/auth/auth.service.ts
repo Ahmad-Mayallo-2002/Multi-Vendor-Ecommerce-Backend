@@ -105,10 +105,14 @@ export class AuthService {
 
   async login(input: LoginInput): Promise<AccessToken> {
     const user = (await this.validateUser(input)) as User;
+    const vendor = (await this.vendorRepo.findOne({
+      where: { userId: user.id },
+    })) as Vendor;
     const payload: Payload = {
       sub: {
         userId: user.id,
         role: user.role,
+        vendorId: vendor.id && vendor.id,
       },
     };
     const accessToken = await this.generateAccessToken(payload);

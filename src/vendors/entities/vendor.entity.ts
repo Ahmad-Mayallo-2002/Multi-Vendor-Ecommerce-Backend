@@ -1,4 +1,4 @@
-import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../assets/IdDate.entity';
 import {
   Column,
@@ -40,14 +40,18 @@ export class Vendor extends IdClass {
   @Field()
   logo: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   @Field()
   public_id: string;
+
+  @Column({ type: 'uuid' })
+  @Field()
+  userId: string;
 
   // Relations
   @OneToOne(() => User, (user) => user.vendor, { onDelete: 'CASCADE' })
   @JoinColumn()
-  @Field(() => User, { nullable: true })
+  @Field(() => User)
   user: Relation<User>;
 
   @OneToMany(() => Product, (products) => products.vendorId)
@@ -58,7 +62,7 @@ export class Vendor extends IdClass {
   @Field(() => [Following])
   followers: Relation<Following[]>;
 
-  @OneToMany(() => VendorReview, reviews => reviews.vendor)
+  @OneToMany(() => VendorReview, (reviews) => reviews.vendor)
   @Field(() => [VendorReview])
   reviews: Relation<VendorReview[]>;
 }

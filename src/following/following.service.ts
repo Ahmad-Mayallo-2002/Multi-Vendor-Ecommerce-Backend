@@ -8,7 +8,6 @@ import { Following } from './entities/following.entity';
 import { Repository } from 'typeorm';
 import { CreateFollowingInput } from './dto/create-following.input';
 import { FollowingsAndCount } from 'src/assets/objectTypes/following.type';
-import { log } from 'console';
 import { SortEnum } from '../assets/enum/sort.enum';
 
 @Injectable()
@@ -34,7 +33,6 @@ export class FollowingService {
       order,
     });
     if (!followers.length) throw new NotFoundException('You Have no Followers');
-    log(followers.length);
     return {
       followings: followers,
       count: followers.length,

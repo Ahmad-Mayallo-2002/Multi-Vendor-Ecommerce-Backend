@@ -30,7 +30,7 @@ export class OrdersResolver {
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => [Order], { name: 'getUserOrders' })
   async getUserOrders(
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
@@ -68,7 +68,7 @@ export class OrdersResolver {
   @Mutation(() => OrderAndPaymentClientSecret, { name: 'createOrder' })
   async createOrder(
     @Args('addressId', { type: () => String }) addressId: string,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
   ): Promise<OrderAndPaymentClientSecret> {
     const { sub } = await currentUser;
     return await this.ordersService.createOrder(addressId, sub.userId);

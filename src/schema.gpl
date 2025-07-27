@@ -82,6 +82,11 @@ input CreateProductInput {
   title: String!
 }
 
+input CreateProductReviewInput {
+  productId: String!
+  value: Float!
+}
+
 input CreateUserInput {
   email: String!
   password: String!
@@ -124,6 +129,7 @@ input LoginInput {
 type Mutation {
   addFollowing(input: CreateFollowingInput!): Following!
   addItemToCart(input: CreateCartItemInput!): CartItem!
+  addProductReview(input: CreateProductReviewInput!): ProductReview!
   addVendorReview(value: Float!, vendorId: String!): VendorReview!
   approveVendor(approve: Boolean!, vendorId: String!): String!
   cancelFollowing(vendorId: String!): Boolean!
@@ -211,11 +217,21 @@ type Product {
   orderItems: [OrderItem!]!
   price: Float!
   public_id: String!
+  reviews: [ProductReview!]!
   stock: Int!
   title: String!
   updatedAt: DateTime!
   vendor: Vendor!
   vendorId: String!
+}
+
+type ProductReview {
+  createdAt: DateTime!
+  id: String!
+  productId: String!
+  updatedAt: DateTime!
+  userId: String!
+  value: Float!
 }
 
 type Query {
@@ -225,6 +241,7 @@ type Query {
   getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
   getAllUsers(skip: Int!, sortByCreated: Sort, take: Int!): [User!]!
   getAverageVendorReview(vendorId: String!): Float!
+  getAvgProductReview(productId: String!): Float!
   getCart(id: String!): Cart!
   getCategories: [Category!]!
   getCategory(categoryId: String!): Category!
@@ -322,6 +339,7 @@ type User {
   email: String!
   followings: [Following!]
   id: String!
+  productReview: ProductReview!
   role: Role!
   updatedAt: DateTime!
   username: String!

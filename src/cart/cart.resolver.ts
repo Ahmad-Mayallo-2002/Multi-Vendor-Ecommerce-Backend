@@ -25,7 +25,7 @@ export class CartResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => Cart, { name: 'getUserCart' })
-  async getUserCart(@CurrentUser() currentUser: any): Promise<Cart> {
+  async getUserCart(@CurrentUser() currentUser: Payload): Promise<Cart> {
     const { sub } = await currentUser;
     return await this.cartService.getUserCart(sub.userId);
   }
@@ -42,7 +42,7 @@ export class CartResolver {
   @Mutation(() => CartItem, { name: 'addItemToCart' })
   async addItemToCart(
     @Args('input') input: CreateCartItemInput,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
   ): Promise<CartItem> {
     const { sub } = await currentUser;
     return await this.cartService.addItemToCart(input, sub.userId);

@@ -50,6 +50,6 @@ export class VendorReviewService {
   async averageVendorReview(vendorId: string): Promise<number> {
     await this.getVendor(vendorId);
     const avg = await this.reviewRepo.average('value', { vendorId });
-    return avg ?? 0;
+    return Number(avg?.toFixed(2)) || 0;
   }
 }

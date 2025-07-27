@@ -30,7 +30,7 @@ export class VendorsResolver {
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => Boolean, { name: 'updateVendor' })
   async updateVendor(
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
     @Args('input', { type: () => UpdateVendorInput })
     input: UpdateVendorInput,
   ): Promise<boolean> {
@@ -40,7 +40,7 @@ export class VendorsResolver {
 
   @Mutation(() => Boolean, { name: 'removeVendor' })
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
-  async removeVendor(@CurrentUser() currentUser: any) {
+  async removeVendor(@CurrentUser() currentUser: Payload) {
     const { sub } = await currentUser;
     return await this.vendorsService.deleteVendor(sub.vendorId);
   }

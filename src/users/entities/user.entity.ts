@@ -15,6 +15,7 @@ import { Vendor } from '../../vendors/entities/vendor.entity';
 import { Address } from '../../addresses/entities/address.entity';
 import { Category } from '../../categories/entities/category.entity';
 import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
+import { ProductReview } from '../../product-review/entities/product-review.entity';
 
 @Entity({ name: 'users' })
 @ObjectType()
@@ -58,4 +59,8 @@ export class User extends IdClass {
   @OneToOne(() => VendorReview, (vendorReview) => vendorReview.user)
   @Field(() => VendorReview)
   vendorReview: Relation<VendorReview>;
+
+  @OneToOne(() => ProductReview, (productReview) => productReview.user)
+  @Field(() => ProductReview)
+  productReview: Relation<ProductReview>;
 }

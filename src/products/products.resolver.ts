@@ -23,7 +23,7 @@ export class ProductsResolver {
   @Mutation(() => Product, { name: 'createProduct' })
   async createProduct(
     @Args('input') input: CreateProductInput,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
   ): Promise<Product> {
     const { sub } = await currentUser;
     return this.productsService.createProduct(input, sub.vendorId);
@@ -31,7 +31,7 @@ export class ProductsResolver {
 
   @Query(() => [Product], { name: 'getProducts' })
   async products(
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
     @Args('sortByFollowings', {

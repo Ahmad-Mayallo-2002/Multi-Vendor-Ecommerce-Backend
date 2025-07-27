@@ -29,7 +29,7 @@ export class UsersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Query(() => User, { name: 'getUser' })
-  async getUser(@CurrentUser() currentUser: any): Promise<User> {
+  async getUser(@CurrentUser() currentUser: Payload): Promise<User> {
     const { sub } = await currentUser;
     return await this.usersService.getUser(sub.userId);
   }
@@ -37,7 +37,7 @@ export class UsersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Mutation(() => Boolean, { name: 'removeUser' })
-  async removeUser(@CurrentUser() currentUser: any) {
+  async removeUser(@CurrentUser() currentUser: Payload) {
     const { sub } = await currentUser;
     return await this.usersService.deleteUser(sub.userId);
   }
@@ -46,7 +46,7 @@ export class UsersResolver {
   @Roles(Role.USER, Role.SUPER_ADMIN)
   @Mutation(() => Boolean, { name: 'updateUser' })
   async updateUser(
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
     @Args('input') input: UpdateUserInput,
   ) {
     const { sub } = await currentUser;

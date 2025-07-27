@@ -29,6 +29,8 @@ import { PriceScalar } from './scalars/totalPrice.scalar';
 import { PaymentMethod } from './orders/entities/payment-method.entity';
 import { VendorReviewModule } from './vendor-review/vendor-review.module';
 import { VendorReview } from './vendor-review/entities/vendor-review.entity';
+import { ProductReviewModule } from './product-review/product-review.module';
+import { ProductReview } from './product-review/entities/product-review.entity';
 
 @Module({
   imports: [
@@ -69,6 +71,7 @@ import { VendorReview } from './vendor-review/entities/vendor-review.entity';
         PaymentMethod,
         Vendor,
         VendorReview,
+        ProductReview
       ],
     }),
     UsersModule,
@@ -81,6 +84,7 @@ import { VendorReview } from './vendor-review/entities/vendor-review.entity';
     AddressesModule,
     VendorsModule,
     VendorReviewModule,
+    ProductReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService, PriceScalar],

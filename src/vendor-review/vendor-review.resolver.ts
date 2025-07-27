@@ -18,7 +18,7 @@ export class VendorReviewResolver {
   async addReview(
     @Args('vendorId', { type: () => String }) vendorId: string,
     @Args('value', { type: () => Float }) value: number,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
   ): Promise<VendorReview> {
     const { sub } = await currentUser;
     return await this.vendorReviewService.addOrUpdateReview(

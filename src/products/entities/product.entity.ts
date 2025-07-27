@@ -5,6 +5,7 @@ import { Category } from '../../categories/entities/category.entity';
 import { CartItem } from '../../cart/entities/cart-item.entity';
 import { OrderItem } from '../../orders/entities/order-item.entity';
 import { Vendor } from '../../vendors/entities/vendor.entity';
+import { ProductReview } from '../../product-review/entities/product-review.entity';
 
 @Entity({ name: 'products' })
 @ObjectType()
@@ -61,4 +62,8 @@ export class Product extends IdClass {
   @OneToMany(() => OrderItem, (orderItems) => orderItems.product)
   @Field(() => [OrderItem])
   orderItems: Relation<OrderItem[]>;
+
+  @OneToMany(() => ProductReview, (reviews) => reviews.product)
+  @Field(() => [ProductReview])
+  reviews: Relation<ProductReview[]>;
 }

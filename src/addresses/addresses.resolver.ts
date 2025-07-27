@@ -26,7 +26,9 @@ export class AddressesResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => [Address], { name: 'getUserAddresses' })
-  async getUserAddresses(@CurrentUser() currentUser: any): Promise<Address[]> {
+  async getUserAddresses(
+    @CurrentUser() currentUser: Payload,
+  ): Promise<Address[]> {
     const { sub } = await currentUser;
     return this.addressesService.getUserAddresses(sub.userId);
   }
@@ -68,7 +70,7 @@ export class AddressesResolver {
   @Mutation(() => Address, { name: 'createAddress' })
   async createAddress(
     @Args('input') input: CreateAddressInput,
-    @CurrentUser() currentUser: any,
+    @CurrentUser() currentUser: Payload,
   ) {
     const { sub } = await currentUser;
     return await this.addressesService.createAddress(input, sub.userId);

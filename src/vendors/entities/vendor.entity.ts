@@ -11,6 +11,7 @@ import {
 import { Product } from '../../products/entities/product.entity';
 import { Following } from '../../following/entities/following.entity';
 import { User } from '../../users/entities/user.entity';
+import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
 
 @Entity({ name: 'vendors' })
 @ObjectType()
@@ -35,10 +36,6 @@ export class Vendor extends IdClass {
   @Field(() => Boolean)
   isApproved: boolean;
 
-  @Column({ type: 'decimal', default: 0 })
-  @Field(() => Float)
-  rating: number;
-
   @Column({ type: 'text' })
   @Field()
   logo: string;
@@ -60,4 +57,8 @@ export class Vendor extends IdClass {
   @OneToMany(() => Following, (following) => following.vendor)
   @Field(() => [Following])
   followers: Relation<Following[]>;
+
+  @OneToMany(() => VendorReview, reviews => reviews.vendor)
+  @Field(() => [VendorReview])
+  reviews: Relation<VendorReview[]>;
 }

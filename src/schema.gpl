@@ -124,6 +124,7 @@ input LoginInput {
 type Mutation {
   addFollowing(input: CreateFollowingInput!): Following!
   addItemToCart(input: CreateCartItemInput!): CartItem!
+  addVendorReview(value: Float!, vendorId: String!): VendorReview!
   approveVendor(approve: Boolean!, vendorId: String!): String!
   cancelFollowing(vendorId: String!): Boolean!
   createAddress(input: CreateAddressInput!): Address!
@@ -223,6 +224,7 @@ type Query {
   getAllCarts: [Cart!]!
   getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
   getAllUsers(skip: Int!, sortByCreated: Sort, take: Int!): [User!]!
+  getAverageVendorReview(vendorId: String!): Float!
   getCart(id: String!): Cart!
   getCategories: [Category!]!
   getCategory(categoryId: String!): Category!
@@ -236,7 +238,7 @@ type Query {
   getUserCart: Cart!
   getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!, userId: String!): FollowingsAndCount!
   getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
-  getVendor: Vendor!
+  getVendor(vendorId: String!): Vendor!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!, vendorId: String!): FollowingsAndCount!
   getVendors: [Vendor!]!
 }
@@ -324,6 +326,7 @@ type User {
   updatedAt: DateTime!
   username: String!
   vendor: Vendor!
+  vendorReview: VendorReview!
 }
 
 type Vendor {
@@ -338,9 +341,18 @@ type Vendor {
   logo: String!
   products: [Product!]!
   public_id: String!
-  rating: Float!
+  reviews: [VendorReview!]!
   updatedAt: DateTime!
   user: User
+}
+
+type VendorReview {
+  createdAt: DateTime!
+  id: String!
+  updatedAt: DateTime!
+  userId: String!
+  value: Float!
+  vendorId: String!
 }
 
 """Total Price Scalar Stores as Cents"""

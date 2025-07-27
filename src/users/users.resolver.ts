@@ -9,8 +9,6 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { log } from 'console';
-import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => User)
 export class UsersResolver {

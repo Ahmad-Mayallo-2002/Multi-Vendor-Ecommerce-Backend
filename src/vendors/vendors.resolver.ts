@@ -8,6 +8,7 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { VendorExistsPipe } from './pipes/vendor-exists.pipe';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
@@ -19,9 +20,10 @@ export class VendorsResolver {
   }
 
   @Query(() => Vendor, { name: 'getVendor' })
-  async getVendor(@CurrentUser() currentUser: any): Promise<Vendor> {
-    const { sub } = await currentUser;
-    return await this.vendorsService.getVendor(sub.vendorId);
+  async getVendor(
+    @Args('vendorId', VendorExistsPipe) vendorId: string,
+  ): Promise<Vendor> {
+    return await this.vendorsService.getVendor(vendorId);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

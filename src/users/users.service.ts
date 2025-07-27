@@ -33,8 +33,7 @@ export class UsersService {
     const user = await this.userRepo.findOne({
       where: { id },
     });
-    if (!user) throw new NotFoundException('User is not Found');
-    return user;
+    return user as User;
   }
 
   async updateUser(id: string, input: UpdateUserInput): Promise<Boolean> {

@@ -18,8 +18,7 @@ export class VendorsService {
       where: { id },
       relations: ['user'],
     });
-    if (!vendor) throw new NotFoundException('This vendor is not found.');
-    return vendor;
+    return vendor as Vendor;
   }
 
   async getVendors(): Promise<Vendor[]> {

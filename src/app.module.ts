@@ -27,6 +27,8 @@ import { Vendor } from './vendors/entities/vendor.entity';
 import { ErrorResponse } from './assets/types/error.type';
 import { PriceScalar } from './scalars/totalPrice.scalar';
 import { PaymentMethod } from './orders/entities/payment-method.entity';
+import { VendorReviewModule } from './vendor-review/vendor-review.module';
+import { VendorReview } from './vendor-review/entities/vendor-review.entity';
 
 @Module({
   imports: [
@@ -66,6 +68,7 @@ import { PaymentMethod } from './orders/entities/payment-method.entity';
         Following,
         PaymentMethod,
         Vendor,
+        VendorReview,
       ],
     }),
     UsersModule,
@@ -77,6 +80,7 @@ import { PaymentMethod } from './orders/entities/payment-method.entity';
     FollowingModule,
     AddressesModule,
     VendorsModule,
+    VendorReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService, PriceScalar],

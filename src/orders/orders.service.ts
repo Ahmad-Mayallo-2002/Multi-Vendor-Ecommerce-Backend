@@ -148,25 +148,32 @@ export class OrdersService {
     return true;
   }
 
-  async refundOrder(paymentIntentId: string): Promise<string> {
+  async refundOrder(paymentIntentId: string, orderId: string): Promise<string> {
     const paymentIntent =
       await this.stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (!paymentIntent)
       throw new NotFoundException('No charge found for this PaymentIntent');
 
-    const refund = await this.stripe.refunds.create({
-      payment_intent: paymentIntentId,
-      reason: 'requested_by_customer',
-    });
-
-    log(refund);
-
     const payment = await this.paymentMethodRepo.findOne({
       where: { paymentIntentId },
     });
     if (!payment)
       throw new NotFoundException('No Payment for this PaymentIntent');
+
+    const refund = await this.stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      reason: 'requested_by_customer',
+    });
+
+    const items = await this.orderItemRepo.find({where: {orderId}});
+    for (const item of items) {
+      const product = await this.productRepo.findOne({where: {id: item.productId}});
+      if (!product) continue;
+      product.stock += item.quantity;
+      await this.productRepo.save(product);
+    }
+
     payment.status = Status.REFUND;
     await this.paymentMethodRepo.save(payment);
     return 'Order is Refunded';

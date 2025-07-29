@@ -143,7 +143,7 @@ type Mutation {
   createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
   orderPaid(paymentIntentId: String!): Boolean!
-  refundOrder(paymentIntentId: String!): String!
+  refundOrder(orderId: String!, paymentIntentId: String!): String!
   removeAddress(addressId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
   removeItemFromCart(itemId: String!): Boolean!

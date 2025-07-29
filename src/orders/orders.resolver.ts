@@ -100,7 +100,10 @@ export class OrdersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => String, { name: 'refundOrder' })
-  async refundOrder(@Args('paymentIntentId') id: string) {
-    return await this.ordersService.refundOrder(id);
+  async refundOrder(
+    @Args('paymentIntentId', { type: () => String }) paymentIntentId: string,
+    @Args('orderId', { type: () => String }) orderId: string,
+  ) {
+    return await this.ordersService.refundOrder(paymentIntentId, orderId);
   }
 }

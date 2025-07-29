@@ -13,12 +13,17 @@ import Stripe from 'stripe';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { PaymentMethod } from './entities/payment-method.entity';
 import { Payment } from '../assets/enum/payment-method.enum';
-import { OrderAndPaymentClientSecret } from '../assets/objectTypes/orderAndPaymentClientSecret.type';
+import { log } from 'console';
+import { Status } from '../assets/enum/order-status.enum';
+import { Product } from '../products/entities/product.entity';
+import { OrderResponse } from '../assets/objectTypes/OrderResponse.type';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
     @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
@@ -41,7 +46,8 @@ export class OrdersService {
   async createOrder(
     addressId: string,
     userId: string,
-  ): Promise<OrderAndPaymentClientSecret> {
+    paymentMethod: Payment,
+  ): Promise<OrderResponse> {
     const cart = await this.cartRepo.findOne({
       where: { userId },
       relations: ['cartItems', 'cartItems.product'],
@@ -58,7 +64,7 @@ export class OrdersService {
     const order = await this.orderRepo.save(newOrder);
 
     for (const item of cart.cartItems) {
-      if (item.quantity > item.product.stock) throw new ConflictException()
+      if (item.quantity > item.product.stock) throw new ConflictException();
       const orderItem = this.orderItemRepo.create({
         orderId: order.id,
         quantity: item.quantity,
@@ -74,9 +80,10 @@ export class OrdersService {
     );
 
     const newPayment = this.paymentMethodRepo.create({
-      method: Payment.STRIPE,
+      method: paymentMethod,
       totalPrice: cart.totalPrice,
       orderId: order.id,
+      paymentIntentId: paymentIntent.id,
     });
     const payment = await this.paymentMethodRepo.save(newPayment);
 
@@ -86,7 +93,41 @@ export class OrdersService {
     return {
       order,
       clientSecret: paymentIntent.client_secret as string,
+      paymentIntentId: paymentIntent.id,
     };
+  }
+
+  async markOrderAsPaid(paymentIntentId: string) {
+    const payment = await this.paymentMethodRepo.findOne({
+      where: { paymentIntentId },
+      relations: ['order'],
+    });
+
+    if (!payment) throw new NotFoundException('PaymentIntent not found');
+
+    const order: Order = payment.order;
+    order.status = Status.PAID;
+
+    const orderItems = await this.orderItemRepo.find({
+      where: {
+        orderId: order.id,
+      },
+    });
+
+    for (const item of orderItems) {
+      const product = await this.productRepo.findOne({
+        where: {
+          id: item.productId,
+        },
+      });
+      if (!product) continue;
+      product.stock -= item.quantity;
+      await this.productRepo.save(product);
+    }
+
+    await this.orderRepo.save(order);
+
+    return true;
   }
 
   async removeOrder(id: string): Promise<boolean> {

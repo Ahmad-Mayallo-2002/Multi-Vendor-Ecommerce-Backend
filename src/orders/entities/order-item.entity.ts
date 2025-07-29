@@ -21,11 +21,11 @@ export class OrderItem extends IdClass {
   @Field(() => Float)
   priceAtPayment: number;
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: true })
   @Field()
   productId: string;
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: true })
   @Field()
   orderId: string;
 

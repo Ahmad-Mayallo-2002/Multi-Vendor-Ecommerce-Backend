@@ -18,6 +18,7 @@ import { CloudinaryService } from '../cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
 import { Cart } from '../cart/entities/cart.entity';
+import { log } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -94,7 +95,6 @@ export class AuthService {
 
     const comparePass = await compare(input.password, user.password);
     if (!comparePass) throw new UnauthorizedException('Invalid Password');
-
     return user;
   }
 
@@ -112,16 +112,23 @@ export class AuthService {
       sub: {
         userId: user.id,
         role: user.role,
-        vendorId: vendor.id && vendor.id,
       },
     };
+    if (vendor) payload.sub.vendorId = vendor.id;
     const accessToken = await this.generateAccessToken(payload);
     let response = {
-      id: user.id,
-      role: user.role,
+      id: user?.id,
+      role: user?.role,
       token: String(accessToken),
     };
-    return !user.vendor ? response : { ...response, vendorId: user.vendor.id };
+    if (vendor) {
+      return {
+        ...response,
+        vendorId: vendor?.id,
+      };
+    } else {
+      return response;
+    }
   }
 
   async seedAdmin(userId: string): Promise<string> {

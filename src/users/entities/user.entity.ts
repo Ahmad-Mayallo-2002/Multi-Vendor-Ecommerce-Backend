@@ -16,6 +16,7 @@ import { Address } from '../../addresses/entities/address.entity';
 import { Category } from '../../categories/entities/category.entity';
 import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
 import { ProductReview } from '../../product-review/entities/product-review.entity';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity({ name: 'users' })
 @ObjectType()
@@ -48,6 +49,10 @@ export class User extends IdClass {
   @OneToOne(() => Cart, (cart) => cart.user)
   @Field(() => Cart)
   cart: Relation<Cart>;
+
+  @OneToMany(() => Order, (order) => order.user)
+  @Field(() => [Order])
+  order: Relation<Order[]>;
 
   @OneToMany(() => Following, (following) => following.user)
   @Field(() => [Following], { nullable: true })

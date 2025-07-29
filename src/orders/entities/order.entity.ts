@@ -4,6 +4,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   Relation,
@@ -48,14 +49,14 @@ export class Order extends IdClass {
   @Field(() => [OrderItem])
   orderItems: Relation<OrderItem[]>;
 
-  @OneToOne(() => User, (user) => user.cart)
+  @ManyToOne(() => User, (user) => user.order)
   @JoinColumn()
   @Field(() => User)
   user: Relation<User>;
 
   @OneToOne(() => PaymentMethod, (payment) => payment.order)
   @Field(() => PaymentMethod)
-  payment: Relation<Order>;
+  payment: Relation<PaymentMethod>;
 
   @OneToOne(() => Address, (address) => address.order)
   @JoinColumn()

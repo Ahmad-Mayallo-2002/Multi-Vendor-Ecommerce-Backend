@@ -15,9 +15,13 @@ export class PaymentMethod extends IdClass {
   @Field(() => Float)
   totalPrice: number;
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: true })
   @Field()
   orderId: string;
+
+  @Column({type: "varchar", length: 255})
+  @Field()
+  paymentIntentId: string;
 
   // Relations
   @OneToOne(() => Order, (order) => order.payment)

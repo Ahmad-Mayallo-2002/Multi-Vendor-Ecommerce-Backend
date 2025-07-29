@@ -71,7 +71,7 @@ import { ProductReview } from './product-review/entities/product-review.entity';
         PaymentMethod,
         Vendor,
         VendorReview,
-        ProductReview
+        ProductReview,
       ],
     }),
     UsersModule,

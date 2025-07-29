@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ObjectType,
+  Field,
+} from '@nestjs/graphql';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { UseGuards } from '@nestjs/common';
@@ -8,9 +16,10 @@ import { Role } from '../assets/enum/role.enum';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { OrderAndPaymentClientSecret } from '../assets/objectTypes/orderAndPaymentClientSecret.type';
+import { OrderResponse } from '../assets/objectTypes/OrderResponse.type';
 import { Payload } from '../assets/types/payload.type';
 import { OrderExistPipes } from './pipes/order-exist.pipe';
+import { Payment } from '../assets/enum/payment-method.enum';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -67,12 +76,24 @@ export class OrdersResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => OrderAndPaymentClientSecret, { name: 'createOrder' })
+  @Mutation(() => OrderResponse, { name: 'createOrder' })
   async createOrder(
     @Args('addressId', { type: () => String }) addressId: string,
+    @Args('paymentMethod', { type: () => Payment }) paymentMethod: Payment,
     @CurrentUser() currentUser: Payload,
-  ): Promise<OrderAndPaymentClientSecret> {
+  ): Promise<OrderResponse> {
     const { sub } = currentUser;
-    return await this.ordersService.createOrder(addressId, sub.userId);
+    return await this.ordersService.createOrder(
+      addressId,
+      sub.userId,
+      paymentMethod,
+    );
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Mutation(() => Boolean, { name: 'orderPaid' })
+  async confirmPayment(@Args('paymentIntentId') id: string) {
+    return await this.ordersService.markOrderAsPaid(id);
   }
 }

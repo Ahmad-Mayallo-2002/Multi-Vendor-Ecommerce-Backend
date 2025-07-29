@@ -139,9 +139,10 @@ type Mutation {
   cancelFollowing(vendorId: String!): Boolean!
   createAddress(input: CreateAddressInput!): Address!
   createCategory(input: CreateCategoryInput!): Category!
-  createOrder(addressId: String!): OrderAndPaymentClientSecret!
+  createOrder(addressId: String!, paymentMethod: Payment!): OrderResponse!
   createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
+  orderPaid(paymentIntentId: String!): Boolean!
   removeAddress(addressId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
   removeItemFromCart(itemId: String!): Boolean!
@@ -175,11 +176,6 @@ type Order {
   userId: String!
 }
 
-type OrderAndPaymentClientSecret {
-  clientSecret: String!
-  order: Order!
-}
-
 type OrderItem {
   createdAt: DateTime!
   id: String!
@@ -192,11 +188,17 @@ type OrderItem {
   updatedAt: DateTime!
 }
 
+type OrderResponse {
+  clientSecret: String!
+  order: Order!
+  paymentIntentId: String!
+}
+
 """Enum for Payment Method"""
 enum Payment {
-  CASH
+  CREDIT
   PAYPAL
-  STRIPE
+  VISA
 }
 
 type PaymentMethod {
@@ -205,6 +207,7 @@ type PaymentMethod {
   method: Payment!
   order: Order!
   orderId: String!
+  paymentIntentId: String!
   totalPrice: Float!
   updatedAt: DateTime!
 }
@@ -343,6 +346,7 @@ type User {
   email: String!
   followings: [Following!]
   id: String!
+  order: [Order!]!
   productReview: ProductReview!
   role: Role!
   updatedAt: DateTime!

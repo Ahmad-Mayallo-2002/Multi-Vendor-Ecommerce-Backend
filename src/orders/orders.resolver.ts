@@ -93,7 +93,7 @@ export class OrdersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => Boolean, { name: 'orderPaid' })
-  async confirmPayment(@Args('paymentIntentId') id: string) {
+  async markOrderAsPaid(@Args('paymentIntentId') id: string) {
     return await this.ordersService.markOrderAsPaid(id);
   }
 

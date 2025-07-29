@@ -5,7 +5,9 @@ export enum Status {
   PAID = 'PAID',
   UNPAID = 'UNPAID',
   FAILED = 'FAILED',
+  REFUND = 'REFUND',
 }
+
 registerEnumType(Status, {
   name: 'Status',
   description: 'Order Status Enum',

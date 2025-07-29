@@ -19,7 +19,7 @@ export class VendorReview extends IdClass {
   @Field(() => Float)
   value: number;
 
-  @OneToOne(() => User, (user) => user.vendorReview)
+  @ManyToOne(() => User, (user) => user.vendorReview)
   @JoinColumn()
   user: Relation<User>;
 

@@ -14,7 +14,7 @@ type Address {
   country: String!
   createdAt: DateTime!
   id: String!
-  order: Order!
+  order: [Order!]!
   state: String!
   updatedAt: DateTime!
   user: User!
@@ -143,6 +143,7 @@ type Mutation {
   createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
   orderPaid(paymentIntentId: String!): Boolean!
+  refundOrder(paymentIntentId: String!): String!
   removeAddress(addressId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
   removeItemFromCart(itemId: String!): Boolean!
@@ -169,7 +170,6 @@ type Order {
   orderItems: [OrderItem!]!
   payment: PaymentMethod!
   paymentId: String!
-  status: Status!
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!
@@ -196,7 +196,7 @@ type OrderResponse {
 
 """Enum for Payment Method"""
 enum Payment {
-  CREDIT
+  CARD
   PAYPAL
   VISA
 }
@@ -208,6 +208,7 @@ type PaymentMethod {
   order: Order!
   orderId: String!
   paymentIntentId: String!
+  status: Status!
   totalPrice: Float!
   updatedAt: DateTime!
 }
@@ -285,6 +286,7 @@ enum Status {
   FAILED
   PAID
   PENDING
+  REFUND
   UNPAID
 }
 
@@ -352,7 +354,7 @@ type User {
   updatedAt: DateTime!
   username: String!
   vendor: Vendor!
-  vendorReview: VendorReview!
+  vendorReview: [VendorReview!]!
 }
 
 type Vendor {

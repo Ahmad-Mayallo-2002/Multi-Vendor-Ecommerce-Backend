@@ -96,4 +96,11 @@ export class OrdersResolver {
   async confirmPayment(@Args('paymentIntentId') id: string) {
     return await this.ordersService.markOrderAsPaid(id);
   }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Mutation(() => String, { name: 'refundOrder' })
+  async refundOrder(@Args('paymentIntentId') id: string) {
+    return await this.ordersService.refundOrder(id);
+  }
 }

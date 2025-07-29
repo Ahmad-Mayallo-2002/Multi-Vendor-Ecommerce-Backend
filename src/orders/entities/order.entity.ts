@@ -40,10 +40,6 @@ export class Order extends IdClass {
   @Field()
   paymentId: string;
 
-  @Column({ type: 'enum', enum: Status, default: Status.PENDING })
-  @Field(() => Status)
-  status: Status;
-
   // Relations
   @OneToMany(() => OrderItem, (orderItems) => orderItems.order)
   @Field(() => [OrderItem])
@@ -58,7 +54,7 @@ export class Order extends IdClass {
   @Field(() => PaymentMethod)
   payment: Relation<PaymentMethod>;
 
-  @OneToOne(() => Address, (address) => address.order)
+  @ManyToOne(() => Address, (address) => address.order)
   @JoinColumn()
   @Field(() => Address)
   address: Relation<Address>;

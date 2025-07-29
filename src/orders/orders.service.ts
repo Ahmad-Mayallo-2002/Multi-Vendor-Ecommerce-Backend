@@ -6,17 +6,17 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { Cart } from '../cart/entities/cart.entity';
 import Stripe from 'stripe';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { PaymentMethod } from './entities/payment-method.entity';
 import { Payment } from '../assets/enum/payment-method.enum';
-import { log } from 'console';
 import { Status } from '../assets/enum/order-status.enum';
 import { Product } from '../products/entities/product.entity';
 import { OrderResponse } from '../assets/objectTypes/OrderResponse.type';
+import { log } from 'console';
 
 @Injectable()
 export class OrdersService {
@@ -29,6 +29,7 @@ export class OrdersService {
     @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
     @InjectRepository(PaymentMethod)
     private readonly paymentMethodRepo: Repository<PaymentMethod>,
+    private readonly dataSource: DataSource,
   ) {}
 
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -48,53 +49,70 @@ export class OrdersService {
     userId: string,
     paymentMethod: Payment,
   ): Promise<OrderResponse> {
-    const cart = await this.cartRepo.findOne({
-      where: { userId },
-      relations: ['cartItems', 'cartItems.product'],
-    });
-    if (!cart || !cart.cartItems.length)
-      throw new BadRequestException('Cart is Empty');
-
-    const newOrder = this.orderRepo.create({
-      addressId,
-      userId,
-      totalPrice: cart.totalPrice,
-    });
-
-    const order = await this.orderRepo.save(newOrder);
-
-    for (const item of cart.cartItems) {
-      if (item.quantity > item.product.stock) throw new ConflictException();
-      const orderItem = this.orderItemRepo.create({
-        orderId: order.id,
-        quantity: item.quantity,
-        priceAtPayment: item.priceAtPayment,
-        productId: item.productId,
+    return await this.dataSource.transaction(async (manager) => {
+      const cart = await this.cartRepo.findOne({
+        where: { userId },
+        relations: ['cartItems', 'cartItems.product'],
       });
-      await this.orderItemRepo.save(orderItem);
-    }
 
-    const paymentIntent = await this.createPaymentIntent(
-      cart.totalPrice,
-      'usd',
-    );
+      if (!cart || !cart.cartItems.length)
+        throw new BadRequestException('Cart is Empty');
 
-    const newPayment = this.paymentMethodRepo.create({
-      method: paymentMethod,
-      totalPrice: cart.totalPrice,
-      orderId: order.id,
-      paymentIntentId: paymentIntent.id,
+      // Step 1: Create Order
+      const newOrder = this.orderRepo.create({
+        addressId,
+        userId,
+        totalPrice: cart.totalPrice,
+      });
+
+      const order = await manager.save(this.orderRepo.create(newOrder));
+
+      // Step 2: Create OrderItems
+      for (const item of cart.cartItems) {
+        if (item.quantity > item.product.stock)
+          throw new ConflictException('Insufficient stock');
+
+        const orderItem = this.orderItemRepo.create({
+          orderId: order.id,
+          quantity: item.quantity,
+          priceAtPayment: item.priceAtPayment,
+          productId: item.productId,
+        });
+
+        await manager.save(orderItem);
+      }
+
+      // Step 3: Create PaymentIntent (outside the DB, won't rollback on failure)
+      const paymentIntent = await this.createPaymentIntent(
+        cart.totalPrice,
+        'usd',
+      );
+
+      const brand = paymentIntent.payment_method_types;
+
+      if (paymentMethod.toLowerCase() !== brand[0].toLowerCase())
+        throw new BadRequestException('Card does not match selected method');
+
+      // Step 4: Save Payment record
+      const newPayment = this.paymentMethodRepo.create({
+        method: paymentMethod,
+        totalPrice: cart.totalPrice,
+        orderId: order.id,
+        paymentIntentId: paymentIntent.id,
+      });
+
+      const payment = await manager.save(newPayment);
+
+      // Step 5: Attach payment to order
+      order.paymentId = payment.id;
+      await manager.save(order);
+
+      return {
+        order,
+        clientSecret: paymentIntent.client_secret as string,
+        paymentIntentId: paymentIntent.id,
+      };
     });
-    const payment = await this.paymentMethodRepo.save(newPayment);
-
-    order.paymentId = payment.id;
-    await this.orderRepo.save(order);
-
-    return {
-      order,
-      clientSecret: paymentIntent.client_secret as string,
-      paymentIntentId: paymentIntent.id,
-    };
   }
 
   async markOrderAsPaid(paymentIntentId: string) {
@@ -106,7 +124,7 @@ export class OrdersService {
     if (!payment) throw new NotFoundException('PaymentIntent not found');
 
     const order: Order = payment.order;
-    order.status = Status.PAID;
+    payment.status = Status.PAID;
 
     const orderItems = await this.orderItemRepo.find({
       where: {
@@ -125,9 +143,33 @@ export class OrdersService {
       await this.productRepo.save(product);
     }
 
-    await this.orderRepo.save(order);
+    await this.paymentMethodRepo.save(payment);
 
     return true;
+  }
+
+  async refundOrder(paymentIntentId: string): Promise<string> {
+    const paymentIntent =
+      await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (!paymentIntent)
+      throw new NotFoundException('No charge found for this PaymentIntent');
+
+    const refund = await this.stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      reason: 'requested_by_customer',
+    });
+
+    log(refund);
+
+    const payment = await this.paymentMethodRepo.findOne({
+      where: { paymentIntentId },
+    });
+    if (!payment)
+      throw new NotFoundException('No Payment for this PaymentIntent');
+    payment.status = Status.REFUND;
+    await this.paymentMethodRepo.save(payment);
+    return 'Order is Refunded';
   }
 
   async removeOrder(id: string): Promise<boolean> {

@@ -3,11 +3,12 @@ import { IdClass } from '../../assets/IdDate.entity';
 import { Column, Entity, JoinColumn, OneToOne, Relation } from 'typeorm';
 import { Payment } from '../../assets/enum/payment-method.enum';
 import { Order } from '../../orders/entities/order.entity';
+import { Status } from '../../assets/enum/order-status.enum';
 
 @Entity({ name: 'paymentMethods' })
 @ObjectType()
 export class PaymentMethod extends IdClass {
-  @Column({ type: 'enum', enum: Payment, default: Payment.STRIPE })
+  @Column({ type: 'enum', enum: Payment })
   @Field(() => Payment)
   method: Payment;
 
@@ -15,11 +16,15 @@ export class PaymentMethod extends IdClass {
   @Field(() => Float)
   totalPrice: number;
 
+  @Column({ type: 'enum', enum: Status, default: Status.PENDING })
+  @Field(() => Status)
+  status: Status;
+
   @Column({ type: 'uuid', nullable: true })
   @Field()
   orderId: string;
 
-  @Column({type: "varchar", length: 255})
+  @Column({ type: 'varchar', length: 255 })
   @Field()
   paymentIntentId: string;
 

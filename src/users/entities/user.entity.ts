@@ -61,11 +61,11 @@ export class User extends IdClass {
   @OneToMany(() => Category, (category) => category.user)
   categories: Relation<Category[]>;
 
-  @OneToOne(() => VendorReview, (vendorReview) => vendorReview.user)
-  @Field(() => VendorReview)
-  vendorReview: Relation<VendorReview>;
+  @OneToMany(() => VendorReview, (vendorReview) => vendorReview.user)
+  @Field(() => [VendorReview])
+  vendorReview: Relation<VendorReview[]>;
 
-  @OneToOne(() => ProductReview, (productReview) => productReview.user)
+  @OneToMany(() => ProductReview, (productReview) => productReview.user)
   @Field(() => ProductReview)
   productReview: Relation<ProductReview>;
 }

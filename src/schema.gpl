@@ -142,8 +142,6 @@ type Mutation {
   createOrder(addressId: String!, paymentMethod: Payment!): OrderResponse!
   createProduct(input: CreateProductInput!): Product!
   login(input: LoginInput!): AccessToken!
-  orderPaid(paymentIntentId: String!): Boolean!
-  refundOrder(orderId: String!, paymentIntentId: String!): String!
   removeAddress(addressId: String!): Boolean!
   removeCategory(categoryId: String!): Boolean!
   removeItemFromCart(itemId: String!): Boolean!
@@ -265,7 +263,7 @@ type Query {
   getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
   getVendor(vendorId: String!): Vendor!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCount!
-  getVendors: [Vendor!]!
+  getVendors: VendorResponse!
 }
 
 """Role Enum"""
@@ -373,6 +371,12 @@ type Vendor {
   updatedAt: DateTime!
   user: User!
   userId: String!
+}
+
+type VendorResponse {
+  data: [Vendor!]!
+  message: String!
+  statusCode: Int!
 }
 
 type VendorReview {

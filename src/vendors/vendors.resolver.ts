@@ -1,4 +1,11 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Field,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
+} from '@nestjs/graphql';
 import { VendorsService } from './vendors.service';
 import { Vendor } from './entities/vendor.entity';
 import { UpdateVendorInput } from './dto/update-vendor.input';
@@ -10,14 +17,25 @@ import { Role } from '../assets/enum/role.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VendorExistsPipe } from './pipes/vendor-exists.pipe';
 import { Payload } from '../assets/types/payload.type';
+import { GraphQLResponse } from '../assets/types/response.type';
+
+@ObjectType()
+class VendorResponse extends GraphQLResponse<Vendor> {
+  @Field(() => [Vendor])
+  data: Vendor[];
+}
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  @Query(() => [Vendor], { name: 'getVendors' })
-  async getVendors(): Promise<Vendor[]> {
-    return await this.vendorsService.getVendors();
+  @Query(() => VendorResponse, { name: 'getVendors' })
+  async getVendors(): Promise<VendorResponse> {
+    return {
+      data: await this.vendorsService.getVendors(),
+      statusCode: 200,
+      message: 'asdasd',
+    };
   }
 
   @Query(() => Vendor, { name: 'getVendor' })

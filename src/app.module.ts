@@ -31,6 +31,7 @@ import { VendorReviewModule } from './vendor-review/vendor-review.module';
 import { VendorReview } from './vendor-review/entities/vendor-review.entity';
 import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
+import { WebhookModule } from './webhook.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { ProductReview } from './product-review/entities/product-review.entity';
     VendorsModule,
     VendorReviewModule,
     ProductReviewModule,
+    WebhookModule,
   ],
   controllers: [AppController],
   providers: [AppService, PriceScalar],

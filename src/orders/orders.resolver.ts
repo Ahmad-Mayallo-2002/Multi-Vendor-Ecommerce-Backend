@@ -16,7 +16,7 @@ import { Role } from '../assets/enum/role.enum';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { SortEnum } from '../assets/enum/sort.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { OrderResponse } from '../assets/objectTypes/OrderResponse.type';
+import { OrderResponse } from '../assets/objectTypes/orderResponse.type';
 import { Payload } from '../assets/types/payload.type';
 import { OrderExistPipes } from './pipes/order-exist.pipe';
 import { Payment } from '../assets/enum/payment-method.enum';
@@ -88,22 +88,5 @@ export class OrdersResolver {
       sub.userId,
       paymentMethod,
     );
-  }
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'orderPaid' })
-  async markOrderAsPaid(@Args('paymentIntentId') id: string) {
-    return await this.ordersService.markOrderAsPaid(id);
-  }
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => String, { name: 'refundOrder' })
-  async refundOrder(
-    @Args('paymentIntentId', { type: () => String }) paymentIntentId: string,
-    @Args('orderId', { type: () => String }) orderId: string,
-  ) {
-    return await this.ordersService.refundOrder(paymentIntentId, orderId);
   }
 }

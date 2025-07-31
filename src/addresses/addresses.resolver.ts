@@ -9,6 +9,7 @@ import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../assets/enum/role.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Payload } from '../assets/types/payload.type';
 
 @Resolver(() => Address)
 export class AddressesResolver {

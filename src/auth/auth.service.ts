@@ -55,7 +55,7 @@ export class AuthService {
 
     return newUser;
   }
-
+  // Split in Code Signup Vendor
   async signupVendor(
     userInput: CreateUserInput,
     vendorInput: CreateVendorInput,
@@ -91,10 +91,10 @@ export class AuthService {
       where: { email: input.email },
       relations: ['vendor'],
     });
-    if (!user) throw new UnauthorizedException('Invalid Email');
+    if (!user) throw new NotFoundException('Invalid Email');
 
     const comparePass = await compare(input.password, user.password);
-    if (!comparePass) throw new UnauthorizedException('Invalid Password');
+    if (!comparePass) throw new Error('Invalid Password');
     return user;
   }
 
@@ -105,32 +105,31 @@ export class AuthService {
 
   async login(input: LoginInput): Promise<AccessToken> {
     const user = (await this.validateUser(input)) as User;
-    const vendor = (await this.vendorRepo.findOne({
-      where: { userId: user.id },
-    })) as Vendor;
+
     const payload: Payload = {
       sub: {
         userId: user.id,
         role: user.role,
       },
     };
-    if (vendor) payload.sub.vendorId = vendor.id;
+    if (user.vendor) payload.sub.vendorId = user.vendor.id;
     const accessToken = await this.generateAccessToken(payload);
     let response = {
       id: user?.id,
       role: user?.role,
       token: String(accessToken),
     };
-    if (vendor) {
+    if (user.vendor) {
       return {
         ...response,
-        vendorId: vendor?.id,
+        vendorId: user.vendor?.id,
       };
     } else {
       return response;
     }
   }
 
+  // Upsert Seed Admin to Add or Update User to Super Admin With Specific Credintials
   async seedAdmin(userId: string): Promise<string> {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('User is not Found');

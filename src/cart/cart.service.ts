@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
@@ -71,6 +75,9 @@ export class CartService {
     const currentItem = await this.cartItemRepo.findOne({
       where: { productId: input.productId },
     });
+
+    // Validate Stock Product with Quantity
+
     if (!currentItem) {
       const item = this.cartItemRepo.create({
         ...input,
@@ -91,8 +98,7 @@ export class CartService {
 
   async removeItemFromCart(itemId: string): Promise<boolean> {
     const item = await this.getCartItem(itemId);
-    const cartId = item.cartId;
-    const priceAtPayment = item.priceAtPayment;
+    const { priceAtPayment, cartId } = item;
     await this.cartItemRepo.delete({ id: itemId });
     const cart = await this.getCart(cartId);
     cart.totalPrice -= priceAtPayment;
@@ -105,26 +111,26 @@ export class CartService {
     input: UpdateCartItemInput,
   ): Promise<boolean> {
     const item = await this.getCartItem(itemId);
+    const product = await this.getProduct(item.productId);
+    if (product.stock < input.quantity)
+      throw new BadRequestException('Quantity is Bigger than Stock');
+
+    const cart = await this.getCart(item.cartId);
+
+    cart.totalPrice -= item.priceAtPayment;
+
     item.quantity = input.quantity;
+
     const priceAtPayment =
       item.product.price * input.quantity * (1 - item.product.discount / 100);
+
     item.priceAtPayment = priceAtPayment;
+
     await this.cartItemRepo.save(item);
-    const cartItems = await this.cartItemRepo.find({
-      where: { cartId: item.cartId },
-      relations: ['product'],
-    });
-    let newTotalPrice: number = 0;
-    for (let i = 0; i < cartItems.length; i++) {
-      newTotalPrice +=
-        cartItems[i].quantity *
-        cartItems[i].product.price *
-        (1 - cartItems[i].product.discount / 100);
-    }
-    await this.cartRepo.update(
-      { id: item.cartId },
-      { totalPrice: newTotalPrice },
-    );
+
+    cart.totalPrice += priceAtPayment;
+
+    await this.cartRepo.save(cart);
     return true;
   }
 }

@@ -15,8 +15,9 @@ import { PaymentMethod } from './entities/payment-method.entity';
 import { Payment } from '../assets/enum/payment-method.enum';
 import { Status } from '../assets/enum/order-status.enum';
 import { Product } from '../products/entities/product.entity';
-import { OrderResponse } from '../assets/objectTypes/OrderResponse.type';
+import { OrderResponse } from '../assets/objectTypes/orderResponse.type';
 import { log } from 'console';
+import { CartItem } from '../cart/entities/cart-item.entity';
 
 @Injectable()
 export class OrdersService {
@@ -26,6 +27,8 @@ export class OrdersService {
     private readonly productRepo: Repository<Product>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
+    @InjectRepository(CartItem)
+    private readonly cartItemRepo: Repository<CartItem>,
     @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
     @InjectRepository(PaymentMethod)
     private readonly paymentMethodRepo: Repository<PaymentMethod>,
@@ -36,11 +39,19 @@ export class OrdersService {
     apiVersion: '2025-06-30.basil',
   });
 
-  async createPaymentIntent(totalPrice: number, currency: string = 'usd') {
+  // Stock Quantity in Product and ORder
+  async createPaymentIntent(
+    totalPrice: number,
+    currency: string = 'usd',
+    orderId: string,
+  ) {
     return this.stripe.paymentIntents.create({
-      amount: Math.round(totalPrice * 100),
+      amount: totalPrice * 100,
       currency,
       payment_method_types: ['card'],
+      metadata: {
+        orderId,
+      },
     });
   }
 
@@ -86,6 +97,7 @@ export class OrdersService {
       const paymentIntent = await this.createPaymentIntent(
         cart.totalPrice,
         'usd',
+        order.id,
       );
 
       const brand = paymentIntent.payment_method_types;
@@ -123,6 +135,15 @@ export class OrdersService {
 
     if (!payment) throw new NotFoundException('PaymentIntent not found');
 
+    const userId = payment.order.userId;
+
+    const cart = await this.cartRepo.findOne({ where: { userId } });
+    if (!cart) throw new NotFoundException('Cart is not Found');
+
+    cart.totalPrice = 0;
+    await this.cartRepo.save(cart);
+    await this.cartItemRepo.delete({ cartId: cart.id });
+
     const order: Order = payment.order;
     payment.status = Status.PAID;
 
@@ -130,14 +151,11 @@ export class OrdersService {
       where: {
         orderId: order.id,
       },
+      relations: ['product'],
     });
 
     for (const item of orderItems) {
-      const product = await this.productRepo.findOne({
-        where: {
-          id: item.productId,
-        },
-      });
+      const product = item.product;
       if (!product) continue;
       product.stock -= item.quantity;
       await this.productRepo.save(product);
@@ -148,7 +166,20 @@ export class OrdersService {
     return true;
   }
 
-  async refundOrder(paymentIntentId: string, orderId: string): Promise<string> {
+  async markOrderAsFailed(paymentIntentId: string): Promise<string> {
+    const paymentMethod = await this.paymentMethodRepo.findOne({
+      where: { paymentIntentId },
+    });
+    if (!paymentMethod)
+      throw new NotFoundException('No Payment found for this PaymentIntent');
+
+    paymentMethod.status = Status.FAILED;
+    await this.paymentMethodRepo.save(paymentMethod);
+
+    return 'Order Payment is Failed';
+  }
+
+  async refundOrder(paymentIntentId: string): Promise<string> {
     const paymentIntent =
       await this.stripe.paymentIntents.retrieve(paymentIntentId);
 
@@ -161,14 +192,19 @@ export class OrdersService {
     if (!payment)
       throw new NotFoundException('No Payment for this PaymentIntent');
 
-    const refund = await this.stripe.refunds.create({
+    const orderId = payment.orderId;
+
+    await this.stripe.refunds.create({
       payment_intent: paymentIntentId,
       reason: 'requested_by_customer',
     });
 
-    const items = await this.orderItemRepo.find({where: {orderId}});
+    const items = await this.orderItemRepo.find({
+      where: { orderId },
+      relations: ['product'],
+    });
     for (const item of items) {
-      const product = await this.productRepo.findOne({where: {id: item.productId}});
+      const product = item.product;
       if (!product) continue;
       product.stock += item.quantity;
       await this.productRepo.save(product);

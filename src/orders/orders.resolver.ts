@@ -10,16 +10,16 @@ import {
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { SortEnum } from '../assets/enum/sort.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { OrderResponse } from '../assets/objectTypes/orderResponse.type';
-import { Payload } from '../assets/types/payload.type';
-import { OrderExistPipes } from './pipes/order-exist.pipe';
-import { Payment } from '../assets/enum/payment-method.enum';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
+import { RolesGuard } from '../common/guards/role.guard';
+import { SortEnum } from '../common/enum/sort.enum';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { OrderResponse } from '../common/objectTypes/orderResponse.type';
+import { Payload } from '../common/types/payload.type';
+import { Payment } from '../common/enum/payment-method.enum';
+import { OrderExistPipes } from '../common/order-exist.pipe';
 
 @Resolver(() => Order)
 export class OrdersResolver {

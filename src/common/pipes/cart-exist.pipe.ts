@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ExistsPipe } from '../../pipes/exists.pipe';
-import { Cart } from '../entities/cart.entity';
+import { ExistsPipe } from './exists.pipe';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Cart } from '../../cart/entities/cart.entity';
 
 @Injectable()
 export class CartExistPipes extends ExistsPipe<Cart> {

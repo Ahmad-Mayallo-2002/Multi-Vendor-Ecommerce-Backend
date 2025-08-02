@@ -1,41 +1,23 @@
-import {
-  Args,
-  Field,
-  Mutation,
-  ObjectType,
-  Query,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { VendorsService } from './vendors.service';
 import { Vendor } from './entities/vendor.entity';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { VendorExistsPipe } from './pipes/vendor-exists.pipe';
-import { Payload } from '../assets/types/payload.type';
-import { GraphQLResponse } from '../assets/types/response.type';
-
-@ObjectType()
-class VendorResponse extends GraphQLResponse<Vendor> {
-  @Field(() => [Vendor])
-  data: Vendor[];
-}
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Payload } from '../common/types/payload.type';
+import { VendorExistsPipe } from '../common/pipes/vendor-exists.pipe';
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  @Query(() => VendorResponse, { name: 'getVendors' })
-  async getVendors(): Promise<VendorResponse> {
-    return {
-      data: await this.vendorsService.getVendors(),
-      statusCode: 200,
-      message: 'asdasd',
-    };
+  @Query(() => [Vendor], { name: 'getVendors' })
+  async getVendors(): Promise<Vendor[]> {
+    return await this.vendorsService.getVendors();
   }
 
   @Query(() => Vendor, { name: 'getVendor' })

@@ -4,6 +4,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { log } from 'console';
 import { map, Observable } from 'rxjs';
 
 @Injectable()
@@ -15,8 +16,9 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         return {
-          data: data,
-          success: 200,
+          data,
+          statusCode: 200,
+          message: 'Operation is Done',
         };
       }),
     );

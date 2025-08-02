@@ -5,8 +5,8 @@ import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { ValidationPipe } from '@nestjs/common';
 import cors from 'cors';
 import * as bodyParser from 'body-parser';
-import { ResponseInterceptor } from './assets/interceptors/response.interceptor';
-import { RequestTimerInterceptor } from './assets/interceptors/request-timer.interceptor';
+import { RequestTimerInterceptor } from './common/interceptors/request-timer.interceptor';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,7 +20,10 @@ async function bootstrap() {
       credentials: true,
     }),
   );
-  app.useGlobalInterceptors(new RequestTimerInterceptor());
+  app.useGlobalInterceptors(
+    new RequestTimerInterceptor(),
+    // new ResponseInterceptor(),
+  );
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 3000);
 }

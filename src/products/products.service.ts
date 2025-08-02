@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
-import { SortEnum } from '../assets/enum/sort.enum';
+import { SortEnum } from '../common/enum/sort.enum';
 
 @Injectable()
 export class ProductsService {

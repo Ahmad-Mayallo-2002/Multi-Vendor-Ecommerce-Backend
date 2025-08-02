@@ -2,15 +2,15 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { FollowingService } from './following.service';
 import { Following } from './entities/following.entity';
 import { CreateFollowingInput } from './dto/create-following.input';
-import { FollowingsAndCount } from '../assets/objectTypes/following.type';
+import { FollowingsAndCount } from '../common/objectTypes/following.type';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Role } from '../assets/enum/role.enum';
-import { Roles } from '../auth/decorators/role.decorator';
-import { SortEnum } from '../assets/enum/sort.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Payload } from '../assets/types/payload.type';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Role } from '../common/enum/role.enum';
+import { Roles } from '../common/decorators/role.decorator';
+import { SortEnum } from '../common/enum/sort.enum';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Payload } from '../common/types/payload.type';
 
 @Resolver(() => Following)
 export class FollowingResolver {

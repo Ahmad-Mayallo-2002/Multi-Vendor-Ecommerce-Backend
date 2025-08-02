@@ -6,9 +6,9 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from '../entities/product.entity';
 import { Repository } from 'typeorm';
-import { Role } from '../../assets/enum/role.enum';
+import { Role } from '../../common/enum/role.enum';
+import { Product } from '../../products/entities/product.entity';
 
 @Injectable()
 export class VendorOwnsProductGuard implements CanActivate {

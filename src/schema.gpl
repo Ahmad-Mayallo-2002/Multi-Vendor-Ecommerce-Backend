@@ -263,7 +263,7 @@ type Query {
   getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): [Order!]!
   getVendor(vendorId: String!): Vendor!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCount!
-  getVendors: VendorResponse!
+  getVendors: [Vendor!]!
 }
 
 """Role Enum"""
@@ -371,12 +371,6 @@ type Vendor {
   updatedAt: DateTime!
   user: User!
   userId: String!
-}
-
-type VendorResponse {
-  data: [Vendor!]!
-  message: String!
-  statusCode: Int!
 }
 
 type VendorReview {

@@ -6,12 +6,9 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { log } from 'console';
 import { Request } from 'express';
 import Stripe from 'stripe';
-import { Repository } from 'typeorm';
-import { PaymentMethod } from './orders/entities/payment-method.entity';
 import { OrdersService } from './orders/orders.service';
 
 const stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}`, {
@@ -20,11 +17,7 @@ const stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}`, {
 
 @Controller('webhook')
 export class WebhookController {
-  constructor(
-    @InjectRepository(PaymentMethod)
-    private paymentMethodRepo: Repository<PaymentMethod>,
-    private orderService: OrdersService,
-  ) {}
+  constructor(private orderService: OrdersService) {}
 
   @Post()
   @HttpCode(200)

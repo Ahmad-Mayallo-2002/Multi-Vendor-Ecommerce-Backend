@@ -7,8 +7,8 @@ import {
   OneToOne,
   Relation,
 } from 'typeorm';
-import { IdClass } from '../../assets/IdDate.entity';
-import { Role } from '../../assets/enum/role.enum';
+import { IdClass } from '../../common/IdDate.entity';
+import { Role } from '../../common/enum/role.enum';
 import { Cart } from '../../cart/entities/cart.entity';
 import { Following } from '../../following/entities/following.entity';
 import { Vendor } from '../../vendors/entities/vendor.entity';

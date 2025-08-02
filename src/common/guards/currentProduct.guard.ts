@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from '../entities/product.entity';
 import { Repository } from 'typeorm';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { Product } from '../../products/entities/product.entity';
 
 export class CurrentProductGuard implements CanActivate {
   constructor(

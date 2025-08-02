@@ -4,12 +4,12 @@ import { Address } from './entities/address.entity';
 import { UpdateAddressInput } from './dto/update-address.input';
 import { CreateAddressInput } from './dto/create-address.input';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Payload } from '../assets/types/payload.type';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Payload } from '../common/types/payload.type';
 
 @Resolver(() => Address)
 export class AddressesResolver {

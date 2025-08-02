@@ -24,7 +24,7 @@ import { AddressesModule } from './addresses/addresses.module';
 import { Address } from './addresses/entities/address.entity';
 import { VendorsModule } from './vendors/vendors.module';
 import { Vendor } from './vendors/entities/vendor.entity';
-import { ErrorResponse } from './assets/types/error.type';
+import { ErrorResponse } from './common/types/error.type';
 import { PriceScalar } from './scalars/totalPrice.scalar';
 import { PaymentMethod } from './orders/entities/payment-method.entity';
 import { VendorReviewModule } from './vendor-review/vendor-review.module';

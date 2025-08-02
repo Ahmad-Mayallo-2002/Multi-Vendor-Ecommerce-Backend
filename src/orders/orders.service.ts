@@ -10,12 +10,12 @@ import { DataSource, Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { Cart } from '../cart/entities/cart.entity';
 import Stripe from 'stripe';
-import { SortEnum } from '../assets/enum/sort.enum';
+import { SortEnum } from '../common/enum/sort.enum';
 import { PaymentMethod } from './entities/payment-method.entity';
-import { Payment } from '../assets/enum/payment-method.enum';
-import { Status } from '../assets/enum/order-status.enum';
+import { Payment } from '../common/enum/payment-method.enum';
+import { Status } from '../common/enum/order-status.enum';
 import { Product } from '../products/entities/product.entity';
-import { OrderResponse } from '../assets/objectTypes/orderResponse.type';
+import { OrderResponse } from '../common/objectTypes/orderResponse.type';
 import { log } from 'console';
 import { CartItem } from '../cart/entities/cart-item.entity';
 

@@ -4,10 +4,10 @@ import { Category } from './entities/category.entity';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
 import { CategoryExistPipes } from './pipes/category-exist.pipe';
 
 @Resolver(() => Category)

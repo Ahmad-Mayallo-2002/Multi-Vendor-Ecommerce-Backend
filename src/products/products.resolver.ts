@@ -4,16 +4,16 @@ import { Product } from './entities/product.entity';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
-import { CurrentProductGuard } from './guards/currentProduct.guard';
-import { VendorIsApprovedGuard } from '../vendors/guards/vendorIsApproved.guard';
-import { SortEnum } from '../assets/enum/sort.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Payload } from '../assets/types/payload.type';
-import { VendorOwnsProductGuard } from './guards/productOwner.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
+import { SortEnum } from '../common/enum/sort.enum';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Payload } from '../common/types/payload.type';
+import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
+import { CurrentProductGuard } from '../common/guards/currentProduct.guard';
+import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
 
 @Resolver(() => Product)
 export class ProductsResolver {

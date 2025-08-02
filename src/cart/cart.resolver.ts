@@ -2,16 +2,16 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { CartService } from './cart.service';
 import { Cart } from './entities/cart.entity';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
 import { CreateCartItemInput } from './dto/create-cart-item.input';
 import { CartItem } from './entities/cart-item.entity';
 import { UpdateCartItemInput } from './dto/update-cart-item.input';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Payload } from '../assets/types/payload.type';
-import { CartExistPipes } from './pipes/cart-exist.pipe';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Payload } from '../common/types/payload.type';
+import { CartExistPipes } from '../common/pipes/cart-exist.pipe';
 
 @Resolver(() => Cart)
 export class CartResolver {

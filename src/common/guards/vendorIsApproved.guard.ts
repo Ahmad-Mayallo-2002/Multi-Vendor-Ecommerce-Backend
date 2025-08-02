@@ -4,9 +4,9 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vendor } from '../entities/vendor.entity';
 import { Repository } from 'typeorm';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { Vendor } from '../../vendors/entities/vendor.entity';
 
 export class VendorIsApprovedGuard implements CanActivate {
   constructor(

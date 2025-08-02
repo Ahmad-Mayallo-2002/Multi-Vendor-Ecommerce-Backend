@@ -1,5 +1,5 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
-import { IdClass } from '../../assets/IdDate.entity';
+import { IdClass } from '../../common/IdDate.entity';
 import {
   Column,
   Entity,
@@ -13,7 +13,7 @@ import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { Address } from '../../addresses/entities/address.entity';
 import { PaymentMethod } from './payment-method.entity';
-import { Status } from '../../assets/enum/order-status.enum';
+import { Status } from '../../common/enum/order-status.enum';
 
 @Entity({ name: 'orders' })
 @ObjectType()

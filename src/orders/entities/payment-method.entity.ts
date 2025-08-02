@@ -1,9 +1,9 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
-import { IdClass } from '../../assets/IdDate.entity';
+import { IdClass } from '../../common/IdDate.entity';
 import { Column, Entity, JoinColumn, OneToOne, Relation } from 'typeorm';
-import { Payment } from '../../assets/enum/payment-method.enum';
+import { Payment } from '../../common/enum/payment-method.enum';
 import { Order } from '../../orders/entities/order.entity';
-import { Status } from '../../assets/enum/order-status.enum';
+import { Status } from '../../common/enum/order-status.enum';
 
 @Entity({ name: 'paymentMethods' })
 @ObjectType()

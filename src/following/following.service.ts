@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Following } from './entities/following.entity';
 import { Repository } from 'typeorm';
 import { CreateFollowingInput } from './dto/create-following.input';
-import { FollowingsAndCount } from 'src/assets/objectTypes/following.type';
-import { SortEnum } from '../assets/enum/sort.enum';
+import { FollowingsAndCount } from 'src/common/objectTypes/following.type';
+import { SortEnum } from '../common/enum/sort.enum';
 
 @Injectable()
 export class FollowingService {

@@ -1,13 +1,13 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { VendorReviewService } from './vendor-review.service';
 import { VendorReview } from './entities/vendor-review.entity';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../auth/guards/auth.guard';
-import { RolesGuard } from '../auth/guards/role.guard';
-import { Roles } from '../auth/decorators/role.decorator';
-import { Role } from '../assets/enum/role.enum';
-import { Payload } from '../assets/types/payload.type';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { RolesGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorators/role.decorator';
+import { Role } from '../common/enum/role.enum';
+import { Payload } from '../common/types/payload.type';
 import { CreateVendorReviewInput } from './dto/create-vendor-review.input';
 
 @Resolver(() => VendorReview)

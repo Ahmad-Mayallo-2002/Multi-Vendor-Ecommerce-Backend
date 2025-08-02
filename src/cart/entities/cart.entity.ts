@@ -1,5 +1,5 @@
 import { ObjectType, Field, Float } from '@nestjs/graphql';
-import { IdClass } from '../../assets/IdDate.entity';
+import { IdClass } from '../../common/IdDate.entity';
 import {
   Column,
   Entity,
@@ -42,5 +42,4 @@ export class Cart extends IdClass {
   @JoinColumn()
   @Field(() => User)
   user: Relation<User>;
-
 }

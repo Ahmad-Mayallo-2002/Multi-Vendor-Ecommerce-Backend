@@ -36,14 +36,14 @@ export class UsersService {
     return user as User;
   }
 
-  async updateUser(id: string, input: UpdateUserInput): Promise<Boolean> {
+  async updateUser(id: string, input: UpdateUserInput): Promise<boolean> {
     const user = await this.getUser(id);
     Object.assign(user, input);
     await this.userRepo.save(user);
     return true;
   }
 
-  async deleteUser(id: string): Promise<Boolean> {
+  async deleteUser(id: string): Promise<boolean> {
     const user = await this.getUser(id);
     await this.userRepo.remove(user);
     return true;

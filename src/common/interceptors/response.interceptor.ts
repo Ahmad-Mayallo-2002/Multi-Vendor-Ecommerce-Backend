@@ -4,7 +4,6 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { log } from 'console';
 import { map, Observable } from 'rxjs';
 
 @Injectable()

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
 import { Repository } from 'typeorm';
 import { v2 } from 'cloudinary';
+import { StringResponse } from '../common/responses/primitive-data-response.object';
 
 @Injectable()
 export class VendorsService {
@@ -49,7 +50,10 @@ export class VendorsService {
     return true;
   }
 
-  async approveVendor(vendorId: string, approve: boolean): Promise<string> {
+  async approveVendor(
+    vendorId: string,
+    approve: boolean,
+  ): Promise<string> {
     await this.getVendor(vendorId);
     await this.vendorRepo.update({ id: vendorId }, { isApproved: approve });
     return approve ? 'This Vendor is Approved' : 'This Vendor is not Approved';

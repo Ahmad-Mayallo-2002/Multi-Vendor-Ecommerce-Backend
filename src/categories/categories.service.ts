@@ -38,7 +38,7 @@ export class CategoriesService {
     return this.categoryRepo.save(category);
   }
 
-  async remove(id: string): Promise<Boolean> {
+  async remove(id: string): Promise<boolean> {
     await this.findOne(id);
     await this.categoryRepo.delete(id);
     return true;

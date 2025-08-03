@@ -18,6 +18,7 @@ import { Product } from '../products/entities/product.entity';
 import { OrderResponse } from '../common/objectTypes/orderResponse.type';
 import { log } from 'console';
 import { CartItem } from '../cart/entities/cart-item.entity';
+import { CreateOrderInput } from './dto/create-order.input';
 
 @Injectable()
 export class OrdersService {
@@ -56,10 +57,9 @@ export class OrdersService {
   }
 
   async createOrder(
-    addressId: string,
+    input: CreateOrderInput,
     userId: string,
-    paymentMethod: Payment,
-  ): Promise<OrderResponse> {
+  ) {
     return await this.dataSource.transaction(async (manager) => {
       const cart = await this.cartRepo.findOne({
         where: { userId },
@@ -71,7 +71,7 @@ export class OrdersService {
 
       // Step 1: Create Order
       const newOrder = this.orderRepo.create({
-        addressId,
+        addressId: input.addressId,
         userId,
         totalPrice: cart.totalPrice,
       });
@@ -102,12 +102,12 @@ export class OrdersService {
 
       const brand = paymentIntent.payment_method_types;
 
-      if (paymentMethod.toLowerCase() !== brand[0].toLowerCase())
+      if (input.paymentMethod.toLowerCase() !== brand[0].toLowerCase())
         throw new BadRequestException('Card does not match selected method');
 
       // Step 4: Save Payment record
       const newPayment = this.paymentMethodRepo.create({
-        method: paymentMethod,
+        method: input.paymentMethod,
         totalPrice: cart.totalPrice,
         orderId: order.id,
         paymentIntentId: paymentIntent.id,

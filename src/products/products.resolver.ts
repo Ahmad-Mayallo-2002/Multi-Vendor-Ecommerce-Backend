@@ -14,6 +14,11 @@ import { Payload } from '../common/types/payload.type';
 import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
 import { CurrentProductGuard } from '../common/guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
+import { BooleanResponse } from '../common/responses/primitive-data-response.object';
+import {
+  ProductResponse,
+  ProductsResponse,
+} from '../common/responses/products-response.object';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -21,16 +26,18 @@ export class ProductsResolver {
 
   @UseGuards(AuthGuard, RolesGuard, VendorIsApprovedGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
-  @Mutation(() => Product, { name: 'createProduct' })
+  @Mutation(() => ProductResponse, { name: 'createProduct' })
   async createProduct(
     @Args('input') input: CreateProductInput,
     @CurrentUser() currentUser: Payload,
-  ): Promise<Product> {
+  ): Promise<ProductResponse> {
     const { sub } = currentUser;
-    return this.productsService.createProduct(input, `${sub.vendorId}`);
+    return {
+      data: await this.productsService.createProduct(input, `${sub.vendorId}`),
+    };
   }
 
-  @Query(() => [Product], { name: 'getProducts' })
+  @Query(() => ProductsResponse, { name: 'getProducts' })
   async products(
     @CurrentUser() currentUser: Payload,
     @Args('take', { type: () => Int }) take: number,
@@ -45,37 +52,39 @@ export class ProductsResolver {
     sortByPrice: SortEnum,
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
-  ): Promise<Product[]> {
+  ): Promise<ProductsResponse> {
     let userId = '';
     currentUser ? (userId = currentUser.sub.userId) : null;
-    return this.productsService.getAll(
-      userId,
-      take,
-      skip,
-      sortByFollowings,
-      sortByPrice,
-      sortByCreated,
-    );
+    return {
+      data: await this.productsService.getAll(
+        userId,
+        take,
+        skip,
+        sortByFollowings,
+        sortByPrice,
+        sortByCreated,
+      ),
+    };
   }
 
-  @Query(() => [Product], { name: 'getProductsByCategory' })
+  @Query(() => ProductsResponse, { name: 'getProductsByCategory' })
   async productsByCategory(
     @Args('category') category: string,
-  ): Promise<Product[]> {
-    return this.productsService.getAllByCategoryId(category);
+  ): Promise<ProductsResponse> {
+    return { data: await this.productsService.getAllByCategoryId(category) };
   }
 
-  @Query(() => [Product], { name: 'getProductsByVendor' })
+  @Query(() => ProductsResponse, { name: 'getProductsByVendor' })
   async productsByVendor(
     @Args('vendorId') vendorId: string,
-  ): Promise<Product[]> {
-    return this.productsService.getAllByVendor(vendorId);
+  ): Promise<ProductsResponse> {
+    return { data: await this.productsService.getAllByVendor(vendorId) };
   }
 
   @UseGuards(CurrentProductGuard)
-  @Query(() => Product, { name: 'getProductById' })
-  async product(@Args('id') id: string): Promise<Product> {
-    return this.productsService.getById(id);
+  @Query(() => ProductResponse, { name: 'getProductById' })
+  async product(@Args('id') id: string): Promise<ProductResponse> {
+    return { data: await this.productsService.getById(id) };
   }
 
   @UseGuards(
@@ -86,12 +95,12 @@ export class ProductsResolver {
     VendorOwnsProductGuard,
   )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
-  @Mutation(() => Product, { name: 'updateProduct' })
+  @Mutation(() => ProductResponse, { name: 'updateProduct' })
   async updateProduct(
     @Args('productId') productId: string,
     @Args('input') input: UpdateProductInput,
-  ): Promise<Product> {
-    return this.productsService.update(input, productId);
+  ): Promise<ProductResponse> {
+    return { data: await this.productsService.update(input, productId) };
   }
 
   @UseGuards(
@@ -102,8 +111,10 @@ export class ProductsResolver {
     VendorOwnsProductGuard,
   )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
-  @Mutation(() => Boolean, { name: 'removeProduct' })
-  async deleteProduct(@Args('productId') productId: string): Promise<boolean> {
-    return this.productsService.delete(productId);
+  @Mutation(() => BooleanResponse, { name: 'removeProduct' })
+  async deleteProduct(
+    @Args('productId') productId: string,
+  ): Promise<BooleanResponse> {
+    return { data: await this.productsService.delete(productId) };
   }
 }

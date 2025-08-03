@@ -12,6 +12,11 @@ import { UpdateCartItemInput } from './dto/update-cart-item.input';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { CartExistPipes } from '../common/pipes/cart-exist.pipe';
+import { BooleanResponse } from '../common/responses/primitive-data-response.object';
+import {
+  CartResponse,
+  CartsResponse,
+} from '../common/responses/carts-response.object';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -19,26 +24,28 @@ export class CartResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => [Cart], { name: 'getAllCarts' })
-  async getAllCarts(): Promise<Cart[]> {
-    return await this.cartService.getAllCarts();
+  @Query(() => CartsResponse, { name: 'getAllCarts' })
+  async getAllCarts(): Promise<CartsResponse> {
+    return { data: await this.cartService.getAllCarts() };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => Cart, { name: 'getUserCart' })
-  async getUserCart(@CurrentUser() currentUser: Payload): Promise<Cart> {
+  @Query(() => CartResponse, { name: 'getUserCart' })
+  async getUserCart(
+    @CurrentUser() currentUser: Payload,
+  ): Promise<CartResponse> {
     const { sub } = currentUser;
-    return await this.cartService.getUserCart(sub.userId);
+    return { data: await this.cartService.getUserCart(sub.userId) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => Cart, { name: 'getCart' })
+  @Query(() => CartResponse, { name: 'getCart' })
   async getCart(
     @Args('id', { type: () => String }, CartExistPipes) id: string,
-  ): Promise<Cart> {
-    return await this.cartService.getCart(id);
+  ): Promise<CartResponse> {
+    return { data: await this.cartService.getCart(id) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -54,18 +61,20 @@ export class CartResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'removeItemFromCart' })
-  async removeItemFromCart(@Args('itemId') itemId: string): Promise<boolean> {
-    return await this.cartService.removeItemFromCart(itemId);
+  @Mutation(() => BooleanResponse, { name: 'removeItemFromCart' })
+  async removeItemFromCart(
+    @Args('itemId') itemId: string,
+  ): Promise<BooleanResponse> {
+    return { data: await this.cartService.removeItemFromCart(itemId) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'updateItemCart' })
+  @Mutation(() => BooleanResponse, { name: 'updateItemCart' })
   async updateItemCart(
     @Args('itemId') itemId: string,
     @Args('input') input: UpdateCartItemInput,
-  ): Promise<boolean> {
-    return await this.cartService.updateItemCart(itemId, input);
+  ): Promise<BooleanResponse> {
+    return { data: await this.cartService.updateItemCart(itemId, input) };
   }
 }

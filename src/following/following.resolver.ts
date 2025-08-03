@@ -11,6 +11,7 @@ import { Roles } from '../common/decorators/role.decorator';
 import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
+import { BooleanResponse } from '../common/responses/primitive-data-response.object';
 
 @Resolver(() => Following)
 export class FollowingResolver {
@@ -60,10 +61,10 @@ export class FollowingResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'cancelFollowing' })
+  @Mutation(() => BooleanResponse, { name: 'cancelFollowing' })
   async cancelFollowing(
     @Args('vendorId', { type: () => String }) vendorId: string,
-  ) {
-    return await this.followingService.cancelFollowing(vendorId);
+  ): Promise<BooleanResponse> {
+    return { data: await this.followingService.cancelFollowing(vendorId)};
   }
 }

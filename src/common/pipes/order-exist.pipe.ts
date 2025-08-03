@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from '../orders/entities/order.entity';
+import { Order } from '../../orders/entities/order.entity';
 import { Repository } from 'typeorm';
-import { ExistsPipe } from './pipes/exists.pipe';
+import { ExistsPipe } from './exists.pipe';
 
 @Injectable()
 export class OrderExistPipes extends ExistsPipe<Order> {

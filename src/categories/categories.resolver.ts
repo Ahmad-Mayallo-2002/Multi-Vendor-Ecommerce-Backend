@@ -9,6 +9,11 @@ import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { CategoryExistPipes } from './pipes/category-exist.pipe';
+import { BooleanResponse } from '../common/responses/primitive-data-response.object';
+import {
+  CategoriesResponse,
+  CategoryResponse,
+} from '../common/responses/categories-response.object';
 
 @Resolver(() => Category)
 export class CategoriesResolver {
@@ -16,42 +21,44 @@ export class CategoriesResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Mutation(() => Category, { name: 'createCategory' })
-  async createCategory(@Args('input') input: CreateCategoryInput) {
-    return await this.categoriesService.create(input);
+  @Mutation(() => CategoryResponse, { name: 'createCategory' })
+  async createCategory(
+    @Args('input') input: CreateCategoryInput,
+  ): Promise<CategoryResponse> {
+    return { data: await this.categoriesService.create(input) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Mutation(() => Category, { name: 'updateCategory' })
+  @Mutation(() => CategoryResponse, { name: 'updateCategory' })
   async updateCategory(
     @Args('input') input: UpdateCategoryInput,
     @Args('categoryId', { type: () => String })
     categoryId: string,
-  ): Promise<Category> {
-    return await this.categoriesService.update(input, categoryId);
+  ): Promise<CategoryResponse> {
+    return { data: await this.categoriesService.update(input, categoryId) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Mutation(() => Boolean, { name: 'removeCategory' })
+  @Mutation(() => BooleanResponse, { name: 'removeCategory' })
   async removeCategory(
     @Args('categoryId', { type: () => String })
     categoryId: string,
-  ): Promise<Boolean> {
-    return await this.categoriesService.remove(categoryId);
+  ): Promise<BooleanResponse> {
+    return { data: await this.categoriesService.remove(categoryId) };
   }
 
-  @Query(() => [Category], { name: 'getCategories' })
-  async getCategories() {
-    return await this.categoriesService.findAll();
+  @Query(() => CategoriesResponse, { name: 'getCategories' })
+  async getCategories(): Promise<CategoriesResponse> {
+    return { data: await this.categoriesService.findAll() };
   }
 
-  @Query(() => Category, { name: 'getCategory' })
+  @Query(() => CategoryResponse, { name: 'getCategory' })
   async getCategory(
     @Args('categoryId', { type: () => String }, CategoryExistPipes)
     categoryId: string,
-  ) {
-    return await this.categoriesService.findOne(categoryId);
+  ): Promise<CategoryResponse> {
+    return { data: await this.categoriesService.findOne(categoryId) };
   }
 }

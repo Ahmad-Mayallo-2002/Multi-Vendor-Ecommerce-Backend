@@ -10,6 +10,11 @@ import { Role } from '../common/enum/role.enum';
 import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
+import { BooleanResponse } from '../common/responses/primitive-data-response.object';
+import {
+  UserResponse,
+  UsersResponse,
+} from '../common/responses/users-response.object';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -17,40 +22,44 @@ export class UsersResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Query(() => [User], { name: 'getAllUsers' })
+  @Query(() => UsersResponse, { name: 'getAllUsers' })
   async getAllUsers(
     @Args('take', { type: () => Int }) take: number,
     @Args('skip', { type: () => Int }) skip: number,
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
-  ): Promise<User[]> {
-    return await this.usersService.getAllUsers(take, skip, sortByCreated);
+  ): Promise<UsersResponse> {
+    return {
+      data: await this.usersService.getAllUsers(take, skip, sortByCreated),
+    };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
-  @Query(() => User, { name: 'getUser' })
-  async getUser(@CurrentUser() currentUser: Payload): Promise<User> {
+  @Query(() => UserResponse, { name: 'getUser' })
+  async getUser(@CurrentUser() currentUser: Payload): Promise<UserResponse> {
     const { sub } = currentUser;
-    return await this.usersService.getUser(sub.userId);
+    return { data: await this.usersService.getUser(sub.userId) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
-  @Mutation(() => Boolean, { name: 'removeUser' })
-  async removeUser(@CurrentUser() currentUser: Payload) {
+  @Mutation(() => BooleanResponse, { name: 'removeUser' })
+  async removeUser(
+    @CurrentUser() currentUser: Payload,
+  ): Promise<BooleanResponse> {
     const { sub } = currentUser;
-    return await this.usersService.deleteUser(sub.userId);
+    return { data: await this.usersService.deleteUser(sub.userId) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.USER, Role.SUPER_ADMIN)
-  @Mutation(() => Boolean, { name: 'updateUser' })
+  @Mutation(() => BooleanResponse, { name: 'updateUser' })
   async updateUser(
     @CurrentUser() currentUser: Payload,
     @Args('input') input: UpdateUserInput,
-  ) {
+  ): Promise<BooleanResponse> {
     const { sub } = currentUser;
-    return await this.usersService.updateUser(sub.userId, input);
+    return { data: await this.usersService.updateUser(sub.userId, input) };
   }
 }

@@ -10,6 +10,11 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
+import { BooleanResponse } from '../common/responses/primitive-data-response.object';
+import {
+  AddressesResponse,
+  AddressResponse,
+} from '../common/responses/addresses-response.object';
 
 @Resolver(() => Address)
 export class AddressesResolver {
@@ -18,62 +23,66 @@ export class AddressesResolver {
   // Get all addresses
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  @Query(() => [Address], { name: 'getAddresses' })
-  async getAddresses(): Promise<Address[]> {
-    return this.addressesService.getAddresses();
+  @Query(() => AddressesResponse, { name: 'getAddresses' })
+  async getAddresses(): Promise<AddressesResponse> {
+    return { data: await this.addressesService.getAddresses() };
   }
 
   // Get all addresses for a user
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => [Address], { name: 'getUserAddresses' })
+  @Query(() => AddressesResponse, { name: 'getUserAddresses' })
   async getUserAddresses(
     @CurrentUser() currentUser: Payload,
-  ): Promise<Address[]> {
+  ): Promise<AddressesResponse> {
     const { sub } = currentUser;
-    return this.addressesService.getUserAddresses(sub.userId);
+    return { data: await this.addressesService.getUserAddresses(sub.userId) };
   }
 
   // Get a single address
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => Address, { name: 'getAddress' })
+  @Query(() => AddressResponse, { name: 'getAddress' })
   async getAddress(
     @Args('addressId', { type: () => String }) addressId: string,
-  ): Promise<Address> {
-    return this.addressesService.getAddress(addressId);
+  ): Promise<AddressResponse> {
+    return { data: await this.addressesService.getAddress(addressId) };
   }
 
   // Update address
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'updateAddress' })
+  @Mutation(() => BooleanResponse, { name: 'updateAddress' })
   async updateAddress(
     @Args('addressId', { type: () => String }) addressId: string,
     @Args('input') input: UpdateAddressInput,
-  ): Promise<boolean> {
-    return this.addressesService.updateAddress(addressId, input);
+  ): Promise<BooleanResponse> {
+    return {
+      data: await this.addressesService.updateAddress(addressId, input),
+    };
   }
 
   // Delete address
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Boolean, { name: 'removeAddress' })
+  @Mutation(() => BooleanResponse, { name: 'removeAddress' })
   async removeAddress(
     @Args('addressId', { type: () => String }) addressId: string,
-  ): Promise<boolean> {
-    return this.addressesService.removeAddress(addressId);
+  ): Promise<BooleanResponse> {
+    return { data: await this.addressesService.removeAddress(addressId) };
   }
 
   // Create Address
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => Address, { name: 'createAddress' })
+  @Mutation(() => AddressResponse, { name: 'createAddress' })
   async createAddress(
     @Args('input') input: CreateAddressInput,
     @CurrentUser() currentUser: Payload,
-  ) {
+  ): Promise<AddressResponse> {
     const { sub } = currentUser;
-    return await this.addressesService.createAddress(input, sub.userId);
+    return {
+      data: await this.addressesService.createAddress(input, sub.userId),
+    };
   }
 }

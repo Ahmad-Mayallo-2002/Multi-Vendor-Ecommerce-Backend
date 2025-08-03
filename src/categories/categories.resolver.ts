@@ -1,6 +1,5 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { CategoriesService } from './categories.service';
-import { Category } from './entities/category.entity';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
 import { UseGuards } from '@nestjs/common';
@@ -8,14 +7,13 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
-import { CategoryExistPipes } from './pipes/category-exist.pipe';
 import { BooleanResponse } from '../common/responses/primitive-data-response.object';
 import {
   CategoriesResponse,
   CategoryResponse,
 } from '../common/responses/categories-response.object';
 
-@Resolver(() => Category)
+@Resolver()
 export class CategoriesResolver {
   constructor(private readonly categoriesService: CategoriesService) {}
 
@@ -56,7 +54,7 @@ export class CategoriesResolver {
 
   @Query(() => CategoryResponse, { name: 'getCategory' })
   async getCategory(
-    @Args('categoryId', { type: () => String }, CategoryExistPipes)
+    @Args('categoryId', { type: () => String })
     categoryId: string,
   ): Promise<CategoryResponse> {
     return { data: await this.categoriesService.findOne(categoryId) };

@@ -3,11 +3,12 @@ import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
+import DataLoader from 'dataloader';
 
 @Injectable()
 export class ProductsService {
@@ -18,6 +19,18 @@ export class ProductsService {
     private readonly followingsRepo: Repository<Following>,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
+
+  private productLoader = new DataLoader<string, Product | undefined>(
+    async (keys) => {
+      const product = await this.productRepo.find({
+        where: { id: In(keys) },
+        relations: ['vendor', 'category'],
+      });
+      const productMap = new Map(product.map((v) => [v.id, v]));
+      const products = keys.map((key) => productMap.get(key));
+      return products;
+    },
+  );
 
   async createProduct(input: CreateProductInput, vendorId: string) {
     const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
@@ -89,9 +102,9 @@ export class ProductsService {
   }
 
   async getById(id: string): Promise<Product> {
-    const product = await this.productRepo.findOne({ where: { id } });
-    if (!product) throw new NotFoundException(`Product is not found`);
-    return product;
+    // const product = await this.productRepo.findOne({ where: { id } });
+    // if (!product) throw new NotFoundException(`Product is not found`);
+    return (await this.productLoader.load(id)) as Product;
   }
 
   async update(input: UpdateProductInput, productId: string): Promise<Product> {

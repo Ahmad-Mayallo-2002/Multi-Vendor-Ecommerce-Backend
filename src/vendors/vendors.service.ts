@@ -3,9 +3,10 @@ import { UpdateVendorInput } from './dto/update-vendor.input';
 import { CloudinaryService } from '../cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { v2 } from 'cloudinary';
-import { StringResponse } from '../common/responses/primitive-data-response.object';
+import DataLoader from 'dataloader';
+import { log } from 'console';
 
 @Injectable()
 export class VendorsService {
@@ -14,12 +15,19 @@ export class VendorsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
+  private vendorLoader = new DataLoader<string, Vendor | undefined>(
+    async (keys) => {
+      const vendors = await this.vendorRepo.find({
+        where: { id: In(keys) },
+        relations: ['reviews', 'user'],
+      });
+      const vendorMap = new Map(vendors.map((v) => [v.id, v]));
+      return keys.map((key) => vendorMap.get(key));
+    },
+  );
+
   async getVendor(id: string): Promise<Vendor> {
-    const vendor = await this.vendorRepo.findOne({
-      where: { id },
-      relations: ['user'],
-    });
-    return vendor as Vendor;
+    return (await this.vendorLoader.load(id)) as Vendor;
   }
 
   async getVendors(): Promise<Vendor[]> {
@@ -50,10 +58,7 @@ export class VendorsService {
     return true;
   }
 
-  async approveVendor(
-    vendorId: string,
-    approve: boolean,
-  ): Promise<string> {
+  async approveVendor(vendorId: string, approve: boolean): Promise<string> {
     await this.getVendor(vendorId);
     await this.vendorRepo.update({ id: vendorId }, { isApproved: approve });
     return approve ? 'This Vendor is Approved' : 'This Vendor is not Approved';

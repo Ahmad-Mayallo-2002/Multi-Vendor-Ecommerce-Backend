@@ -157,6 +157,12 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type FloatResponse {
+  data: Float!
+  message: String!
+  statusCode: Int!
+}
+
 type Following {
   createdAt: DateTime!
   id: String!
@@ -312,7 +318,7 @@ type Query {
   getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrdersResponse!
   getAllUsers(skip: Int!, sortByCreated: Sort, take: Int!): UsersResponse!
   getAverageVendorReview(vendorId: String!): Float!
-  getAvgProductReview(productId: String!): Float!
+  getAvgProductReview(productId: String!): FloatResponse!
   getCart(id: String!): CartResponse!
   getCategories: CategoriesResponse!
   getCategory(categoryId: String!): CategoryResponse!

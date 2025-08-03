@@ -1,6 +1,5 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { OrdersService } from './orders.service';
-import { Order } from './entities/order.entity';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { Roles } from '../common/decorators/role.decorator';
@@ -18,7 +17,7 @@ import {
 } from '../common/responses/orders-response.object';
 import { CreateOrderInput } from './dto/create-order.input';
 
-@Resolver(() => Order)
+@Resolver()
 export class OrdersResolver {
   constructor(private readonly ordersService: OrdersService) {}
 

@@ -1,6 +1,5 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { VendorsService } from './vendors.service';
-import { Vendor } from './entities/vendor.entity';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -14,9 +13,13 @@ import {
   VendorResponse,
   VendorsResponse,
 } from '../common/responses/vendors-response.object';
-import { BooleanResponse, StringResponse } from '../common/responses/primitive-data-response.object';
+import {
+  BooleanResponse,
+  StringResponse,
+} from '../common/responses/primitive-data-response.object';
+import { Vendor } from './entities/vendor.entity';
 
-@Resolver()
+@Resolver(() => Vendor)
 export class VendorsResolver {
   constructor(private readonly vendorsService: VendorsService) {}
 

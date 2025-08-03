@@ -9,6 +9,7 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { Payload } from '../common/types/payload.type';
 import { CreateVendorReviewInput } from './dto/create-vendor-review.input';
+import { FloatResponse } from '../common/responses/primitive-data-response.object';
 
 @Resolver(() => VendorReview)
 export class VendorReviewResolver {
@@ -29,7 +30,9 @@ export class VendorReviewResolver {
   @Query(() => Number, { name: 'getAverageVendorReview' })
   async getAverageReview(
     @Args('vendorId', { type: () => String }) vendorId: string,
-  ): Promise<number> {
-    return await this.vendorReviewService.averageVendorReview(vendorId);
+  ): Promise<FloatResponse> {
+    return {
+      data: await this.vendorReviewService.averageVendorReview(vendorId),
+    };
   }
 }

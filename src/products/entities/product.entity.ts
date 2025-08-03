@@ -1,6 +1,13 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../common/IdDate.entity';
-import { Column, Entity, ManyToOne, OneToMany, Relation } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Relation,
+} from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { CartItem } from '../../cart/entities/cart-item.entity';
 import { OrderItem } from '../../orders/entities/order-item.entity';
@@ -52,6 +59,7 @@ export class Product extends IdClass {
   category: Relation<Category>;
 
   @ManyToOne(() => Vendor, (vendor) => vendor.products)
+  @JoinColumn()
   @Field(() => Vendor)
   vendor: Relation<Vendor>;
 

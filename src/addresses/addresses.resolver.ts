@@ -1,6 +1,5 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { AddressesService } from './addresses.service';
-import { Address } from './entities/address.entity';
 import { UpdateAddressInput } from './dto/update-address.input';
 import { CreateAddressInput } from './dto/create-address.input';
 import { UseGuards } from '@nestjs/common';
@@ -16,7 +15,7 @@ import {
   AddressResponse,
 } from '../common/responses/addresses-response.object';
 
-@Resolver(() => Address)
+@Resolver()
 export class AddressesResolver {
   constructor(private readonly addressesService: AddressesService) {}
 

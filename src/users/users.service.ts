@@ -1,16 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Role } from '../common/enum/role.enum';
 import { UpdateUserInput } from './dto/update-user.input';
 import { SortEnum } from '../common/enum/sort.enum';
+import DataLoader from 'dataloader';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
+
+  private userLoader = new DataLoader<string, User | undefined>(
+    async (keys) => {
+      const user = await this.userRepo.find({
+        where: { id: In(keys) },
+        relations: ['followings'],
+      });
+      const userMap = new Map(user.map((v) => [v.id, v]));
+      const users = keys.map((v) => userMap.get(v));
+      return users;
+    },
+  );
 
   async getAllUsers(
     take: number,
@@ -30,10 +43,7 @@ export class UsersService {
   }
 
   async getUser(id: string): Promise<User> {
-    const user = await this.userRepo.findOne({
-      where: { id },
-    });
-    return user as User;
+    return (await this.userLoader.load(id)) as User;
   }
 
   async updateUser(id: string, input: UpdateUserInput): Promise<boolean> {

@@ -1,6 +1,5 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { CartService } from './cart.service';
-import { Cart } from './entities/cart.entity';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
@@ -18,7 +17,7 @@ import {
   CartsResponse,
 } from '../common/responses/carts-response.object';
 
-@Resolver(() => Cart)
+@Resolver()
 export class CartResolver {
   constructor(private readonly cartService: CartService) {}
 

@@ -22,14 +22,15 @@ import {
   ProductsResponse,
 } from '../common/responses/products-response.object';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
-
+import { Queue, QueueEvents } from 'bullmq';
 @Resolver()
 export class ProductsResolver {
   constructor(
     private readonly productsService: ProductsService,
     @InjectQueue('products') private readonly pQueue: Queue,
   ) {}
+
+  private pQueueEvents = new QueueEvents('products');
 
   private async readStreamToBuffer(
     stream: NodeJS.ReadableStream,
@@ -53,7 +54,7 @@ export class ProductsResolver {
         (await input.image).createReadStream(),
       );
 
-      await this.pQueue.add('upload-product-image', {
+      const job = await this.pQueue.add('upload-product-image', {
         file: {
           filename: (await input.image).filename,
           mimetype: (await input.image).mimetype,
@@ -63,7 +64,9 @@ export class ProductsResolver {
         vendorId: currentUser.sub.vendorId,
       });
 
-      return 'Product Creation Enqueued';
+      await job.waitUntilFinished(this.pQueueEvents);
+
+      return 'Product Creation is Done';
     } catch (error: any) {
       return `Error ${error.message}`;
     }
@@ -145,13 +148,14 @@ export class ProductsResolver {
       };
     }
 
-    await this.pQueue.add('update-product', {
+    const job = await this.pQueue.add('update-product', {
       input: { ...input, image: undefined }, // remove image from input
       file: fileData,
       productId,
     });
+    const result = await job.waitUntilFinished(this.pQueueEvents);
 
-    return { data: 'Product update enqueued' };
+    return { data: 'Product update is Done' };
   }
 
   @UseGuards(

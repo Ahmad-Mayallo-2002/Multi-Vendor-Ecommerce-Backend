@@ -10,7 +10,7 @@ import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
 import { createGetByIdLoader } from '../common/utils/dataloader.factory';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { Queue, QueueEvents } from 'bullmq';
 
 @Injectable()
 export class ProductsService {
@@ -117,9 +117,11 @@ export class ProductsService {
   async delete(id: string): Promise<boolean> {
     const product = await this.getById(id);
     await this.productRepo.delete(id);
-    await this.productQueue.add('delete-product-image', {
+    const queueEvents = new QueueEvents('products');
+    const job = await this.productQueue.add('delete-product-image', {
       public_id: product.public_id,
     });
+    job.waitUntilFinished(queueEvents);
     return true;
   }
 }

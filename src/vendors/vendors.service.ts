@@ -1,12 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { CloudinaryService } from '../cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { v2 } from 'cloudinary';
-import DataLoader from 'dataloader';
-import { log } from 'console';
+import {
+  createGetAllLoader,
+  createGetByIdLoader,
+} from '../common/utils/dataloader.factory';
 
 @Injectable()
 export class VendorsService {
@@ -15,25 +17,16 @@ export class VendorsService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  private vendorLoader = new DataLoader<string, Vendor | undefined>(
-    async (keys) => {
-      const vendors = await this.vendorRepo.find({
-        where: { id: In(keys) },
-        relations: ['reviews', 'user'],
-      });
-      const vendorMap = new Map(vendors.map((v) => [v.id, v]));
-      return keys.map((key) => vendorMap.get(key));
-    },
-  );
-
   async getVendor(id: string): Promise<Vendor> {
-    return (await this.vendorLoader.load(id)) as Vendor;
+    const vendor = await createGetByIdLoader(this.vendorRepo, []).load(id);
+    return vendor as Vendor;
   }
 
   async getVendors(): Promise<Vendor[]> {
-    const vendors = await this.vendorRepo.find({ relations: ['user'] });
-    if (!vendors.length) throw new NotFoundException('No Vendors');
-    return vendors;
+    const vendors = await createGetAllLoader(this.vendorRepo, []).load(
+      '__all__',
+    );
+    return vendors as Vendor[];
   }
 
   async deleteVendor(id: string): Promise<boolean> {

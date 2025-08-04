@@ -12,11 +12,8 @@ import { Cart } from '../cart/entities/cart.entity';
 import Stripe from 'stripe';
 import { SortEnum } from '../common/enum/sort.enum';
 import { PaymentMethod } from './entities/payment-method.entity';
-import { Payment } from '../common/enum/payment-method.enum';
 import { Status } from '../common/enum/order-status.enum';
 import { Product } from '../products/entities/product.entity';
-import { OrderResponse } from '../common/objectTypes/orderResponse.type';
-import { log } from 'console';
 import { CartItem } from '../cart/entities/cart-item.entity';
 import { CreateOrderInput } from './dto/create-order.input';
 

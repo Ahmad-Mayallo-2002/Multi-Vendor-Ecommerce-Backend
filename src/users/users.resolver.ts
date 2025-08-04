@@ -6,7 +6,6 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
-import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { BooleanResponse } from '../common/responses/primitive-data-response.object';
@@ -22,14 +21,9 @@ export class UsersResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @Query(() => UsersResponse, { name: 'getAllUsers' })
-  async getAllUsers(
-    @Args('take', { type: () => Int }) take: number,
-    @Args('skip', { type: () => Int }) skip: number,
-    @Args('sortByCreated', { type: () => SortEnum, nullable: true })
-    sortByCreated: SortEnum,
-  ): Promise<UsersResponse> {
+  async getAllUsers(): Promise<UsersResponse> {
     return {
-      data: await this.usersService.getAllUsers(take, skip, sortByCreated),
+      data: await this.usersService.getAllUsers(),
     };
   }
 

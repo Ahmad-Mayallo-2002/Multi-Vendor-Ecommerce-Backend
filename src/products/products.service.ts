@@ -9,6 +9,7 @@ import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
 import DataLoader from 'dataloader';
+import { createGetByIdLoader } from '../common/utils/dataloader.factory';
 
 @Injectable()
 export class ProductsService {
@@ -102,9 +103,9 @@ export class ProductsService {
   }
 
   async getById(id: string): Promise<Product> {
-    // const product = await this.productRepo.findOne({ where: { id } });
-    // if (!product) throw new NotFoundException(`Product is not found`);
-    return (await this.productLoader.load(id)) as Product;
+    return (await createGetByIdLoader(this.productRepo, []).load(
+      id,
+    )) as Product;
   }
 
   async update(input: UpdateProductInput, productId: string): Promise<Product> {

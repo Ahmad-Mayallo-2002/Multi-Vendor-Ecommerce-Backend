@@ -316,7 +316,7 @@ type Query {
   getAddresses: AddressesResponse!
   getAllCarts: CartsResponse!
   getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrdersResponse!
-  getAllUsers(skip: Int!, sortByCreated: Sort, take: Int!): UsersResponse!
+  getAllUsers: UsersResponse!
   getAverageVendorReview(vendorId: String!): Float!
   getAvgProductReview(productId: String!): FloatResponse!
   getCart(id: String!): CartResponse!

@@ -193,7 +193,7 @@ type Mutation {
   createAddress(input: CreateAddressInput!): AddressResponse!
   createCategory(input: CreateCategoryInput!): CategoryResponse!
   createOrder(input: CreateOrderInput!): OrderResponse!
-  createProduct(input: CreateProductInput!): ProductResponse!
+  createProduct(input: CreateProductInput!): String!
   login(input: LoginInput!): AccessToken!
   removeAddress(addressId: String!): BooleanResponse!
   removeCategory(categoryId: String!): BooleanResponse!
@@ -208,7 +208,7 @@ type Mutation {
   updateAddress(addressId: String!, input: UpdateAddressInput!): BooleanResponse!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategoryResponse!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): BooleanResponse!
-  updateProduct(input: UpdateProductInput!, productId: String!): ProductResponse!
+  updateProduct(input: UpdateProductInput!, productId: String!): StringResponse!
   updateUser(input: UpdateUserInput!): BooleanResponse!
   updateVendor(input: UpdateVendorInput!): BooleanResponse!
 }
@@ -335,6 +335,7 @@ type Query {
   getVendor(vendorId: String!): VendorResponse!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCount!
   getVendors: VendorsResponse!
+  test: String!
 }
 
 """Role Enum"""

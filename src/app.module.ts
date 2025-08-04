@@ -32,6 +32,7 @@ import { VendorReview } from './vendor-review/entities/vendor-review.entity';
 import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -74,6 +75,15 @@ import { WebhookModule } from './webhook.module';
         VendorReview,
         ProductReview,
       ],
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+      defaultJobOptions: {
+        attempts: 3,
+      },
     }),
     UsersModule,
     CategoriesModule,

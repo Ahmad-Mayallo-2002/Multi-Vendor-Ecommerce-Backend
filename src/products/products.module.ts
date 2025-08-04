@@ -7,9 +7,20 @@ import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from '../cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { Following } from '../following/entities/following.entity';
+import { BullModule } from '@nestjs/bullmq';
+import { ProductsProcessor } from '../common/processors/products.processor';
 
 @Module({
-  providers: [ProductsResolver, ProductsService, JwtService, CloudinaryService],
-  imports: [TypeOrmModule.forFeature([Product, Vendor, Following])],
+  providers: [
+    ProductsResolver,
+    ProductsService,
+    JwtService,
+    CloudinaryService,
+    ProductsProcessor,
+  ],
+  imports: [
+    TypeOrmModule.forFeature([Product, Vendor, Following]),
+    BullModule.registerQueue({ name: 'products' }),
+  ],
 })
 export class ProductsModule {}

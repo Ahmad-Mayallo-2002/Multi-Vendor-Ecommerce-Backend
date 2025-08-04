@@ -3,13 +3,14 @@ import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
-import DataLoader from 'dataloader';
 import { createGetByIdLoader } from '../common/utils/dataloader.factory';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class ProductsService {
@@ -19,31 +20,21 @@ export class ProductsService {
     @InjectRepository(Following)
     private readonly followingsRepo: Repository<Following>,
     private readonly cloudinaryService: CloudinaryService,
+
+    @InjectQueue('products')
+    private readonly productQueue: Queue,
   ) {}
 
-  private productLoader = new DataLoader<string, Product | undefined>(
-    async (keys) => {
-      const product = await this.productRepo.find({
-        where: { id: In(keys) },
-        relations: ['vendor', 'category'],
-      });
-      const productMap = new Map(product.map((v) => [v.id, v]));
-      const products = keys.map((key) => productMap.get(key));
-      return products;
-    },
-  );
-
   async createProduct(input: CreateProductInput, vendorId: string) {
-    const { secure_url, public_id } = await this.cloudinaryService.uploadFile(
-      await input.image,
-    );
-    const product = this.productRepo.create({
-      ...input,
-      image: secure_url,
-      public_id,
+    const image = await input.image;
+
+    await this.productQueue.add('upload-product-image', {
+      image,
+      input,
       vendorId,
     });
-    return await this.productRepo.save(product);
+
+    return 'Product Creation Enqueued';
   }
 
   async getAll(
@@ -126,7 +117,9 @@ export class ProductsService {
   async delete(id: string): Promise<boolean> {
     const product = await this.getById(id);
     await this.productRepo.delete(id);
-    v2.api.delete_resources([product.public_id]);
+    await this.productQueue.add('delete-product-image', {
+      public_id: product.public_id,
+    });
     return true;
   }
 }

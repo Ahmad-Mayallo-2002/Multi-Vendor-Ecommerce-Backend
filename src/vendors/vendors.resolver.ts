@@ -1,4 +1,12 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { VendorsService } from './vendors.service';
 import { UpdateVendorInput } from './dto/update-vendor.input';
 import { UseGuards } from '@nestjs/common';
@@ -11,6 +19,8 @@ import { Payload } from '../common/types/payload.type';
 import { VendorExistsPipe } from '../common/pipes/vendor-exists.pipe';
 import { Vendor } from './entities/vendor.entity';
 import { BaseResponse } from '../common/responses/base-response.object';
+import { Product } from '../products/entities/product.entity';
+import { ProductsLoader } from '../common/dataloader/data-loader.loader';
 
 const VendorList = BaseResponse(Vendor, true, 'VendorList');
 const VendorItem = BaseResponse(Vendor, false, 'VendorItem');
@@ -19,7 +29,10 @@ const StringResponse = BaseResponse(String, false, 'VendorStringResponse');
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
-  constructor(private readonly vendorsService: VendorsService) {}
+  constructor(
+    private readonly vendorsService: VendorsService,
+    private readonly productsLoader: ProductsLoader,
+  ) {}
 
   // Get All Vendors
   @Query(() => VendorList, { name: 'getVendors' })
@@ -36,6 +49,11 @@ export class VendorsResolver {
     vendorId: string,
   ) {
     return { data: await this.vendorsService.getVendor(vendorId) };
+  }
+
+  @ResolveField(() => [Product])
+  async products(@Parent() vendor: Vendor, @Context() context: any) {
+    return await this.productsLoader.productsByVendor.load(vendor.id);
   }
 
   // Update Vendor

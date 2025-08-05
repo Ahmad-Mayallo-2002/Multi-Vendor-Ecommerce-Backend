@@ -5,10 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
 import { Repository } from 'typeorm';
 import { v2 } from 'cloudinary';
-import {
-  createGetAllLoader,
-  createGetByIdLoader,
-} from '../common/utils/dataloader.factory';
 
 @Injectable()
 export class VendorsService {
@@ -18,14 +14,16 @@ export class VendorsService {
   ) {}
 
   async getVendor(id: string): Promise<Vendor> {
-    const vendor = await createGetByIdLoader(this.vendorRepo, []).load(id);
+    const vendor = await this.vendorRepo.findOne({
+      where: { id },
+    });
     return vendor as Vendor;
   }
 
   async getVendors(): Promise<Vendor[]> {
-    const vendors = await createGetAllLoader(this.vendorRepo, [
-      'products',
-    ]).load('__all__');
+    const vendors = await this.vendorRepo.find({
+      relations: ['products'],
+    });
     return vendors as Vendor[];
   }
 

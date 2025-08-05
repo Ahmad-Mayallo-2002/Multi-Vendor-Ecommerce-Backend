@@ -54,7 +54,7 @@ export class Vendor extends IdClass {
   @Field(() => User)
   user: Relation<User>;
 
-  @OneToMany(() => Product, (products) => products.vendorId)
+  @OneToMany(() => Product, (products) => products.vendor)
   @Field(() => [Product])
   products: Relation<Product[]>;
 

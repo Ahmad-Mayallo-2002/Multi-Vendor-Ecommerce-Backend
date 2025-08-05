@@ -33,6 +33,7 @@ import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook.module';
 import { BullModule } from '@nestjs/bullmq';
+import { ProductsLoader } from './common/dataloader/data-loader.loader';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { BullModule } from '@nestjs/bullmq';
           error: originalError?.error || 'Internal Server Error',
         };
       },
+      context: ({ req }) => ({}),
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({

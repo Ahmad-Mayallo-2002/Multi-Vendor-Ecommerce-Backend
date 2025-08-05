@@ -8,7 +8,6 @@ import { CloudinaryService } from '../cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
-import { createGetByIdLoader } from '../common/utils/dataloader.factory';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, QueueEvents } from 'bullmq';
 
@@ -94,9 +93,9 @@ export class ProductsService {
   }
 
   async getById(id: string): Promise<Product> {
-    return (await createGetByIdLoader(this.productRepo, []).load(
-      id,
-    )) as Product;
+    return (await this.productRepo.findOne({
+      where: { id },
+    })) as Product;
   }
 
   async update(input: UpdateProductInput, productId: string): Promise<Product> {

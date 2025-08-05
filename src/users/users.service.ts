@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { UpdateUserInput } from './dto/update-user.input';
-import {
-  createGetAllLoader,
-  createGetByIdLoader,
-} from '../common/utils/dataloader.factory';
+import { Role } from '../common/enum/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -15,13 +12,13 @@ export class UsersService {
   ) {}
 
   async getAllUsers(): Promise<User[]> {
-    const users = await createGetAllLoader(this.userRepo, []).load('__all__');
+    const users = await this.userRepo.find({ where: { role: Role.USER } });
     if (!users.length) throw new NotFoundException('No Users Here');
     return users as User[];
   }
 
   async getUser(id: string): Promise<User> {
-    const user = await createGetByIdLoader(this.userRepo, []).load(id);
+    const user = await this.userRepo.findOne({ where: { id } });
     return user as User;
   }
 

@@ -18,7 +18,7 @@ import { Queue, QueueEvents } from 'bullmq';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from './entities/product.entity';
 
-const ProductsResponse = BaseResponse(Product, true, 'ProductsList');
+const ProductsResponse = BaseResponse(Product, true, 'ProductsList', false);
 const ProductResponse = BaseResponse(Product, false, 'ProductItem');
 const BooleanResponse = BaseResponse(Boolean, false, 'ProductBoolean');
 const StringResponse = BaseResponse(String, false, 'ProductString');
@@ -92,15 +92,22 @@ export class ProductsResolver {
   ) {
     let userId = '';
     currentUser ? (userId = currentUser.sub.userId) : null;
+    const products = await this.productsService.getAll(
+      userId,
+      take,
+      skip,
+      sortByFollowings,
+      sortByPrice,
+      sortByCreated,
+    );
     return {
-      data: await this.productsService.getAll(
-        userId,
-        take,
-        skip,
-        sortByFollowings,
-        sortByPrice,
-        sortByCreated,
-      ),
+      data: products,
+      pagination: {
+        prev: 0,
+        next: products.length - skip,
+        totalPages: products.length,
+        currentPages: 1,
+      },
     };
   }
 

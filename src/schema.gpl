@@ -12,6 +12,7 @@ type AccessToken {
 type AddToItemResponse {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -30,42 +31,49 @@ type Address {
 type AddressBoolean {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type AddressItem {
   data: Address!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type AddressesList {
   data: [Address!]!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type AvgProductReviewResponse {
   data: Float!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type AvgVendorReviewResponse {
   data: Float!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type BooleanCategory {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type BooleanFollowingResponse {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -92,18 +100,21 @@ type CartItem {
 type CartItemResponse {
   data: CartItem!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type CartList {
   data: [Cart!]!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type CartResponse {
   data: Cart!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -119,12 +130,14 @@ type Category {
 type CategoryList {
   data: [Category!]!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type CategryItem {
   data: Category!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -206,6 +219,7 @@ type Following {
 type FollowingResponse {
   data: Following!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -217,6 +231,7 @@ type FollowingsAndCount {
 type FollowingsAndCountResponse {
   data: FollowingsAndCount!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -272,6 +287,7 @@ type Order {
 type OrderBoolean {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -290,13 +306,22 @@ type OrderItem {
 type OrderItemResponse {
   data: Order!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type OrderList {
   data: [Order!]!
   message: String!
+  pagination: Pagination
   statusCode: Int!
+}
+
+type Pagination {
+  currentPages: Int
+  next: Int
+  prev: Int
+  totalPages: Int
 }
 
 """Enum for Payment Method"""
@@ -341,12 +366,14 @@ type Product {
 type ProductBoolean {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type ProductItem {
   data: Product!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -362,18 +389,21 @@ type ProductReview {
 type ProductReviewResponse {
   data: ProductReview!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type ProductString {
   data: String!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type ProductsList {
   data: [Product!]!
   message: String!
+  pagination: Pagination!
   statusCode: Int!
 }
 
@@ -496,18 +526,21 @@ type User {
 type UserBoolean {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type UserItem {
   data: User!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type UserList {
   data: [User!]!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -532,18 +565,21 @@ type Vendor {
 type VendorBooleanResponse {
   data: Boolean!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type VendorItem {
   data: Vendor!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type VendorList {
   data: [Vendor!]!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
@@ -559,12 +595,14 @@ type VendorReview {
 type VendorReviewResponse {
   data: VendorReview!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 
 type VendorStringResponse {
   data: String!
   message: String!
+  pagination: Pagination
   statusCode: Int!
 }
 

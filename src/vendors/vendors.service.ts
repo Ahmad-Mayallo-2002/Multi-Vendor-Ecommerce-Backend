@@ -23,9 +23,9 @@ export class VendorsService {
   }
 
   async getVendors(): Promise<Vendor[]> {
-    const vendors = await createGetAllLoader(this.vendorRepo, []).load(
-      '__all__',
-    );
+    const vendors = await createGetAllLoader(this.vendorRepo, [
+      'products',
+    ]).load('__all__');
     return vendors as Vendor[];
   }
 

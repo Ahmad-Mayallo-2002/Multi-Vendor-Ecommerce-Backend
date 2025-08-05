@@ -13,16 +13,16 @@ import { Payload } from '../common/types/payload.type';
 import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
 import { CurrentProductGuard } from '../common/guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
-import {
-  BooleanResponse,
-  StringResponse,
-} from '../common/responses/primitive-data-response.object';
-import {
-  ProductResponse,
-  ProductsResponse,
-} from '../common/responses/products-response.object';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, QueueEvents } from 'bullmq';
+import { BaseResponse } from '../common/responses/base-response.object';
+import { Product } from './entities/product.entity';
+
+const ProductsResponse = BaseResponse(Product, true, 'ProductsList');
+const ProductResponse = BaseResponse(Product, false, 'ProductItem');
+const BooleanResponse = BaseResponse(Boolean, false, 'ProductBoolean');
+const StringResponse = BaseResponse(String, false, 'ProductString');
+
 @Resolver()
 export class ProductsResolver {
   constructor(
@@ -42,6 +42,7 @@ export class ProductsResolver {
     return Buffer.concat(chunks);
   }
 
+  // Create Product
   @UseGuards(AuthGuard, RolesGuard, VendorIsApprovedGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => String, { name: 'createProduct' })
@@ -72,6 +73,7 @@ export class ProductsResolver {
     }
   }
 
+  // Get All Products
   @Query(() => ProductsResponse, { name: 'getProducts' })
   async products(
     @CurrentUser() currentUser: Payload,
@@ -87,7 +89,7 @@ export class ProductsResolver {
     sortByPrice: SortEnum,
     @Args('sortByCreated', { type: () => SortEnum, nullable: true })
     sortByCreated: SortEnum,
-  ): Promise<ProductsResponse> {
+  ) {
     let userId = '';
     currentUser ? (userId = currentUser.sub.userId) : null;
     return {
@@ -102,26 +104,26 @@ export class ProductsResolver {
     };
   }
 
+  // Get Products By Category
   @Query(() => ProductsResponse, { name: 'getProductsByCategory' })
-  async productsByCategory(
-    @Args('category') category: string,
-  ): Promise<ProductsResponse> {
+  async productsByCategory(@Args('category') category: string) {
     return { data: await this.productsService.getAllByCategoryId(category) };
   }
 
+  // Get Products By Vendor
   @Query(() => ProductsResponse, { name: 'getProductsByVendor' })
-  async productsByVendor(
-    @Args('vendorId') vendorId: string,
-  ): Promise<ProductsResponse> {
+  async productsByVendor(@Args('vendorId') vendorId: string) {
     return { data: await this.productsService.getAllByVendor(vendorId) };
   }
 
+  // Get Product By Id
   @UseGuards(CurrentProductGuard)
   @Query(() => ProductResponse, { name: 'getProductById' })
-  async product(@Args('id') id: string): Promise<ProductResponse> {
+  async product(@Args('id') id: string) {
     return { data: await this.productsService.getById(id) };
   }
 
+  // Update Product
   @UseGuards(
     AuthGuard,
     RolesGuard,
@@ -134,7 +136,7 @@ export class ProductsResolver {
   async updateProduct(
     @Args('productId') productId: string,
     @Args('input') input: UpdateProductInput,
-  ): Promise<StringResponse> {
+  ) {
     let fileData: any = null;
 
     if (input.image) {
@@ -153,11 +155,12 @@ export class ProductsResolver {
       file: fileData,
       productId,
     });
-    const result = await job.waitUntilFinished(this.pQueueEvents);
+    await job.waitUntilFinished(this.pQueueEvents);
 
     return { data: 'Product update is Done' };
   }
 
+  // Delete Product
   @UseGuards(
     AuthGuard,
     RolesGuard,
@@ -167,9 +170,7 @@ export class ProductsResolver {
   )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => BooleanResponse, { name: 'removeProduct' })
-  async deleteProduct(
-    @Args('productId') productId: string,
-  ): Promise<BooleanResponse> {
+  async deleteProduct(@Args('productId') productId: string) {
     return { data: await this.productsService.delete(productId) };
   }
 

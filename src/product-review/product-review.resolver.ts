@@ -9,7 +9,19 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
-import { FloatResponse } from '../common/responses/primitive-data-response.object';
+import { BaseResponse } from '../common/responses/base-response.object';
+
+const ProductReviewResponse = BaseResponse(
+  ProductReview,
+  false,
+  'ProductReviewResponse',
+);
+
+const AvgProductReviewResponse = BaseResponse(
+  Number,
+  false,
+  'AvgProductReviewResponse',
+);
 
 @Resolver(() => ProductReview)
 export class ProductReviewResolver {
@@ -17,22 +29,27 @@ export class ProductReviewResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => ProductReview, { name: 'addProductReview' })
+  @Mutation(() => ProductReviewResponse, { name: 'addProductReview' })
   async addReview(
     @CurrentUser() currentUser: Payload,
     @Args('input') input: CreateProductReviewInput,
-  ): Promise<ProductReview> {
+  ) {
     const { sub } = currentUser;
-    return await this.productReviewService.addOrUpdateReview(sub.userId, input);
+    return {
+      data: await this.productReviewService.addOrUpdateReview(
+        sub.userId,
+        input,
+      ),
+    };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => FloatResponse, { name: 'getAvgProductReview' })
+  @Query(() => AvgProductReviewResponse, { name: 'getAvgProductReview' })
   async getAvgReview(
     @Args('productId', { type: () => String })
     productId: string,
-  ): Promise<FloatResponse> {
+  ) {
     return {
       data: await this.productReviewService.averageProductReview(productId),
     };

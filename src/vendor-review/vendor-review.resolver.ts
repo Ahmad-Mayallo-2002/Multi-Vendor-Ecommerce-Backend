@@ -9,28 +9,43 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { Payload } from '../common/types/payload.type';
 import { CreateVendorReviewInput } from './dto/create-vendor-review.input';
-import { FloatResponse } from '../common/responses/primitive-data-response.object';
+import { BaseResponse } from '../common/responses/base-response.object';
+
+const VendorReviewResponse = BaseResponse(
+  VendorReview,
+  false,
+  'VendorReviewResponse',
+);
+const AvgVendorReviewResponse = BaseResponse(
+  Number,
+  false,
+  'AvgVendorReviewResponse',
+);
 
 @Resolver(() => VendorReview)
 export class VendorReviewResolver {
   constructor(private readonly vendorReviewService: VendorReviewService) {}
 
+  // Add Review To Vendor
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => VendorReview, { name: 'addVendorReview' })
+  @Mutation(() => VendorReviewResponse, { name: 'addVendorReview' })
   async addReview(
     @Args('vendorId', { type: () => String }) vendorId: string,
     @Args('input') input: CreateVendorReviewInput,
     @CurrentUser() currentUser: Payload,
-  ): Promise<VendorReview> {
+  ) {
     const { sub } = currentUser;
-    return await this.vendorReviewService.addOrUpdateReview(sub.userId, input);
+    return {
+      data: await this.vendorReviewService.addOrUpdateReview(sub.userId, input),
+    };
   }
 
-  @Query(() => Number, { name: 'getAverageVendorReview' })
+  // Get Average Vendor Review
+  @Query(() => AvgVendorReviewResponse, { name: 'getAverageVendorReview' })
   async getAverageReview(
     @Args('vendorId', { type: () => String }) vendorId: string,
-  ): Promise<FloatResponse> {
+  ) {
     return {
       data: await this.vendorReviewService.averageVendorReview(vendorId),
     };

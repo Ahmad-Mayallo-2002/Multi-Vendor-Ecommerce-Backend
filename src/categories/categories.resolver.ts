@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
@@ -7,25 +7,26 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
-import { BooleanResponse } from '../common/responses/primitive-data-response.object';
-import {
-  CategoriesResponse,
-  CategoryResponse,
-} from '../common/responses/categories-response.object';
+import { BaseResponse } from '../common/responses/base-response.object';
+import { Category } from './entities/category.entity';
+
+const CategoryListResponse = BaseResponse(Category, true, 'CategoryList');
+const CategoryResponse = BaseResponse(Category, false, 'CategryItem');
+const BooleanResponse = BaseResponse(Boolean, false, 'BooleanCategory');
 
 @Resolver()
 export class CategoriesResolver {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  // Create Category
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @Mutation(() => CategoryResponse, { name: 'createCategory' })
-  async createCategory(
-    @Args('input') input: CreateCategoryInput,
-  ): Promise<CategoryResponse> {
+  async createCategory(@Args('input') input: CreateCategoryInput) {
     return { data: await this.categoriesService.create(input) };
   }
 
+  // Update Category
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @Mutation(() => CategoryResponse, { name: 'updateCategory' })
@@ -33,30 +34,33 @@ export class CategoriesResolver {
     @Args('input') input: UpdateCategoryInput,
     @Args('categoryId', { type: () => String })
     categoryId: string,
-  ): Promise<CategoryResponse> {
+  ) {
     return { data: await this.categoriesService.update(input, categoryId) };
   }
 
+  // Remove Category
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   @Mutation(() => BooleanResponse, { name: 'removeCategory' })
   async removeCategory(
     @Args('categoryId', { type: () => String })
     categoryId: string,
-  ): Promise<BooleanResponse> {
+  ) {
     return { data: await this.categoriesService.remove(categoryId) };
   }
 
-  @Query(() => CategoriesResponse, { name: 'getCategories' })
-  async getCategories(): Promise<CategoriesResponse> {
+  // Get Categories
+  @Query(() => CategoryListResponse, { name: 'getCategories' })
+  async getCategories() {
     return { data: await this.categoriesService.findAll() };
   }
 
+  // Get Category By Id
   @Query(() => CategoryResponse, { name: 'getCategory' })
   async getCategory(
     @Args('categoryId', { type: () => String })
     categoryId: string,
-  ): Promise<CategoryResponse> {
+  ) {
     return { data: await this.categoriesService.findOne(categoryId) };
   }
 }

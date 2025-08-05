@@ -9,6 +9,12 @@ type AccessToken {
   vendorId: String
 }
 
+type AddToItemResponse {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
 type Address {
   city: String!
   country: String!
@@ -21,19 +27,43 @@ type Address {
   userId: String!
 }
 
-type AddressResponse {
+type AddressBoolean {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
+type AddressItem {
   data: Address!
   message: String!
   statusCode: Int!
 }
 
-type AddressesResponse {
+type AddressesList {
   data: [Address!]!
   message: String!
   statusCode: Int!
 }
 
-type BooleanResponse {
+type AvgProductReviewResponse {
+  data: Float!
+  message: String!
+  statusCode: Int!
+}
+
+type AvgVendorReviewResponse {
+  data: Float!
+  message: String!
+  statusCode: Int!
+}
+
+type BooleanCategory {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
+type BooleanFollowingResponse {
   data: Boolean!
   message: String!
   statusCode: Int!
@@ -59,20 +89,20 @@ type CartItem {
   updatedAt: DateTime!
 }
 
-type CartResponse {
-  data: Cart!
+type CartItemResponse {
+  data: CartItem!
   message: String!
   statusCode: Int!
 }
 
-type CartsResponse {
+type CartList {
   data: [Cart!]!
   message: String!
   statusCode: Int!
 }
 
-type CategoriesResponse {
-  data: [Category!]!
+type CartResponse {
+  data: Cart!
   message: String!
   statusCode: Int!
 }
@@ -86,7 +116,13 @@ type Category {
   updatedAt: DateTime!
 }
 
-type CategoryResponse {
+type CategoryList {
+  data: [Category!]!
+  message: String!
+  statusCode: Int!
+}
+
+type CategryItem {
   data: Category!
   message: String!
   statusCode: Int!
@@ -157,12 +193,6 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type FloatResponse {
-  data: Float!
-  message: String!
-  statusCode: Int!
-}
-
 type Following {
   createdAt: DateTime!
   id: String!
@@ -173,9 +203,21 @@ type Following {
   vendorId: String!
 }
 
+type FollowingResponse {
+  data: Following!
+  message: String!
+  statusCode: Int!
+}
+
 type FollowingsAndCount {
   count: Int!
   followings: [Following!]!
+}
+
+type FollowingsAndCountResponse {
+  data: FollowingsAndCount!
+  message: String!
+  statusCode: Int!
 }
 
 input LoginInput {
@@ -184,33 +226,33 @@ input LoginInput {
 }
 
 type Mutation {
-  addFollowing(input: CreateFollowingInput!): Following!
-  addItemToCart(input: CreateCartItemInput!): CartItem!
-  addProductReview(input: CreateProductReviewInput!): ProductReview!
-  addVendorReview(input: CreateVendorReviewInput!, vendorId: String!): VendorReview!
-  approveVendor(approve: Boolean!, vendorId: String!): StringResponse!
-  cancelFollowing(vendorId: String!): BooleanResponse!
-  createAddress(input: CreateAddressInput!): AddressResponse!
-  createCategory(input: CreateCategoryInput!): CategoryResponse!
-  createOrder(input: CreateOrderInput!): OrderResponse!
+  addFollowing(input: CreateFollowingInput!): FollowingResponse!
+  addItemToCart(input: CreateCartItemInput!): CartItemResponse!
+  addProductReview(input: CreateProductReviewInput!): ProductReviewResponse!
+  addVendorReview(input: CreateVendorReviewInput!, vendorId: String!): VendorReviewResponse!
+  approveVendor(approve: Boolean!, vendorId: String!): VendorStringResponse!
+  cancelFollowing(vendorId: String!): BooleanFollowingResponse!
+  createAddress(input: CreateAddressInput!): AddressItem!
+  createCategory(input: CreateCategoryInput!): CategryItem!
+  createOrder(input: CreateOrderInput!): OrderItemResponse!
   createProduct(input: CreateProductInput!): String!
   login(input: LoginInput!): AccessToken!
-  removeAddress(addressId: String!): BooleanResponse!
-  removeCategory(categoryId: String!): BooleanResponse!
-  removeItemFromCart(itemId: String!): BooleanResponse!
-  removeOrder(id: String!): BooleanResponse!
-  removeProduct(productId: String!): BooleanResponse!
-  removeUser: BooleanResponse!
-  removeVendor: BooleanResponse!
+  removeAddress(addressId: String!): AddressBoolean!
+  removeCategory(categoryId: String!): BooleanCategory!
+  removeItemFromCart(itemId: String!): AddToItemResponse!
+  removeOrder(id: String!): OrderBoolean!
+  removeProduct(productId: String!): ProductBoolean!
+  removeUser: UserBoolean!
+  removeVendor: VendorBooleanResponse!
   seedAdmin(userId: String!): String!
   signupUser(input: CreateUserInput!): User!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
-  updateAddress(addressId: String!, input: UpdateAddressInput!): BooleanResponse!
-  updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategoryResponse!
-  updateItemCart(input: UpdateCartItemInput!, itemId: String!): BooleanResponse!
-  updateProduct(input: UpdateProductInput!, productId: String!): StringResponse!
-  updateUser(input: UpdateUserInput!): BooleanResponse!
-  updateVendor(input: UpdateVendorInput!): BooleanResponse!
+  updateAddress(addressId: String!, input: UpdateAddressInput!): AddressBoolean!
+  updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategryItem!
+  updateItemCart(input: UpdateCartItemInput!, itemId: String!): AddToItemResponse!
+  updateProduct(input: UpdateProductInput!, productId: String!): ProductString!
+  updateUser(input: UpdateUserInput!): UserBoolean!
+  updateVendor(input: UpdateVendorInput!): VendorBooleanResponse!
 }
 
 type Order {
@@ -227,6 +269,12 @@ type Order {
   userId: String!
 }
 
+type OrderBoolean {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
 type OrderItem {
   createdAt: DateTime!
   id: String!
@@ -239,13 +287,13 @@ type OrderItem {
   updatedAt: DateTime!
 }
 
-type OrderResponse {
+type OrderItemResponse {
   data: Order!
   message: String!
   statusCode: Int!
 }
 
-type OrdersResponse {
+type OrderList {
   data: [Order!]!
   message: String!
   statusCode: Int!
@@ -290,7 +338,13 @@ type Product {
   vendorId: String!
 }
 
-type ProductResponse {
+type ProductBoolean {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
+type ProductItem {
   data: Product!
   message: String!
   statusCode: Int!
@@ -305,36 +359,48 @@ type ProductReview {
   value: Float!
 }
 
-type ProductsResponse {
+type ProductReviewResponse {
+  data: ProductReview!
+  message: String!
+  statusCode: Int!
+}
+
+type ProductString {
+  data: String!
+  message: String!
+  statusCode: Int!
+}
+
+type ProductsList {
   data: [Product!]!
   message: String!
   statusCode: Int!
 }
 
 type Query {
-  getAddress(addressId: String!): AddressResponse!
-  getAddresses: AddressesResponse!
-  getAllCarts: CartsResponse!
-  getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrdersResponse!
-  getAllUsers: UsersResponse!
-  getAverageVendorReview(vendorId: String!): Float!
-  getAvgProductReview(productId: String!): FloatResponse!
+  getAddress(addressId: String!): AddressItem!
+  getAddresses: AddressesList!
+  getAllCarts: CartList!
+  getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrderList!
+  getAllUsers: UserList!
+  getAverageVendorReview(vendorId: String!): AvgVendorReviewResponse!
+  getAvgProductReview(productId: String!): AvgProductReviewResponse!
   getCart(id: String!): CartResponse!
-  getCategories: CategoriesResponse!
-  getCategory(categoryId: String!): CategoryResponse!
-  getProductById(id: String!): ProductResponse!
-  getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): ProductsResponse!
-  getProductsByCategory(category: String!): ProductsResponse!
-  getProductsByVendor(vendorId: String!): ProductsResponse!
-  getSingleOrder(orderId: String!): OrderResponse!
-  getUser: UserResponse!
-  getUserAddresses: AddressesResponse!
+  getCategories: CategoryList!
+  getCategory(categoryId: String!): CategryItem!
+  getProductById(id: String!): ProductItem!
+  getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): ProductsList!
+  getProductsByCategory(category: String!): ProductsList!
+  getProductsByVendor(vendorId: String!): ProductsList!
+  getSingleOrder(orderId: String!): OrderItemResponse!
+  getUser: UserItem!
+  getUserAddresses: AddressesList!
   getUserCart: CartResponse!
-  getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!): FollowingsAndCount!
-  getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrdersResponse!
-  getVendor(vendorId: String!): VendorResponse!
-  getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCount!
-  getVendors: VendorsResponse!
+  getUserFollowings(skip: Int!, sortByCreated: Sort, take: Int!): FollowingsAndCountResponse!
+  getUserOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrderList!
+  getVendor(vendorId: String!): VendorItem!
+  getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCountResponse!
+  getVendors: VendorList!
   test: String!
 }
 
@@ -358,12 +424,6 @@ enum Status {
   PENDING
   REFUND
   UNPAID
-}
-
-type StringResponse {
-  data: String!
-  message: String!
-  statusCode: Int!
 }
 
 input UpdateAddressInput {
@@ -433,13 +493,19 @@ type User {
   vendorReview: [VendorReview!]!
 }
 
-type UserResponse {
+type UserBoolean {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
+type UserItem {
   data: User!
   message: String!
   statusCode: Int!
 }
 
-type UsersResponse {
+type UserList {
   data: [User!]!
   message: String!
   statusCode: Int!
@@ -463,8 +529,20 @@ type Vendor {
   userId: String!
 }
 
-type VendorResponse {
+type VendorBooleanResponse {
+  data: Boolean!
+  message: String!
+  statusCode: Int!
+}
+
+type VendorItem {
   data: Vendor!
+  message: String!
+  statusCode: Int!
+}
+
+type VendorList {
+  data: [Vendor!]!
   message: String!
   statusCode: Int!
 }
@@ -478,8 +556,14 @@ type VendorReview {
   vendorId: String!
 }
 
-type VendorsResponse {
-  data: [Vendor!]!
+type VendorReviewResponse {
+  data: VendorReview!
+  message: String!
+  statusCode: Int!
+}
+
+type VendorStringResponse {
+  data: String!
   message: String!
   statusCode: Int!
 }

@@ -9,35 +9,36 @@ import { Role } from '../common/enum/role.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { VendorExistsPipe } from '../common/pipes/vendor-exists.pipe';
-import {
-  VendorResponse,
-  VendorsResponse,
-} from '../common/responses/vendors-response.object';
-import {
-  BooleanResponse,
-  StringResponse,
-} from '../common/responses/primitive-data-response.object';
 import { Vendor } from './entities/vendor.entity';
+import { BaseResponse } from '../common/responses/base-response.object';
+
+const VendorList = BaseResponse(Vendor, true, 'VendorList');
+const VendorItem = BaseResponse(Vendor, false, 'VendorItem');
+const BooleanResponse = BaseResponse(Boolean, false, 'VendorBooleanResponse');
+const StringResponse = BaseResponse(String, false, 'VendorStringResponse');
 
 @Resolver(() => Vendor)
 export class VendorsResolver {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  @Query(() => VendorsResponse, { name: 'getVendors' })
-  async getVendors(): Promise<VendorsResponse> {
+  // Get All Vendors
+  @Query(() => VendorList, { name: 'getVendors' })
+  async getVendors() {
     return {
       data: await this.vendorsService.getVendors(),
     };
   }
 
-  @Query(() => VendorResponse, { name: 'getVendor' })
+  // Get Vendor By Id
+  @Query(() => VendorItem, { name: 'getVendor' })
   async getVendor(
     @Args('vendorId', { type: () => String }, VendorExistsPipe)
     vendorId: string,
-  ): Promise<VendorResponse> {
+  ) {
     return { data: await this.vendorsService.getVendor(vendorId) };
   }
 
+  // Update Vendor
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   @Mutation(() => BooleanResponse, { name: 'updateVendor' })
@@ -45,13 +46,14 @@ export class VendorsResolver {
     @CurrentUser() currentUser: Payload,
     @Args('input', { type: () => UpdateVendorInput })
     input: UpdateVendorInput,
-  ): Promise<BooleanResponse> {
+  ) {
     const { sub } = currentUser;
     return {
       data: await this.vendorsService.updateVendor(`${sub.vendorId}`, input),
     };
   }
 
+  // Remove Vendor
   @Mutation(() => BooleanResponse, { name: 'removeVendor' })
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
   async removeVendor(@CurrentUser() currentUser: Payload) {
@@ -59,12 +61,13 @@ export class VendorsResolver {
     return await this.vendorsService.deleteVendor(`${sub.vendorId}`);
   }
 
+  // Approve Vendor By Super Admin
   @Mutation(() => StringResponse, { name: 'approveVendor' })
   @Roles(Role.SUPER_ADMIN)
   async approveVendor(
     @Args('vendorId', { type: () => String }) vendorId: string,
     @Args('approve', { type: () => Boolean }) approve: boolean,
-  ): Promise<StringResponse> {
+  ) {
     return { data: await this.vendorsService.approveVendor(vendorId, approve) };
   }
 }

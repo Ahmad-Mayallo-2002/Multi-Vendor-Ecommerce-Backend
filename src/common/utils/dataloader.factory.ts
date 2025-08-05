@@ -11,7 +11,7 @@ export function createGetByIdLoader<Entity extends { id: string }>(
     async (keys: readonly string[]) => {
       const items = await repo.find({
         where: { id: In([...keys]) },
-        relations,
+        relations: relations,
       } as FindManyOptions<Entity>);
       if (!items.length) throw new NotFoundException('Not Found');
       const map = new Map(items.map((item) => [item.id, item]));
@@ -26,7 +26,9 @@ export function createGetAllLoader<Entity>(
 ): DataLoader<any, Entity[]> {
   return new DataLoader<any, Entity[]>(
     async () => {
-      const items = await repo.find({ relations });
+      console.log(repo);
+
+      const items = await repo.find({ relations: relations });
       if (!items.length) throw new NotFoundException('Not Found');
       return [items]; // return single array
     },

@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
-import { UseGuards } from '@nestjs/common';
+import { NotFoundException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
@@ -92,7 +92,7 @@ export class ProductsResolver {
   ) {
     let userId = '';
     currentUser ? (userId = currentUser.sub.userId) : null;
-    const products = await this.productsService.getAll(
+    const { products, counts } = await this.productsService.getAll(
       userId,
       take,
       skip,
@@ -103,10 +103,10 @@ export class ProductsResolver {
     return {
       data: products,
       pagination: {
-        prev: 0,
-        next: products.length - skip,
-        totalPages: products.length,
-        currentPages: 1,
+        prev: skip,
+        next: counts - 1 - skip,
+        totalPages: Math.ceil(counts / take),
+        currentPages: skip + 1,
       },
     };
   }

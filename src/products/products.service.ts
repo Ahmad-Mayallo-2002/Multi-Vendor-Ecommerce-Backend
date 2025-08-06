@@ -43,8 +43,14 @@ export class ProductsService {
     sortByFollowings: boolean,
     sortByPrice: SortEnum,
     sortByCreated: SortEnum,
-  ): Promise<Product[]> {
-    if (!userId) return await this.productRepo.find({ take, skip });
+  ) {
+    const counts = await this.productRepo.count({});
+    if (counts - 1 - skip < 0) throw new NotFoundException('Not Products');
+    if (!userId)
+      return {
+        products: await this.productRepo.find({ take, skip }),
+        counts,
+      };
     const userFollowings = await this.followingsRepo.find({
       where: { userId },
     });
@@ -71,9 +77,15 @@ export class ProductsService {
         followedVendorIds.has(product.vendorId)
           ? followedProducts.push(product)
           : otherProducts.push(product);
-      return [...followedProducts, ...otherProducts];
+      return {
+        products: [...followedProducts, ...otherProducts],
+        counts,
+      };
     }
-    return allProducts;
+    return {
+      products: allProducts,
+      counts,
+    };
   }
 
   async getAllByCategoryId(categoryId: string) {

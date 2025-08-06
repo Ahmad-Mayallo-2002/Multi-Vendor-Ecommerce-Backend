@@ -129,20 +129,20 @@ export class AuthService {
     }
   }
 
-  // Upsert Seed Admin to Add or Update User to Super Admin With Specific Credintials
-  async seedAdmin(userId: string): Promise<string> {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
-    if (!user) throw new NotFoundException('User is not Found');
-    const superAdmins = await this.userRepo.find({
+  async seedAdmin(): Promise<string> {
+    const admin = await this.userRepo.findOne({
       where: { role: Role.SUPER_ADMIN },
     });
-    if (superAdmins.length > 1)
-      throw new NotFoundException('Only One Can be Super Admin.');
-
-    if (user.role !== Role.SUPER_ADMIN) {
-      await this.userRepo.update({ id: userId }, { role: Role.SUPER_ADMIN });
-      return 'You Are Now Super Admin';
+    if (!admin) {
+      const newAdmin = this.userRepo.create({
+        username: 'superadmin',
+        email: 'admin@gmail.com',
+        password: await hash('123456789', 10),
+        role: Role.SUPER_ADMIN,
+      });
+      await this.userRepo.save(newAdmin);
+      return 'Super Admin is Created';
     }
-    return 'You Already are Super Admin.';
+    return 'No More Than One Super Admin';
   }
 }

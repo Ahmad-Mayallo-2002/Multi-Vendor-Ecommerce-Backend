@@ -6,33 +6,45 @@ import { LoginInput } from '../common/inputTypes/login.input';
 import { AccessToken } from '../common/objectTypes/accessToken.type';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
 import { Vendor } from '../vendors/entities/vendor.entity';
+import { BaseResponse } from '../common/responses/base-response.object';
+
+const UserSignUp = BaseResponse(User, false, 'UserSignUp');
+const VendorSignUp = BaseResponse(Vendor, false, 'VendorSignUp');
+const Login = BaseResponse(AccessToken, false, 'Login');
+const SeedAdminString = BaseResponse(String, false, 'SeedAdminString');
 
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => User, { name: 'signupUser' })
-  async signupUser(@Args('input') input: CreateUserInput): Promise<User> {
-    return await this.authService.signupUser(input);
+  @Mutation(() => UserSignUp, { name: 'signupUser' })
+  async signupUser(@Args('input') input: CreateUserInput) {
+    return {
+      data: await this.authService.signupUser(input),
+    };
   }
 
-  @Mutation(() => Vendor, { name: 'signupVendor' })
+  @Mutation(() => VendorSignUp, { name: 'signupVendor' })
   async signupVendor(
     @Args('user') user: CreateUserInput,
     @Args('vendor') vendor: CreateVendorInput,
-  ): Promise<Vendor> {
-    return await this.authService.signupVendor(user, vendor);
+  ) {
+    return {
+      data: await this.authService.signupVendor(user, vendor),
+    };
   }
 
-  @Mutation(() => AccessToken, { name: 'login' })
-  async login(@Args('input') input: LoginInput): Promise<AccessToken> {
-    return await this.authService.login(input);
+  @Mutation(() => Login, { name: 'login' })
+  async login(@Args('input') input: LoginInput) {
+    return {
+      data: await this.authService.login(input),
+    };
   }
 
-  @Mutation(() => String, { name: 'seedAdmin' })
-  async seedAdmin(
-    @Args('userId', { type: () => String }) userId: string,
-  ): Promise<String> {
-    return await this.authService.seedAdmin(userId);
+  @Mutation(() => SeedAdminString, { name: 'seedAdmin' })
+  async seedAdmin() {
+    return {
+      data: await this.authService.seedAdmin(),
+    };
   }
 }

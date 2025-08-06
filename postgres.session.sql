@@ -1,8 +1,10 @@
--- DELETE FROM "orderItems";
--- DELETE FROM "paymentMethods";
--- DELETE FROM "orders";
+-- -- DELETE FROM "orderItems";
+-- -- DELETE FROM "paymentMethods";
+-- -- DELETE FROM "orders";
 
--- UPDATE products SET stock = 20;
--- SELECT * FROM products;
+-- -- UPDATE products SET stock = 20;
+-- -- SELECT * FROM products;
 
-SELECT * FROM "paymentMethods"
+-- SELECT * FROM "paymentMethods"
+
+CREATE DATABASE "multiVendor";

@@ -235,6 +235,13 @@ type FollowingsAndCountResponse {
   statusCode: Int!
 }
 
+type Login {
+  data: AccessToken!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -251,7 +258,7 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): CategryItem!
   createOrder(input: CreateOrderInput!): OrderItemResponse!
   createProduct(input: CreateProductInput!): String!
-  login(input: LoginInput!): AccessToken!
+  login(input: LoginInput!): Login!
   removeAddress(addressId: String!): AddressBoolean!
   removeCategory(categoryId: String!): BooleanCategory!
   removeItemFromCart(itemId: String!): AddToItemResponse!
@@ -259,9 +266,9 @@ type Mutation {
   removeProduct(productId: String!): ProductBoolean!
   removeUser: UserBoolean!
   removeVendor: VendorBooleanResponse!
-  seedAdmin(userId: String!): String!
-  signupUser(input: CreateUserInput!): User!
-  signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): Vendor!
+  seedAdmin: SeedAdminString!
+  signupUser(input: CreateUserInput!): UserSignUp!
+  signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
   updateAddress(addressId: String!, input: UpdateAddressInput!): AddressBoolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategryItem!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): AddToItemResponse!
@@ -441,6 +448,13 @@ enum Role {
   VENDOR
 }
 
+type SeedAdminString {
+  data: String!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
 """Enum for Sort By ASC or DESC"""
 enum Sort {
   ASC
@@ -544,6 +558,13 @@ type UserList {
   statusCode: Int!
 }
 
+type UserSignUp {
+  data: User!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
 type Vendor {
   companyName: String!
   contactEmail: String!
@@ -594,6 +615,13 @@ type VendorReview {
 
 type VendorReviewResponse {
   data: VendorReview!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
+type VendorSignUp {
+  data: Vendor!
   message: String!
   pagination: Pagination
   statusCode: Int!

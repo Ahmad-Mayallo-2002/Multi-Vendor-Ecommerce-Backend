@@ -77,6 +77,8 @@ export class CartService {
     });
 
     // Validate Stock Product with Quantity
+    if (product.stock < input.quantity)
+      throw new Error('Stock is not Enough for Quantity');
 
     if (!currentItem) {
       const item = this.cartItemRepo.create({

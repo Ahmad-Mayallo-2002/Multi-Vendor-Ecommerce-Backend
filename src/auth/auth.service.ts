@@ -2,7 +2,6 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';

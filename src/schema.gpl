@@ -155,7 +155,6 @@ input CreateCartItemInput {
 input CreateCategoryInput {
   description: String!
   name: String!
-  user: String!
 }
 
 input CreateFollowingInput {
@@ -483,7 +482,6 @@ input UpdateCartItemInput {
 input UpdateCategoryInput {
   description: String
   name: String
-  user: String
 }
 
 input UpdateProductInput {

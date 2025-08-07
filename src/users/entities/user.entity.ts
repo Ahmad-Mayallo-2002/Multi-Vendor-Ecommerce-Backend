@@ -50,16 +50,15 @@ export class User extends IdClass {
   @Field(() => Cart)
   cart: Relation<Cart>;
 
-  @OneToMany(() => Order, (order) => order.user)
+  @OneToMany(() => Order, (order) => order.user, {
+    
+  })
   @Field(() => [Order])
   order: Relation<Order[]>;
 
   @OneToMany(() => Following, (following) => following.user)
   @Field(() => [Following], { nullable: true })
   followings: Relation<Following[]>;
-
-  @OneToMany(() => Category, (category) => category.user)
-  categories: Relation<Category[]>;
 
   @OneToMany(() => VendorReview, (vendorReview) => vendorReview.user)
   @Field(() => [VendorReview])

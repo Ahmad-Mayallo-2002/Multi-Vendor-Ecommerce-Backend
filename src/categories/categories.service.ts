@@ -15,7 +15,6 @@ export class CategoriesService {
   async create(input: CreateCategoryInput): Promise<Category> {
     const category = this.categoryRepo.create({
       ...input,
-      user: { id: input.user },
     });
     return await this.categoryRepo.save(category);
   }

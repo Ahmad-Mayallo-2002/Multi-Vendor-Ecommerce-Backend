@@ -20,7 +20,7 @@ import { VendorExistsPipe } from '../common/pipes/vendor-exists.pipe';
 import { Vendor } from './entities/vendor.entity';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from '../products/entities/product.entity';
-import { ProductsLoader } from '../common/dataloader/data-loader.loader';
+import { ProductsLoader } from '../common/dataloader/products-loader.loader';
 
 const VendorList = BaseResponse(Vendor, true, 'VendorList');
 const VendorItem = BaseResponse(Vendor, false, 'VendorItem');

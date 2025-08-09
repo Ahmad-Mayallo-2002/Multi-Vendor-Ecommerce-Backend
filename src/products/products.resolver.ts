@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
-import { NotFoundException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
@@ -14,7 +14,7 @@ import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
 import { CurrentProductGuard } from '../common/guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue, QueueEvents } from 'bullmq';
+import { Queue } from 'bullmq';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from './entities/product.entity';
 
@@ -29,8 +29,6 @@ export class ProductsResolver {
     private readonly productsService: ProductsService,
     @InjectQueue('products') private readonly pQueue: Queue,
   ) {}
-
-  private pQueueEvents = new QueueEvents('products');
 
   private async readStreamToBuffer(
     stream: NodeJS.ReadableStream,
@@ -55,7 +53,7 @@ export class ProductsResolver {
         (await input.image).createReadStream(),
       );
 
-      const job = await this.pQueue.add('upload-product-image', {
+      await this.pQueue.add('upload-product-image', {
         file: {
           filename: (await input.image).filename,
           mimetype: (await input.image).mimetype,
@@ -64,8 +62,6 @@ export class ProductsResolver {
         input,
         vendorId: currentUser.sub.vendorId,
       });
-
-      await job.waitUntilFinished(this.pQueueEvents);
 
       return 'Product Creation is Done';
     } catch (error: any) {
@@ -157,12 +153,11 @@ export class ProductsResolver {
       };
     }
 
-    const job = await this.pQueue.add('update-product', {
+    await this.pQueue.add('update-product', {
       input: { ...input, image: undefined }, // remove image from input
       file: fileData,
       productId,
     });
-    await job.waitUntilFinished(this.pQueueEvents);
 
     return { data: 'Product update is Done' };
   }
@@ -179,13 +174,5 @@ export class ProductsResolver {
   @Mutation(() => BooleanResponse, { name: 'removeProduct' })
   async deleteProduct(@Args('productId') productId: string) {
     return { data: await this.productsService.delete(productId) };
-  }
-
-  @Query(() => String, { name: 'test' })
-  async test() {
-    await this.pQueue.add('test', {
-      data: 'Test Data',
-    });
-    return 'Test Operation';
   }
 }

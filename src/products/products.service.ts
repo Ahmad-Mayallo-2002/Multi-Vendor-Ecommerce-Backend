@@ -9,7 +9,7 @@ import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue, QueueEvents } from 'bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class ProductsService {
@@ -53,9 +53,10 @@ export class ProductsService {
       };
     const userFollowings = await this.followingsRepo.find({
       where: { userId },
+      select: ['vendorId'],
     });
 
-    const followedVendorIds = new Set(userFollowings.map((v) => v.vendorId));
+    const followedVendorIds = new Set(userFollowings as any);
 
     let orderBy: Record<string, string> = {};
 
@@ -128,11 +129,9 @@ export class ProductsService {
   async delete(id: string): Promise<boolean> {
     const product = await this.getById(id);
     await this.productRepo.delete(id);
-    const queueEvents = new QueueEvents('products');
-    const job = await this.productQueue.add('delete-product-image', {
+    await this.productQueue.add('delete-product-image', {
       public_id: product.public_id,
     });
-    job.waitUntilFinished(queueEvents);
     return true;
   }
 }

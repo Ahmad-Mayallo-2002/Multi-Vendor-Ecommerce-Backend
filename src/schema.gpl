@@ -437,7 +437,6 @@ type Query {
   getVendor(vendorId: String!): VendorItem!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCountResponse!
   getVendors: VendorList!
-  test: String!
 }
 
 """Role Enum"""

@@ -25,8 +25,6 @@ export class ProductsProcessor extends WorkerHost {
         return await this.handleImageDelete(job);
       case 'update-product':
         return await this.handleProductUpdate(job);
-      case 'test':
-        return await this.test(job);
       default:
         throw new Error(`Unknown job type: ${job.name}`);
     }
@@ -50,10 +48,6 @@ export class ProductsProcessor extends WorkerHost {
   @OnWorkerEvent('failed')
   onFailed(job: Job) {
     console.log(`Job ${job.name} is Failed`);
-  }
-
-  private async test(job: Job) {
-    return 'Test Operation';
   }
 
   private async handleImageUpload(job: Job) {

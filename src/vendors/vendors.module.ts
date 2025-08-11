@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Product } from '../products/entities/product.entity';
 import { ProductsLoader } from '../common/dataloader/products-loader.loader';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({
   providers: [
@@ -16,6 +17,6 @@ import { ProductsLoader } from '../common/dataloader/products-loader.loader';
     CloudinaryService,
     ProductsLoader,
   ],
-  imports: [TypeOrmModule.forFeature([Vendor, Product])],
+  imports: [TypeOrmModule.forFeature([Vendor, Product]), CloudinaryModule],
 })
 export class VendorsModule {}

@@ -6,7 +6,6 @@ import { ValidationPipe } from '@nestjs/common';
 import cors from 'cors';
 import * as bodyParser from 'body-parser';
 import { RequestTimerInterceptor } from './common/interceptors/request-timer.interceptor';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,10 +19,7 @@ async function bootstrap() {
       credentials: true,
     }),
   );
-  app.useGlobalInterceptors(
-    new RequestTimerInterceptor(),
-    // new ResponseInterceptor(),
-  );
+  app.useGlobalInterceptors(new RequestTimerInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -4,7 +4,7 @@ import { UpdateProductInput } from './dto/update-product.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
-import { CloudinaryService } from '../cloudinary.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';

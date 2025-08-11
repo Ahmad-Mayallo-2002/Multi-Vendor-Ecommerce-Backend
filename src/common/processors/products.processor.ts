@@ -1,5 +1,5 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
-import { CloudinaryService } from '../../cloudinary.service';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Repository } from 'typeorm';

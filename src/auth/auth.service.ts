@@ -13,7 +13,7 @@ import { Role } from '../common/enum/role.enum';
 import { Payload } from '../common/types/payload.type';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken } from 'src/common/objectTypes/accessToken.type';
-import { CloudinaryService } from '../cloudinary.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
 import { Cart } from '../cart/entities/cart.entity';

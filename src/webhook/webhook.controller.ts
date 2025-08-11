@@ -9,7 +9,7 @@ import {
 import { log } from 'console';
 import { Request } from 'express';
 import Stripe from 'stripe';
-import { OrdersService } from './orders/orders.service';
+import { OrdersService } from '../orders/orders.service';
 
 const stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}`, {
   apiVersion: '2025-06-30.basil',

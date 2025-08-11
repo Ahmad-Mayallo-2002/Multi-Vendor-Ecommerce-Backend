@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CloudinaryService } from '../cloudinary.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { Cart } from '../cart/entities/cart.entity';
 

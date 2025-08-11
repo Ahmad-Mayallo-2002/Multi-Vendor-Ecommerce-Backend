@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateVendorInput } from './dto/update-vendor.input';
-import { CloudinaryService } from '../cloudinary.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
 import { Repository } from 'typeorm';

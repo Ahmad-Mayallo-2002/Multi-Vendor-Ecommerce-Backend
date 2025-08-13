@@ -12,9 +12,15 @@ import { OrderExistPipes } from '../common/pipes/order-exist.pipe';
 import { CreateOrderInput } from './dto/create-order.input';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Order } from './entities/order.entity';
+import { OrderResponse } from '../common/objectTypes/orderResponse.type';
 
 const OrderListResponse = BaseResponse(Order, true, 'OrderList');
-const OrderResponse = BaseResponse(Order, false, 'OrderItemResponse');
+const OrderItemResponse = BaseResponse(Order, true, 'OrderItemResponse');
+const CreateOrderResponse = BaseResponse(
+  OrderResponse,
+  false,
+  'CreateOrderResponse',
+);
 const BooleanResponse = BaseResponse(Boolean, false, 'OrderBoolean');
 
 @Resolver()
@@ -61,7 +67,7 @@ export class OrdersResolver {
   // Get Order By Id
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => OrderResponse, { name: 'getSingleOrder' })
+  @Query(() => OrderItemResponse, { name: 'getSingleOrder' })
   async getSingleOrder(
     @Args('orderId', { type: () => String }, OrderExistPipes) orderId: string,
   ) {
@@ -79,7 +85,7 @@ export class OrdersResolver {
   // Create Order
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Mutation(() => OrderResponse, { name: 'createOrder' })
+  @Mutation(() => CreateOrderResponse, { name: 'createOrder' })
   async createOrder(
     @Args('input') input: CreateOrderInput,
     @CurrentUser() currentUser: Payload,

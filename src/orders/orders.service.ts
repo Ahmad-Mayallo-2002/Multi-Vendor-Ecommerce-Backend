@@ -135,7 +135,10 @@ export class OrdersService {
     const userId = payment.order.userId;
 
     const cart = await this.cartRepo.findOne({ where: { userId } });
-    if (!cart) throw new NotFoundException('Cart is not Found');
+    if (!cart) {
+      await this.refundOrder(payment.paymentIntentId);
+      throw new NotFoundException('Cart is not Found');
+    }
 
     cart.totalPrice = 0;
     await this.cartRepo.save(cart);
@@ -154,6 +157,10 @@ export class OrdersService {
     for (const item of orderItems) {
       const product = item.product;
       if (!product) continue;
+      if (product.stock < item.quantity) {
+        await this.refundOrder(payment.paymentIntentId);
+        throw new ConflictException('Insufficient stock');
+      }
       product.stock -= item.quantity;
       await this.productRepo.save(product);
     }

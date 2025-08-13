@@ -37,15 +37,15 @@ export function BaseResponse<T>(
     data: T[] | T;
 
     @Field(() => Pagination, {
+      nullable: isPage,
       defaultValue: {
         prev: 0,
         next: 0,
         currentPages: 0,
         totalPages: 0,
       },
-      nullable: isPage,
     })
-    pagination: Pagination;
+    pagination?: Pagination;
   }
   return BaseResponse;
 }

@@ -1,6 +1,13 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { CartService } from './cart.service';
-import { UseGuards } from '@nestjs/common';
+import { Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
@@ -13,19 +20,36 @@ import { Payload } from '../common/types/payload.type';
 import { CartExistPipes } from '../common/pipes/cart-exist.pipe';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Cart } from './entities/cart.entity';
+import { CartAndItemsAndProducts } from '../common/dataloader/cart-cart-items-products.loader';
+import { Product } from '../products/entities/product.entity';
 
 const CartListResponse = BaseResponse(Cart, true, 'CartList');
 const CartResponse = BaseResponse(Cart, false, 'CartResponse');
 const CartItemResponse = BaseResponse(CartItem, false, 'CartItemResponse');
 const BooleanResponse = BaseResponse(Boolean, false, 'AddToItemResponse');
 
-@Resolver()
+@Resolver(() => Cart)
 export class CartResolver {
-  constructor(private readonly cartService: CartService) {}
+  constructor(
+    private readonly cartService: CartService,
+    private readonly cartsAndItemsAndProducts: CartAndItemsAndProducts,
+  ) {}
+
+  @ResolveField(() => [CartItem])
+  async cartItems(@Parent() cart: Cart) {
+    return await this.cartsAndItemsAndProducts.itemsInCarts.load(cart.id);
+  }
+
+  @ResolveField(() => Product)
+  async products(@Parent() cartItem: CartItem) {
+    return await this.cartsAndItemsAndProducts.productsInItems.load(
+      cartItem.productId,
+    );
+  }
 
   // Get All Carts
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.SUPER_ADMIN)
   @Query(() => CartListResponse, { name: 'getAllCarts' })
   async getAllCarts() {
     return { data: await this.cartService.getAllCarts() };
@@ -33,7 +57,7 @@ export class CartResolver {
 
   // Get User Cart
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Query(() => CartResponse, { name: 'getUserCart' })
   async getUserCart(@CurrentUser() currentUser: Payload) {
     const { sub } = currentUser;
@@ -42,7 +66,7 @@ export class CartResolver {
 
   // Get Cart By Id
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.SUPER_ADMIN)
   @Query(() => CartResponse, { name: 'getCart' })
   async getCart(
     @Args('id', { type: () => String }, CartExistPipes) id: string,
@@ -52,32 +76,47 @@ export class CartResolver {
 
   // Add Item To Cart
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Mutation(() => CartItemResponse, { name: 'addItemToCart' })
   async addItemToCart(
     @Args('input') input: CreateCartItemInput,
     @CurrentUser() currentUser: Payload,
   ) {
     const { sub } = currentUser;
-    return await this.cartService.addItemToCart(input, sub.userId);
+    return { data: await this.cartService.addItemToCart(input, sub.userId) };
   }
 
   // Remove Item From Cart
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Mutation(() => BooleanResponse, { name: 'removeItemFromCart' })
-  async removeItemFromCart(@Args('itemId') itemId: string) {
-    return { data: await this.cartService.removeItemFromCart(itemId) };
+  async removeItemFromCart(
+    @Args('itemId') itemId: string,
+    @CurrentUser() currentUser: Payload,
+  ) {
+    return {
+      data: await this.cartService.removeItemFromCart(
+        itemId,
+        currentUser.sub.userId,
+      ),
+    };
   }
 
   // Update Item in Current Cart
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Mutation(() => BooleanResponse, { name: 'updateItemCart' })
   async updateItemCart(
     @Args('itemId') itemId: string,
     @Args('input') input: UpdateCartItemInput,
+    @CurrentUser() currentUser: Payload,
   ) {
-    return { data: await this.cartService.updateItemCart(itemId, input) };
+    return {
+      data: await this.cartService.updateItemCart(
+        itemId,
+        input,
+        currentUser.sub.userId,
+      ),
+    };
   }
 }

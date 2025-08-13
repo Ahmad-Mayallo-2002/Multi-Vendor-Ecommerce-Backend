@@ -1,7 +1,6 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { FollowingService } from './following.service';
 import { Following } from './entities/following.entity';
-import { CreateFollowingInput } from './dto/create-following.input';
 import { FollowingsAndCount } from '../common/objectTypes/following.type';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -71,8 +70,12 @@ export class FollowingResolver {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Mutation(() => FollowingResponse, { name: 'addFollowing' })
-  async addFollowing(@Args('input') input: CreateFollowingInput) {
-    return { data: await this.followingService.addFollowing(input) };
+  async addFollowing(
+    @Args('vendorId') vendorId: string,
+    @Context() context: Payload,
+  ) {
+    const userId = context.sub.userId;
+    return { data: await this.followingService.addFollowing(userId, vendorId) };
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -80,7 +83,11 @@ export class FollowingResolver {
   @Mutation(() => BooleanResponse, { name: 'cancelFollowing' })
   async cancelFollowing(
     @Args('vendorId', { type: () => String }) vendorId: string,
+    @Context() context: Payload,
   ) {
-    return { data: await this.followingService.cancelFollowing(vendorId) };
+    const userId = context.sub.userId;
+    return {
+      data: await this.followingService.cancelFollowing(userId, vendorId),
+    };
   }
 }

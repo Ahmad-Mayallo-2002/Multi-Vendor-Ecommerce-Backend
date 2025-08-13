@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { AddressesService } from './addresses.service';
 import { UpdateAddressInput } from './dto/update-address.input';
 import { CreateAddressInput } from './dto/create-address.input';
@@ -30,7 +30,7 @@ export class AddressesResolver {
 
   // Get all addresses for a user
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Query(() => AddressListResponse, { name: 'getUserAddresses' })
   async getUserAddresses(@CurrentUser() currentUser: Payload) {
     const { sub } = currentUser;
@@ -53,26 +53,35 @@ export class AddressesResolver {
 
   // Update address
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Mutation(() => BooleanResponse, { name: 'updateAddress' })
   async updateAddress(
     @Args('addressId', { type: () => String }) addressId: string,
     @Args('input') input: UpdateAddressInput,
+    @Context() context: Payload,
   ) {
     return {
-      data: await this.addressesService.updateAddress(addressId, input),
+      data: await this.addressesService.updateAddress(
+        addressId,
+        input,
+        context.sub.userId,
+      ),
     };
   }
 
   // Delete address
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.USER)
+  @Roles(Role.USER)
   @Mutation(() => BooleanResponse, { name: 'removeAddress' })
   async removeAddress(
     @Args('addressId', { type: () => String }) addressId: string,
+    @Context() context: Payload,
   ) {
     return {
-      data: await this.addressesService.removeAddress(addressId),
+      data: await this.addressesService.removeAddress(
+        addressId,
+        context.sub.userId,
+      ),
     };
   }
 

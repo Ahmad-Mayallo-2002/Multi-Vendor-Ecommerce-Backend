@@ -6,7 +6,7 @@ import { Vendor } from './entities/vendor.entity';
 import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Product } from '../products/entities/product.entity';
-import { ProductsLoader } from '../common/dataloader/products-loader.loader';
+import { ProductsLoader } from '../common/dataloader/products-vendor.loader';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 
 @Module({

@@ -4,9 +4,16 @@ import { CategoriesResolver } from './categories.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { JwtService } from '@nestjs/jwt';
+import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
+import { Product } from '../products/entities/product.entity';
 
 @Module({
-  providers: [CategoriesResolver, CategoriesService, JwtService],
-  imports: [TypeOrmModule.forFeature([Category])],
+  providers: [
+    CategoriesResolver,
+    CategoriesService,
+    JwtService,
+    ProductsAndCategories,
+  ],
+  imports: [TypeOrmModule.forFeature([Category, Product])],
 })
 export class CategoriesModule {}

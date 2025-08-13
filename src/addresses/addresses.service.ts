@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAddressInput } from './dto/create-address.input';
 import { UpdateAddressInput } from './dto/update-address.input';
 import { Repository } from 'typeorm';
@@ -38,15 +42,20 @@ export class AddressesService {
   async updateAddress(
     addressId: string,
     input: UpdateAddressInput,
+    userId: string,
   ): Promise<boolean> {
     const address = await this.getAddress(addressId);
+    if (address.userId !== userId)
+      throw new BadRequestException('This is Not Your Address');
     const updated = this.addressRepo.merge(address, input);
     await this.addressRepo.save(updated);
     return true;
   }
 
-  async removeAddress(addressId: string): Promise<boolean> {
-    await this.getAddress(addressId);
+  async removeAddress(addressId: string, userId: string): Promise<boolean> {
+    const address = await this.getAddress(addressId);
+    if (address.userId !== userId)
+      throw new BadRequestException('This is Not Your Address');
     await this.addressRepo.delete({ id: addressId });
     return true;
   }

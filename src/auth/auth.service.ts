@@ -134,14 +134,14 @@ export class AuthService {
     });
     if (!admin) {
       const newAdmin = this.userRepo.create({
-        username: 'superadmin',
-        email: 'admin@gmail.com',
-        password: await hash('123456789', 10),
+        username: process.env.SUPER_ADMIN_USERNAME,
+        email: process.env.SUPER_ADMIN_EMAIL,
+        password: await hash(`${process.env.SUPER_ADMIN_PASSWORD}`, 10),
         role: Role.SUPER_ADMIN,
       });
       await this.userRepo.save(newAdmin);
       return 'Super Admin is Created';
     }
-    return 'No More Than One Super Admin';
+    throw new Error('No More Than One Super Admin');
   }
 }

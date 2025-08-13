@@ -33,7 +33,7 @@ import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook/webhook.module';
 import { BullModule } from '@nestjs/bullmq';
-import { ProductsLoader } from './common/dataloader/products-loader.loader';
+import { ProductsLoader } from './common/dataloader/products-vendor.loader';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({

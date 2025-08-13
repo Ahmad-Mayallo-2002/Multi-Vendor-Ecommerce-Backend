@@ -31,7 +31,7 @@ export class UsersResolver {
 
   // Get User By Id
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.USER, Role.SUPER_ADMIN)
+  @Roles(Role.USER)
   @Query(() => UserResponse, { name: 'getUser' })
   async getUser(@CurrentUser() currentUser: Payload) {
     const { sub } = currentUser;
@@ -40,7 +40,7 @@ export class UsersResolver {
 
   // Remove User
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.USER, Role.SUPER_ADMIN)
+  @Roles(Role.USER)
   @Mutation(() => BooleanResponse, { name: 'removeUser' })
   async removeUser(@CurrentUser() currentUser: Payload) {
     const { sub } = currentUser;
@@ -49,7 +49,7 @@ export class UsersResolver {
 
   // Update User
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.USER, Role.SUPER_ADMIN)
+  @Roles(Role.USER)
   @Mutation(() => BooleanResponse, { name: 'updateUser' })
   async updateUser(
     @CurrentUser() currentUser: Payload,

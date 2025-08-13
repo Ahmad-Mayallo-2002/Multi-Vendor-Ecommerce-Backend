@@ -10,6 +10,7 @@ import { CartItem } from './entities/cart-item.entity';
 import { CreateCartItemInput } from './dto/create-cart-item.input';
 import { Product } from '../products/entities/product.entity';
 import { UpdateCartItemInput } from './dto/update-cart-item.input';
+import { CartAndItemsAndProducts } from '../common/dataloader/cart-cart-items-products.loader';
 
 @Injectable()
 export class CartService {
@@ -39,9 +40,7 @@ export class CartService {
   }
 
   async getAllCarts(): Promise<Cart[]> {
-    const carts = await this.cartRepo.find({
-      relations: ['cartItems', 'cartItems.product', 'user'],
-    });
+    const carts = await this.cartRepo.find({});
     if (!carts.length) throw new NotFoundException('No Carts are Found');
     return carts;
   }
@@ -49,7 +48,6 @@ export class CartService {
   async getUserCart(userId: string): Promise<Cart> {
     const cart = await this.cartRepo.findOne({
       where: { userId },
-      relations: ['cartItems', 'cartItems.product'],
     });
     if (!cart) throw new NotFoundException('This Cart is not Found');
     return cart;
@@ -58,7 +56,6 @@ export class CartService {
   async getCart(id: string): Promise<Cart> {
     const cart = await this.cartRepo.findOne({
       where: { id },
-      relations: ['cartItems', 'cartItems.product'],
     });
     if (!cart) throw new NotFoundException('This Cart is not Found');
     return cart;
@@ -70,6 +67,7 @@ export class CartService {
   ): Promise<CartItem> {
     const product = await this.getProduct(input.productId);
     const cart = await this.getUserCart(userId);
+    if (cart.userId !== userId) throw new Error('This is not Your Cart');
     const priceAtPayment =
       product.price * input.quantity * (1 - product.discount / 100);
     const currentItem = await this.cartItemRepo.findOne({
@@ -86,7 +84,7 @@ export class CartService {
         priceAtPayment,
         cartId: cart.id,
       });
-      cart.totalPrice = priceAtPayment;
+      cart.totalPrice += priceAtPayment;
       await this.cartRepo.save(cart);
       return await this.cartItemRepo.save(item);
     } else {
@@ -98,11 +96,12 @@ export class CartService {
     }
   }
 
-  async removeItemFromCart(itemId: string): Promise<boolean> {
+  async removeItemFromCart(itemId: string, userId: string): Promise<boolean> {
     const item = await this.getCartItem(itemId);
     const { priceAtPayment, cartId } = item;
     await this.cartItemRepo.delete({ id: itemId });
     const cart = await this.getCart(cartId);
+    if (cart.userId !== userId) throw new Error('This is not Your Cart');
     cart.totalPrice -= priceAtPayment;
     await this.cartRepo.save(cart);
     return true;
@@ -111,13 +110,16 @@ export class CartService {
   async updateItemCart(
     itemId: string,
     input: UpdateCartItemInput,
+    userId: string,
   ): Promise<boolean> {
     const item = await this.getCartItem(itemId);
     const product = await this.getProduct(item.productId);
-    if (product.stock < input.quantity)
-      throw new BadRequestException('Quantity is Bigger than Stock');
 
     const cart = await this.getCart(item.cartId);
+    if (cart.userId !== userId) throw new Error('This is not Your Cart');
+
+    if (product.stock < input.quantity)
+      throw new BadRequestException('Quantity is Bigger than Stock');
 
     cart.totalPrice -= item.priceAtPayment;
 

@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { ProductsService } from './products.service';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
@@ -11,23 +19,25 @@ import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
-import { CurrentProductGuard } from '../common/guards/currentProduct.guard';
 import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from './entities/product.entity';
+import { Category } from '../categories/entities/category.entity';
+import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
 
 const ProductsResponse = BaseResponse(Product, true, 'ProductsList', false);
 const ProductResponse = BaseResponse(Product, false, 'ProductItem');
 const BooleanResponse = BaseResponse(Boolean, false, 'ProductBoolean');
 const StringResponse = BaseResponse(String, false, 'ProductString');
 
-@Resolver()
+@Resolver(() => Product)
 export class ProductsResolver {
   constructor(
     private readonly productsService: ProductsService,
     @InjectQueue('products') private readonly pQueue: Queue,
+    private readonly productsAndCategories: ProductsAndCategories,
   ) {}
 
   private async readStreamToBuffer(
@@ -67,6 +77,13 @@ export class ProductsResolver {
     } catch (error: any) {
       return `Error ${error.message}`;
     }
+  }
+
+  @ResolveField(() => Category)
+  async category(@Parent() product: Product) {
+    return await this.productsAndCategories.productsCategory.load(
+      product.categoryId,
+    );
   }
 
   // Get All Products
@@ -120,7 +137,6 @@ export class ProductsResolver {
   }
 
   // Get Product By Id
-  @UseGuards(CurrentProductGuard)
   @Query(() => ProductResponse, { name: 'getProductById' })
   async product(@Args('id') id: string) {
     return { data: await this.productsService.getById(id) };
@@ -131,7 +147,6 @@ export class ProductsResolver {
     AuthGuard,
     RolesGuard,
     VendorIsApprovedGuard,
-    CurrentProductGuard,
     VendorOwnsProductGuard,
   )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
@@ -167,7 +182,6 @@ export class ProductsResolver {
     AuthGuard,
     RolesGuard,
     VendorIsApprovedGuard,
-    CurrentProductGuard,
     VendorOwnsProductGuard,
   )
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)

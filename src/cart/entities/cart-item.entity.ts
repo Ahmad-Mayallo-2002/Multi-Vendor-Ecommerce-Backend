@@ -1,6 +1,6 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { IdClass } from '../../common/IdDate.entity';
-import { Column, Entity, ManyToOne, Relation } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Relation } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Cart } from './cart.entity';
 
@@ -14,7 +14,7 @@ export class CartItem extends IdClass {
   @Column({
     type: 'decimal',
     transformer: {
-      to: (value: number) => Math.round(value * 100),
+      to: (value: number) => value * 100,
       from: (value: number) => value / 100,
     },
   })
@@ -29,7 +29,8 @@ export class CartItem extends IdClass {
 
   // Relations
   @ManyToOne(() => Product, (product) => product.cartItems)
-  @Field(() => Product)
+  @JoinColumn()
+  @Field(() => Product, { nullable: true })
   product: Relation<Product>;
 
   @ManyToOne(() => Cart, (cart) => cart.cartItems, { onDelete: 'CASCADE' })

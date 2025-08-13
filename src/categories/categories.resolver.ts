@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryInput } from './dto/create-category.input';
 import { UpdateCategoryInput } from './dto/update-category.input';
@@ -9,14 +16,19 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Category } from './entities/category.entity';
+import { Product } from '../products/entities/product.entity';
+import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
 
 const CategoryListResponse = BaseResponse(Category, true, 'CategoryList');
 const CategoryResponse = BaseResponse(Category, false, 'CategryItem');
 const BooleanResponse = BaseResponse(Boolean, false, 'BooleanCategory');
 
-@Resolver()
+@Resolver(() => Category)
 export class CategoriesResolver {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(
+    private readonly categoriesService: CategoriesService,
+    private readonly productsAndCategories: ProductsAndCategories,
+  ) {}
 
   // Create Category
   @UseGuards(AuthGuard, RolesGuard)
@@ -62,5 +74,10 @@ export class CategoriesResolver {
     categoryId: string,
   ) {
     return { data: await this.categoriesService.findOne(categoryId) };
+  }
+
+  @ResolveField(() => [Product])
+  async products(@Parent() category: Category) {
+    return await this.productsAndCategories.categoryProducts.load(category.id);
   }
 }

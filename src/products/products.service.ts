@@ -8,8 +8,6 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
 
 @Injectable()
 export class ProductsService {
@@ -19,36 +17,36 @@ export class ProductsService {
     @InjectRepository(Following)
     private readonly followingsRepo: Repository<Following>,
     private readonly cloudinaryService: CloudinaryService,
-
-    @InjectQueue('products')
-    private readonly productQueue: Queue,
   ) {}
 
   async createProduct(input: CreateProductInput, vendorId: string) {
-    const image = await input.image;
-
-    await this.productQueue.add('upload-product-image', {
-      image,
-      input,
+    const image = await this.cloudinaryService.uploadFile(await input.image);
+    const newProduct = this.productRepo.create({
+      ...input,
+      image: image.secure_url,
+      public_id: image.public_id,
       vendorId,
     });
-
-    return 'Product Creation Enqueued';
+    return await this.productRepo.save(newProduct);
   }
 
   async getAll(
     userId: string,
     take: number,
-    skip: number,
+    page: number,
     sortByFollowings: boolean,
     sortByPrice: SortEnum,
     sortByCreated: SortEnum,
   ) {
     const counts = await this.productRepo.count({});
-    if (counts - 1 - skip < 0) throw new NotFoundException('Not Products');
+    if (page > Math.ceil(counts / take))
+      throw new NotFoundException('No Products');
     if (!userId)
       return {
-        products: await this.productRepo.find({ take, skip }),
+        products: await this.productRepo.find({
+          take,
+          skip: (page - 1) * take,
+        }),
         counts,
       };
     const userFollowings = await this.followingsRepo.find({
@@ -65,7 +63,7 @@ export class ProductsService {
 
     const allProducts = await this.productRepo.find({
       take,
-      skip,
+      skip: (page - 1) * take,
       order: orderBy,
     });
 
@@ -128,10 +126,8 @@ export class ProductsService {
 
   async delete(id: string): Promise<boolean> {
     const product = await this.getById(id);
+    v2.api.delete_all_resources([product.public_id]);
     await this.productRepo.delete(id);
-    await this.productQueue.add('delete-product-image', {
-      public_id: product.public_id,
-    });
     return true;
   }
 }

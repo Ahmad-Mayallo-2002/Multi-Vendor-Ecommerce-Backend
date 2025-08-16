@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { Cart } from '../cart/entities/cart.entity';
 import Stripe from 'stripe';
@@ -16,6 +16,7 @@ import { Status } from '../common/enum/order-status.enum';
 import { Product } from '../products/entities/product.entity';
 import { CartItem } from '../cart/entities/cart-item.entity';
 import { CreateOrderInput } from './dto/create-order.input';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class OrdersService {
@@ -30,7 +31,6 @@ export class OrdersService {
     @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
     @InjectRepository(PaymentMethod)
     private readonly paymentMethodRepo: Repository<PaymentMethod>,
-    private readonly dataSource: DataSource,
   ) {}
 
   private stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -53,75 +53,71 @@ export class OrdersService {
     });
   }
 
-  async createOrder(
-    input: CreateOrderInput,
-    userId: string,
-  ) {
-    return await this.dataSource.transaction(async (manager) => {
-      const cart = await this.cartRepo.findOne({
-        where: { userId },
-        relations: ['cartItems', 'cartItems.product'],
-      });
-
-      if (!cart || !cart.cartItems.length)
-        throw new BadRequestException('Cart is Empty');
-
-      // Step 1: Create Order
-      const newOrder = this.orderRepo.create({
-        addressId: input.addressId,
-        userId,
-        totalPrice: cart.totalPrice,
-      });
-
-      const order = await manager.save(this.orderRepo.create(newOrder));
-
-      // Step 2: Create OrderItems
-      for (const item of cart.cartItems) {
-        if (item.quantity > item.product.stock)
-          throw new ConflictException('Insufficient stock');
-
-        const orderItem = this.orderItemRepo.create({
-          orderId: order.id,
-          quantity: item.quantity,
-          priceAtPayment: item.priceAtPayment,
-          productId: item.productId,
-        });
-
-        await manager.save(orderItem);
-      }
-
-      // Step 3: Create PaymentIntent (outside the DB, won't rollback on failure)
-      const paymentIntent = await this.createPaymentIntent(
-        cart.totalPrice,
-        'usd',
-        order.id,
-      );
-
-      const brand = paymentIntent.payment_method_types;
-
-      if (input.paymentMethod.toLowerCase() !== brand[0].toLowerCase())
-        throw new BadRequestException('Card does not match selected method');
-
-      // Step 4: Save Payment record
-      const newPayment = this.paymentMethodRepo.create({
-        method: input.paymentMethod,
-        totalPrice: cart.totalPrice,
-        orderId: order.id,
-        paymentIntentId: paymentIntent.id,
-      });
-
-      const payment = await manager.save(newPayment);
-
-      // Step 5: Attach payment to order
-      order.paymentId = payment.id;
-      await manager.save(order);
-
-      return {
-        order,
-        clientSecret: paymentIntent.client_secret as string,
-        paymentIntentId: paymentIntent.id,
-      };
+  @Transactional()
+  async createOrder(input: CreateOrderInput, userId: string) {
+    const cart = await this.cartRepo.findOne({
+      where: { userId },
+      relations: ['cartItems', 'cartItems.product'],
     });
+
+    if (!cart || !cart.cartItems.length)
+      throw new BadRequestException('Cart is Empty');
+
+    // Step 1: Create Order
+    const newOrder = this.orderRepo.create({
+      addressId: input.addressId,
+      userId,
+      totalPrice: cart.totalPrice,
+    });
+
+    const order = await this.orderRepo.save(this.orderRepo.create(newOrder));
+
+    // Step 2: Create OrderItems
+    for (const item of cart.cartItems) {
+      if (item.quantity > item.product.stock)
+        throw new ConflictException('Insufficient stock');
+
+      const orderItem = this.orderItemRepo.create({
+        orderId: order.id,
+        quantity: item.quantity,
+        priceAtPayment: item.priceAtPayment,
+        productId: item.productId,
+      });
+
+      await this.orderItemRepo.save(orderItem);
+    }
+
+    // Step 3: Create PaymentIntent (outside the DB, won't rollback on failure)
+    const paymentIntent = await this.createPaymentIntent(
+      cart.totalPrice,
+      'usd',
+      order.id,
+    );
+
+    const brand = paymentIntent.payment_method_types;
+
+    if (input.paymentMethod.toLowerCase() !== brand[0].toLowerCase())
+      throw new BadRequestException('Card does not match selected method');
+
+    // Step 4: Save Payment record
+    const newPayment = this.paymentMethodRepo.create({
+      method: input.paymentMethod,
+      totalPrice: cart.totalPrice,
+      orderId: order.id,
+      paymentIntentId: paymentIntent.id,
+    });
+
+    const payment = await this.paymentMethodRepo.save(newPayment);
+
+    // Step 5: Attach payment to order
+    order.paymentId = payment.id;
+    await this.orderRepo.save(order);
+
+    return {
+      order,
+      clientSecret: paymentIntent.client_secret as string,
+      paymentIntentId: paymentIntent.id,
+    };
   }
 
   async markOrderAsPaid(paymentIntentId: string) {

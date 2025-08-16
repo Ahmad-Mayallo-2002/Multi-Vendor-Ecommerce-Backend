@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { OrdersService } from './orders.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
@@ -13,6 +21,8 @@ import { CreateOrderInput } from './dto/create-order.input';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Order } from './entities/order.entity';
 import { OrderResponse } from '../common/objectTypes/orderResponse.type';
+import { OrderItem } from './entities/order-item.entity';
+import { OrdersAndItemsAndProducts } from '../common/dataloader/order-order-items-products.loader';
 
 const OrderListResponse = BaseResponse(Order, true, 'OrderList');
 const OrderItemResponse = BaseResponse(Order, true, 'OrderItemResponse');
@@ -23,9 +33,17 @@ const CreateOrderResponse = BaseResponse(
 );
 const BooleanResponse = BaseResponse(Boolean, false, 'OrderBoolean');
 
-@Resolver()
+@Resolver(() => Order)
 export class OrdersResolver {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly ordersAndItemsAndProducts: OrdersAndItemsAndProducts,
+  ) {}
+
+  @ResolveField(() => [OrderItem])
+  async orderItems(@Parent() order: Order) {
+    return await this.ordersAndItemsAndProducts.itemsInOrder.load(order.id);
+  }
 
   // Get All Orders
   @UseGuards(AuthGuard, RolesGuard)

@@ -20,8 +20,6 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
 import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from './entities/product.entity';
 import { Category } from '../categories/entities/category.entity';
@@ -36,47 +34,23 @@ const StringResponse = BaseResponse(String, false, 'ProductString');
 export class ProductsResolver {
   constructor(
     private readonly productsService: ProductsService,
-    @InjectQueue('products') private readonly pQueue: Queue,
     private readonly productsAndCategories: ProductsAndCategories,
   ) {}
-
-  private async readStreamToBuffer(
-    stream: NodeJS.ReadableStream,
-  ): Promise<Buffer> {
-    const chunks: any[] = [];
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-    return Buffer.concat(chunks);
-  }
 
   // Create Product
   @UseGuards(AuthGuard, RolesGuard, VendorIsApprovedGuard)
   @Roles(Role.SUPER_ADMIN, Role.VENDOR)
-  @Mutation(() => String, { name: 'createProduct' })
+  @Mutation(() => ProductResponse, { name: 'createProduct' })
   async createProduct(
     @Args('input') input: CreateProductInput,
     @CurrentUser() currentUser: Payload,
-  ): Promise<string> {
-    try {
-      const buffer = await this.readStreamToBuffer(
-        (await input.image).createReadStream(),
-      );
-
-      await this.pQueue.add('upload-product-image', {
-        file: {
-          filename: (await input.image).filename,
-          mimetype: (await input.image).mimetype,
-          buffer: buffer.toString('base64'),
-        },
+  ) {
+    return {
+      data: await this.productsService.createProduct(
         input,
-        vendorId: currentUser.sub.vendorId,
-      });
-
-      return 'Product Creation is Done';
-    } catch (error: any) {
-      return `Error ${error.message}`;
-    }
+        currentUser.sub.vendorId as string,
+      ),
+    };
   }
 
   @ResolveField(() => Category)
@@ -91,7 +65,7 @@ export class ProductsResolver {
   async products(
     @CurrentUser() currentUser: Payload,
     @Args('take', { type: () => Int }) take: number,
-    @Args('skip', { type: () => Int }) skip: number,
+    @Args('page', { type: () => Int }) page: number,
     @Args('sortByFollowings', {
       type: () => Boolean,
       defaultValue: false,
@@ -108,7 +82,7 @@ export class ProductsResolver {
     const { products, counts } = await this.productsService.getAll(
       userId,
       take,
-      skip,
+      page,
       sortByFollowings,
       sortByPrice,
       sortByCreated,
@@ -116,10 +90,10 @@ export class ProductsResolver {
     return {
       data: products,
       pagination: {
-        prev: skip,
-        next: counts - 1 - skip,
+        currentPage: page,
         totalPages: Math.ceil(counts / take),
-        currentPages: skip + 1,
+        next: page < Math.ceil(counts / take),
+        prev: page > 1,
       },
     };
   }
@@ -155,26 +129,7 @@ export class ProductsResolver {
     @Args('productId') productId: string,
     @Args('input') input: UpdateProductInput,
   ) {
-    let fileData: any = null;
-
-    if (input.image) {
-      const file = await input.image;
-      const buffer = await this.readStreamToBuffer(file.createReadStream());
-
-      fileData = {
-        buffer: buffer.toString('base64'),
-        filename: file.filename,
-        mimetype: file.mimetype,
-      };
-    }
-
-    await this.pQueue.add('update-product', {
-      input: { ...input, image: undefined }, // remove image from input
-      file: fileData,
-      productId,
-    });
-
-    return { data: 'Product update is Done' };
+    return { data: await this.productsService.update(input, productId) };
   }
 
   // Delete Product

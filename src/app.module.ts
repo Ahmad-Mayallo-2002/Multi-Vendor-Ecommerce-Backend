@@ -32,8 +32,6 @@ import { VendorReview } from './vendor-review/entities/vendor-review.entity';
 import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook/webhook.module';
-import { BullModule } from '@nestjs/bullmq';
-import { ProductsLoader } from './common/dataloader/products-vendor.loader';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
@@ -78,15 +76,6 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         VendorReview,
         ProductReview,
       ],
-    }),
-    BullModule.forRoot({
-      connection: {
-        host: 'localhost',
-        port: 6379,
-      },
-      defaultJobOptions: {
-        attempts: 3,
-      },
     }),
     UsersModule,
     CategoriesModule,

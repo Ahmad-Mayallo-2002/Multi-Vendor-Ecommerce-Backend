@@ -21,7 +21,6 @@ import { CartExistPipes } from '../common/pipes/cart-exist.pipe';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Cart } from './entities/cart.entity';
 import { CartAndItemsAndProducts } from '../common/dataloader/cart-cart-items-products.loader';
-import { Product } from '../products/entities/product.entity';
 
 const CartListResponse = BaseResponse(Cart, true, 'CartList');
 const CartResponse = BaseResponse(Cart, false, 'CartResponse');
@@ -38,13 +37,6 @@ export class CartResolver {
   @ResolveField(() => [CartItem])
   async cartItems(@Parent() cart: Cart) {
     return await this.cartsAndItemsAndProducts.itemsInCarts.load(cart.id);
-  }
-
-  @ResolveField(() => Product)
-  async products(@Parent() cartItem: CartItem) {
-    return await this.cartsAndItemsAndProducts.productsInItems.load(
-      cartItem.productId,
-    );
   }
 
   // Get All Carts

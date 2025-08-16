@@ -52,11 +52,13 @@
     "rxjs": "^7.8.1",
     "stream": "^0.0.3",
     "stripe": "^18.3.0",
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.25",
+    "typeorm-transactional": "^0.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@nestjs-cls/transactional": "^3.1.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",

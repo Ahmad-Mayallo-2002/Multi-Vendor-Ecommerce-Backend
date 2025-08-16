@@ -7,8 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { Following } from '../following/entities/following.entity';
-import { BullModule } from '@nestjs/bullmq';
-import { ProductsProcessor } from '../common/processors/products.processor';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
 import { Category } from '../categories/entities/category.entity';
@@ -19,12 +17,10 @@ import { Category } from '../categories/entities/category.entity';
     ProductsService,
     JwtService,
     CloudinaryService,
-    ProductsProcessor,
     ProductsAndCategories,
   ],
   imports: [
     TypeOrmModule.forFeature([Product, Vendor, Following, Category]),
-    BullModule.registerQueue({ name: 'products' }),
     CloudinaryModule,
   ],
 })

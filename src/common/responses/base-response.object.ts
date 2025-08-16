@@ -6,16 +6,16 @@ type ClassType<T = any> = {
 
 @ObjectType()
 export class Pagination {
-  @Field(() => Int, { defaultValue: 0, nullable: true })
-  prev: number;
+  @Field(() => Boolean, { defaultValue: false })
+  prev: boolean;
 
-  @Field(() => Int, { defaultValue: 0, nullable: true })
-  next: number;
+  @Field(() => Boolean, { defaultValue: false })
+  next: boolean;
 
-  @Field(() => Int, { defaultValue: 0, nullable: true })
-  currentPages: number;
+  @Field(() => Int, { defaultValue: 1, nullable: true })
+  currentPage: number;
 
-  @Field(() => Int, { defaultValue: 0, nullable: true })
+  @Field(() => Int, { defaultValue: 1, nullable: true })
   totalPages: number;
 }
 
@@ -39,10 +39,10 @@ export function BaseResponse<T>(
     @Field(() => Pagination, {
       nullable: isPage,
       defaultValue: {
-        prev: 0,
-        next: 0,
-        currentPages: 0,
-        totalPages: 0,
+        prev: false,
+        next: false,
+        currentPage: 1,
+        totalPages: 1,
       },
     })
     pagination?: Pagination;

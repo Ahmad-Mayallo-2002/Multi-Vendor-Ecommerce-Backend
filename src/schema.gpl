@@ -81,7 +81,6 @@ type Cart {
   cartItems: [CartItem!]!
   createdAt: DateTime!
   id: String!
-  products: Product!
   totalPrice: Float!
   updatedAt: DateTime!
   user: User!
@@ -259,7 +258,7 @@ type Mutation {
   createAddress(input: CreateAddressInput!): AddressItem!
   createCategory(input: CreateCategoryInput!): CategryItem!
   createOrder(input: CreateOrderInput!): CreateOrderResponse!
-  createProduct(input: CreateProductInput!): String!
+  createProduct(input: CreateProductInput!): ProductItem!
   login(input: LoginInput!): Login!
   removeAddress(addressId: String!): AddressBoolean!
   removeCategory(categoryId: String!): BooleanCategory!
@@ -333,9 +332,9 @@ type OrderResponse {
 }
 
 type Pagination {
-  currentPages: Int
-  next: Int
-  prev: Int
+  currentPage: Int
+  next: Boolean!
+  prev: Boolean!
   totalPages: Int
 }
 
@@ -434,7 +433,7 @@ type Query {
   getCategories: CategoryList!
   getCategory(categoryId: String!): CategryItem!
   getProductById(id: String!): ProductItem!
-  getProducts(skip: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): ProductsList!
+  getProducts(page: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): ProductsList!
   getProductsByCategory(category: String!): ProductsList!
   getProductsByVendor(vendorId: String!): ProductsList!
   getSingleOrder(orderId: String!): OrderItemResponse!

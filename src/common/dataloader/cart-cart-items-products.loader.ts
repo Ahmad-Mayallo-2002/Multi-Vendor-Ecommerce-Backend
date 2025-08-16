@@ -1,7 +1,6 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartItem } from '../../cart/entities/cart-item.entity';
-import { Cart } from '../../cart/entities/cart.entity';
 import { Product } from '../../products/entities/product.entity';
 import { In, Repository } from 'typeorm';
 import DataLoader from 'dataloader';
@@ -10,7 +9,6 @@ import DataLoader from 'dataloader';
 export class CartAndItemsAndProducts {
   constructor(
     @InjectRepository(Product) private productRepo: Repository<Product>,
-    @InjectRepository(Cart) private cartRepo: Repository<Cart>,
     @InjectRepository(CartItem) private cartItemRepo: Repository<CartItem>,
   ) {}
 
@@ -31,8 +29,6 @@ export class CartAndItemsAndProducts {
       const products = await this.productRepo.findBy({ id: In(productIds) });
 
       const productMap = new Map(products.map((p) => [p.id, p]));
-      console.log(products);
-
       return productIds.map((id) => productMap.get(id));
     },
   );

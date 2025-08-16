@@ -6,9 +6,18 @@ import { ValidationPipe } from '@nestjs/common';
 import cors from 'cors';
 import * as bodyParser from 'body-parser';
 import { RequestTimerInterceptor } from './common/interceptors/request-timer.interceptor';
+import {
+  addTransactionalDataSource,
+  initializeTransactionalContext,
+} from 'typeorm-transactional';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
+  addTransactionalDataSource(app.get(DataSource));
+
   app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
   log(`http://localhost:${process.env.PORT}`);
   app.use(graphqlUploadExpress({ maxFieldSize: 5_000_000, maxFiles: 100000 }));

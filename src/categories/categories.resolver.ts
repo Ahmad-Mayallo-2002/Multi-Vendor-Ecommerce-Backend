@@ -14,14 +14,11 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
-import { BaseResponse } from '../common/responses/base-response.object';
 import { Category } from './entities/category.entity';
 import { Product } from '../products/entities/product.entity';
 import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
+import { BooleanResponse, CategoryListResponse, CategoryResponse } from '../common/responses/entities-responses.response';
 
-const CategoryListResponse = BaseResponse(Category, true, 'CategoryList');
-const CategoryResponse = BaseResponse(Category, false, 'CategryItem');
-const BooleanResponse = BaseResponse(Boolean, false, 'BooleanCategory');
 
 @Resolver(() => Category)
 export class CategoriesResolver {

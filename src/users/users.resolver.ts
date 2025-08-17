@@ -8,14 +8,14 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { BaseResponse } from '../common/responses/base-response.object';
+import {
+  BooleanResponse,
+  UserResponse,
+  UsersResponse,
+} from '../common/responses/entities-responses.response';
 import { User } from './entities/user.entity';
 
-const UsersResponse = BaseResponse(User, true, 'UserList');
-const UserResponse = BaseResponse(User, false, 'UserItem');
-const BooleanResponse = BaseResponse(Boolean, false, 'UserBoolean');
-
-@Resolver()
+@Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 

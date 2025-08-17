@@ -18,20 +18,12 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { OrderExistPipes } from '../common/pipes/order-exist.pipe';
 import { CreateOrderInput } from './dto/create-order.input';
-import { BaseResponse } from '../common/responses/base-response.object';
 import { Order } from './entities/order.entity';
-import { OrderResponse } from '../common/objectTypes/orderResponse.type';
 import { OrderItem } from './entities/order-item.entity';
 import { OrdersAndItemsAndProducts } from '../common/dataloader/order-order-items-products.loader';
+import { BooleanResponse, CreateOrderResponse, OrderItemResponse, OrderListResponse } from '../common/responses/entities-responses.response';
 
-const OrderListResponse = BaseResponse(Order, true, 'OrderList');
-const OrderItemResponse = BaseResponse(Order, true, 'OrderItemResponse');
-const CreateOrderResponse = BaseResponse(
-  OrderResponse,
-  false,
-  'CreateOrderResponse',
-);
-const BooleanResponse = BaseResponse(Boolean, false, 'OrderBoolean');
+
 
 @Resolver(() => Order)
 export class OrdersResolver {

@@ -9,13 +9,6 @@ type AccessToken {
   vendorId: String
 }
 
-type AddToItemResponse {
-  data: Boolean!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
 type Address {
   city: String!
   country: String!
@@ -49,28 +42,7 @@ type AddressesList {
   statusCode: Int!
 }
 
-type AvgProductReviewResponse {
-  data: Float!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
-type AvgVendorReviewResponse {
-  data: Float!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
-type BooleanCategory {
-  data: Boolean!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
-type BooleanFollowingResponse {
+type BooleanResponse {
   data: Boolean!
   message: String!
   pagination: Pagination
@@ -253,8 +225,8 @@ type Mutation {
   addItemToCart(input: CreateCartItemInput!): CartItemResponse!
   addProductReview(input: CreateProductReviewInput!): ProductReviewResponse!
   addVendorReview(input: CreateVendorReviewInput!, vendorId: String!): VendorReviewResponse!
-  approveVendor(approve: Boolean!, vendorId: String!): VendorStringResponse!
-  cancelFollowing(vendorId: String!): BooleanFollowingResponse!
+  approveVendor(approve: Boolean!, vendorId: String!): StringResponse!
+  cancelFollowing(vendorId: String!): BooleanResponse!
   compareVerificationCode(code: String!): Boolean!
   createAddress(input: CreateAddressInput!): AddressItem!
   createCategory(input: CreateCategoryInput!): CategryItem!
@@ -262,23 +234,30 @@ type Mutation {
   createProduct(input: CreateProductInput!): ProductItem!
   login(input: LoginInput!): Login!
   removeAddress(addressId: String!): AddressBoolean!
-  removeCategory(categoryId: String!): BooleanCategory!
-  removeItemFromCart(itemId: String!): AddToItemResponse!
-  removeOrder(id: String!): OrderBoolean!
-  removeProduct(productId: String!): ProductBoolean!
-  removeUser: UserBoolean!
-  removeVendor: VendorBooleanResponse!
-  seedAdmin: SeedAdminString!
+  removeCategory(categoryId: String!): BooleanResponse!
+  removeItemFromCart(itemId: String!): BooleanResponse!
+  removeOrder(id: String!): BooleanResponse!
+  removeProduct(productId: String!): BooleanResponse!
+  removeUser: BooleanResponse!
+  removeVendor: BooleanResponse!
+  seedAdmin: StringResponse!
   sendVerificationCode(email: String!): String!
   signupUser(input: CreateUserInput!): UserSignUp!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
   updateAddress(addressId: String!, input: UpdateAddressInput!): AddressBoolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategryItem!
-  updateItemCart(input: UpdateCartItemInput!, itemId: String!): AddToItemResponse!
+  updateItemCart(input: UpdateCartItemInput!, itemId: String!): BooleanResponse!
   updatePassword(newPassword: String!, oldPassword: String!): Boolean!
-  updateProduct(input: UpdateProductInput!, productId: String!): ProductString!
-  updateUser(input: UpdateUserInput!): UserBoolean!
-  updateVendor(input: UpdateVendorInput!): VendorBooleanResponse!
+  updateProduct(input: UpdateProductInput!, productId: String!): StringResponse!
+  updateUser(input: UpdateUserInput!): BooleanResponse!
+  updateVendor(input: UpdateVendorInput!): BooleanResponse!
+}
+
+type NumberResponse {
+  data: Float!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
 }
 
 type Order {
@@ -293,13 +272,6 @@ type Order {
   updatedAt: DateTime!
   user: User!
   userId: String!
-}
-
-type OrderBoolean {
-  data: Boolean!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
 }
 
 type OrderItem {
@@ -380,13 +352,6 @@ type Product {
   vendorId: String!
 }
 
-type ProductBoolean {
-  data: Boolean!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
 type ProductItem {
   data: Product!
   message: String!
@@ -410,13 +375,6 @@ type ProductReviewResponse {
   statusCode: Int!
 }
 
-type ProductString {
-  data: String!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
 type ProductsList {
   data: [Product!]!
   message: String!
@@ -430,8 +388,8 @@ type Query {
   getAllCarts: CartList!
   getAllOrders(skip: Int!, sortByCreated: Sort, take: Int!): OrderList!
   getAllUsers: UserList!
-  getAverageVendorReview(vendorId: String!): AvgVendorReviewResponse!
-  getAvgProductReview(productId: String!): AvgProductReviewResponse!
+  getAverageVendorReview(vendorId: String!): NumberResponse!
+  getAvgProductReview(productId: String!): NumberResponse!
   getCart(id: String!): CartResponse!
   getCategories: CategoryList!
   getCategory(categoryId: String!): CategryItem!
@@ -457,13 +415,6 @@ enum Role {
   VENDOR
 }
 
-type SeedAdminString {
-  data: String!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
 """Enum for Sort By ASC or DESC"""
 enum Sort {
   ASC
@@ -477,6 +428,13 @@ enum Status {
   PENDING
   REFUND
   UNPAID
+}
+
+type StringResponse {
+  data: String!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
 }
 
 input UpdateAddressInput {
@@ -545,13 +503,6 @@ type User {
   vendorReview: [VendorReview!]!
 }
 
-type UserBoolean {
-  data: Boolean!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
 type UserItem {
   data: User!
   message: String!
@@ -591,13 +542,6 @@ type Vendor {
   userId: String!
 }
 
-type VendorBooleanResponse {
-  data: Boolean!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
 type VendorItem {
   data: Vendor!
   message: String!
@@ -630,13 +574,6 @@ type VendorReviewResponse {
 
 type VendorSignUp {
   data: Vendor!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
-}
-
-type VendorStringResponse {
-  data: String!
   message: String!
   pagination: Pagination
   statusCode: Int!

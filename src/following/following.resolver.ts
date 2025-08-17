@@ -10,19 +10,8 @@ import { Roles } from '../common/decorators/role.decorator';
 import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { BaseResponse } from '../common/responses/base-response.object';
+import { BooleanResponse, FollowingResponse, FollowingsAndCountResponse } from '../common/responses/entities-responses.response';
 
-const FollowingResponse = BaseResponse(Following, false, 'FollowingResponse');
-const BooleanResponse = BaseResponse(
-  Boolean,
-  false,
-  'BooleanFollowingResponse',
-);
-const FollowingsAndCountResponse = BaseResponse(
-  FollowingsAndCount,
-  false,
-  'FollowingsAndCountResponse',
-);
 
 @Resolver(() => Following)
 export class FollowingResolver {

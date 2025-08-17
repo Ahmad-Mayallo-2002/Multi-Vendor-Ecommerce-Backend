@@ -18,14 +18,10 @@ import { UpdateCartItemInput } from './dto/update-cart-item.input';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { CartExistPipes } from '../common/pipes/cart-exist.pipe';
-import { BaseResponse } from '../common/responses/base-response.object';
 import { Cart } from './entities/cart.entity';
 import { CartAndItemsAndProducts } from '../common/dataloader/cart-cart-items-products.loader';
+import { BooleanResponse, CartItemResponse, CartListResponse, CartResponse } from '../common/responses/entities-responses.response';
 
-const CartListResponse = BaseResponse(Cart, true, 'CartList');
-const CartResponse = BaseResponse(Cart, false, 'CartResponse');
-const CartItemResponse = BaseResponse(CartItem, false, 'CartItemResponse');
-const BooleanResponse = BaseResponse(Boolean, false, 'AddToItemResponse');
 
 @Resolver(() => Cart)
 export class CartResolver {

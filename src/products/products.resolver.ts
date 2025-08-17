@@ -20,15 +20,11 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
 import { VendorOwnsProductGuard } from '../common/guards/productOwner.guard';
 import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
-import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from './entities/product.entity';
 import { Category } from '../categories/entities/category.entity';
 import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
+import { BooleanResponse, ProductResponse, ProductsResponse, StringResponse } from '../common/responses/entities-responses.response';
 
-const ProductsResponse = BaseResponse(Product, true, 'ProductsList', false);
-const ProductResponse = BaseResponse(Product, false, 'ProductItem');
-const BooleanResponse = BaseResponse(Boolean, false, 'ProductBoolean');
-const StringResponse = BaseResponse(String, false, 'ProductString');
 
 @Resolver(() => Product)
 export class ProductsResolver {

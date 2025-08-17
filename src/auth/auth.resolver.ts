@@ -1,17 +1,14 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { CreateUserInput } from '../users/dto/create-user.input';
-import { User } from '../users/entities/user.entity';
 import { LoginInput } from '../common/inputTypes/login.input';
-import { AccessToken } from '../common/objectTypes/accessToken.type';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
-import { Vendor } from '../vendors/entities/vendor.entity';
-import { BaseResponse } from '../common/responses/base-response.object';
-
-const UserSignUp = BaseResponse(User, false, 'UserSignUp');
-const VendorSignUp = BaseResponse(Vendor, false, 'VendorSignUp');
-const Login = BaseResponse(AccessToken, false, 'Login');
-const SeedAdminString = BaseResponse(String, false, 'SeedAdminString');
+import {
+  Login,
+  StringResponse,
+  UserSignUp,
+  VendorSignUp,
+} from '../common/responses/entities-responses.response';
 
 @Resolver()
 export class AuthResolver {
@@ -41,7 +38,7 @@ export class AuthResolver {
     };
   }
 
-  @Mutation(() => SeedAdminString, { name: 'seedAdmin' })
+  @Mutation(() => StringResponse, { name: 'seedAdmin' })
   async seedAdmin() {
     return {
       data: await this.authService.seedAdmin(),

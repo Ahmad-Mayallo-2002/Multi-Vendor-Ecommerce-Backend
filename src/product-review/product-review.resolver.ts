@@ -9,19 +9,10 @@ import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
-import { BaseResponse } from '../common/responses/base-response.object';
-
-const ProductReviewResponse = BaseResponse(
-  ProductReview,
-  false,
-  'ProductReviewResponse',
-);
-
-const AvgProductReviewResponse = BaseResponse(
-  Number,
-  false,
-  'AvgProductReviewResponse',
-);
+import {
+  NumberResponse,
+  ProductReviewResponse,
+} from '../common/responses/entities-responses.response';
 
 @Resolver(() => ProductReview)
 export class ProductReviewResolver {
@@ -45,7 +36,7 @@ export class ProductReviewResolver {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.USER)
-  @Query(() => AvgProductReviewResponse, { name: 'getAvgProductReview' })
+  @Query(() => NumberResponse, { name: 'getAvgProductReview' })
   async getAvgReview(
     @Args('productId', { type: () => String })
     productId: string,

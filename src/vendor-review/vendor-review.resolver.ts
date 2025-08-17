@@ -9,18 +9,10 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { Payload } from '../common/types/payload.type';
 import { CreateVendorReviewInput } from './dto/create-vendor-review.input';
-import { BaseResponse } from '../common/responses/base-response.object';
-
-const VendorReviewResponse = BaseResponse(
-  VendorReview,
-  false,
-  'VendorReviewResponse',
-);
-const AvgVendorReviewResponse = BaseResponse(
-  Number,
-  false,
-  'AvgVendorReviewResponse',
-);
+import {
+  NumberResponse,
+  VendorReviewResponse,
+} from '../common/responses/entities-responses.response';
 
 @Resolver(() => VendorReview)
 export class VendorReviewResolver {
@@ -42,7 +34,7 @@ export class VendorReviewResolver {
   }
 
   // Get Average Vendor Review
-  @Query(() => AvgVendorReviewResponse, { name: 'getAverageVendorReview' })
+  @Query(() => NumberResponse, { name: 'getAverageVendorReview' })
   async getAverageReview(
     @Args('vendorId', { type: () => String }) vendorId: string,
   ) {

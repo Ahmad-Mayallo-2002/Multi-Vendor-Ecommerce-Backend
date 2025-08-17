@@ -20,11 +20,8 @@ import { Vendor } from './entities/vendor.entity';
 import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from '../products/entities/product.entity';
 import { ProductsLoader } from '../common/dataloader/products-vendor.loader';
+import { BooleanResponse, StringResponse, VendorItem, VendorList } from '../common/responses/entities-responses.response';
 
-const VendorList = BaseResponse(Vendor, true, 'VendorList');
-const VendorItem = BaseResponse(Vendor, false, 'VendorItem');
-const BooleanResponse = BaseResponse(Boolean, false, 'VendorBooleanResponse');
-const StringResponse = BaseResponse(String, false, 'VendorStringResponse');
 
 @Resolver(() => Vendor)
 export class VendorsResolver {

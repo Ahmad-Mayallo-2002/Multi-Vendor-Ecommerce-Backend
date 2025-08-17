@@ -255,6 +255,7 @@ type Mutation {
   addVendorReview(input: CreateVendorReviewInput!, vendorId: String!): VendorReviewResponse!
   approveVendor(approve: Boolean!, vendorId: String!): VendorStringResponse!
   cancelFollowing(vendorId: String!): BooleanFollowingResponse!
+  compareVerificationCode(code: String!): Boolean!
   createAddress(input: CreateAddressInput!): AddressItem!
   createCategory(input: CreateCategoryInput!): CategryItem!
   createOrder(input: CreateOrderInput!): CreateOrderResponse!
@@ -268,11 +269,13 @@ type Mutation {
   removeUser: UserBoolean!
   removeVendor: VendorBooleanResponse!
   seedAdmin: SeedAdminString!
+  sendVerificationCode(email: String!): String!
   signupUser(input: CreateUserInput!): UserSignUp!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
   updateAddress(addressId: String!, input: UpdateAddressInput!): AddressBoolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategryItem!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): AddToItemResponse!
+  updatePassword(newPassword: String!, oldPassword: String!): Boolean!
   updateProduct(input: UpdateProductInput!, productId: String!): ProductString!
   updateUser(input: UpdateUserInput!): UserBoolean!
   updateVendor(input: UpdateVendorInput!): VendorBooleanResponse!

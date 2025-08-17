@@ -33,6 +33,8 @@ import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook/webhook.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { redisStore } from 'cache-manager-ioredis-yet';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -49,7 +51,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
           error: originalError?.error || 'Internal Server Error',
         };
       },
-      context: ({ req }) => ({}),
+      context: ({ req, res }) => ({ req, res }),
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
@@ -77,6 +79,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
         ProductReview,
       ],
     }),
+    CacheModule.register({ isGlobal: true }),
     UsersModule,
     CategoriesModule,
     ProductsModule,

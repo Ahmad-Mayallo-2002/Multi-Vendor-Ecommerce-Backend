@@ -5,6 +5,7 @@ import { graphqlUploadExpress } from 'graphql-upload-ts';
 import { ValidationPipe } from '@nestjs/common';
 import cors from 'cors';
 import * as bodyParser from 'body-parser';
+import session from 'express-session';
 import { RequestTimerInterceptor } from './common/interceptors/request-timer.interceptor';
 import {
   addTransactionalDataSource,
@@ -23,9 +24,16 @@ async function bootstrap() {
   app.use(graphqlUploadExpress({ maxFieldSize: 5_000_000, maxFiles: 100000 }));
   app.use(
     cors({
-      origin: ['http://localhost:5173'],
       methods: ['GET', 'POST', 'DELETE', 'PATCH'],
       credentials: true,
+    }),
+  );
+  app.use(
+    session({
+      secret: `${process.env.SESSION}`,
+      resave: false,
+      saveUninitialized: false,
+      cookie: { maxAge: 1000 * 60 * 60 },
     }),
   );
   app.useGlobalInterceptors(new RequestTimerInterceptor());

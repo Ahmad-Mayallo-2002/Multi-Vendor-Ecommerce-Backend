@@ -47,4 +47,26 @@ export class AuthResolver {
       data: await this.authService.seedAdmin(),
     };
   }
+
+  @Mutation(() => String, { name: 'sendVerificationCode' })
+  async sendVerificationCode(
+    @Args('email', { type: () => String }) email: string,
+  ) {
+    return await this.authService.sendVerificationCode(email);
+  }
+
+  @Mutation(() => Boolean, { name: 'compareVerificationCode' })
+  async compareVerificationCode(
+    @Args('code', { type: () => String }) code: string,
+  ) {
+    return await this.authService.comapreVerificationCode(code);
+  }
+
+  @Mutation(() => Boolean, { name: 'updatePassword' })
+  async updatePassword(
+    @Args('oldPassword') oldPassword: string,
+    @Args('newPassword') newPassword: string,
+  ) {
+    return await this.authService.updatePassword(oldPassword, newPassword);
+  }
 }

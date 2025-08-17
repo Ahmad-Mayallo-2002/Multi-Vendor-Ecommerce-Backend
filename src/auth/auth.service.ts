@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,6 +20,9 @@ import { Vendor } from '../vendors/entities/vendor.entity';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';
 import { Cart } from '../cart/entities/cart.entity';
 import { log } from 'console';
+import { sendVerificationCodeMail } from '../common/nodemailer/sendVerificationCode';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +34,7 @@ export class AuthService {
     @InjectRepository(Cart) private readonly cartRepo: Repository<Cart>,
     private readonly jwtService: JwtService,
     private readonly cloudinaryService: CloudinaryService,
+    @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) {}
 
   async signupUser(input: CreateUserInput, role?: Role): Promise<User> {
@@ -54,7 +60,7 @@ export class AuthService {
 
     return newUser;
   }
-  // Split in Code Signup Vendor
+
   async signupVendor(
     userInput: CreateUserInput,
     vendorInput: CreateVendorInput,
@@ -126,6 +132,35 @@ export class AuthService {
     } else {
       return response;
     }
+  }
+
+  async sendVerificationCode(email: string): Promise<string> {
+    let code: string = await sendVerificationCodeMail(email);
+    await this.cache.set('verificationCode', code);
+    log(code);
+    await this.cache.set('email', email);
+    return 'Verification Code is Sent';
+  }
+
+  async comapreVerificationCode(code: string): Promise<boolean> {
+    const cachedCode = await this.cache.get('verificationCode');
+    return cachedCode === code;
+  }
+
+  async updatePassword(
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<boolean> {
+    const email = (await this.cache.get('email')) as string;
+    if (!email) throw new Error('Email is not Exist Try Again');
+    const user = (await this.userRepo.findOneBy({ email })) as User;
+    const comparePass = await compare(oldPassword, user?.password);
+    if (!comparePass) throw new Error('Invalid Password');
+    await this.userRepo.update(
+      { email: email },
+      { password: await hash(newPassword, 10) },
+    );
+    return true;
   }
 
   async seedAdmin(): Promise<string> {

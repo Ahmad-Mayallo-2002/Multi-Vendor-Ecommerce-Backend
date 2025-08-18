@@ -208,6 +208,11 @@ type FollowingsAndCountResponse {
   statusCode: Int!
 }
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 type Login {
   data: AccessToken!
   message: String!
@@ -232,7 +237,10 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): CategryItem!
   createOrder(input: CreateOrderInput!): CreateOrderResponse!
   createProduct(input: CreateProductInput!): ProductItem!
+  getGoogleAuthUrl: StringResponse!
+  googleAuthCallback(code: String!): StringResponse!
   login(input: LoginInput!): Login!
+  registerFcmToken(platform: String, token: String!): Boolean!
   removeAddress(addressId: String!): AddressBoolean!
   removeCategory(categoryId: String!): BooleanResponse!
   removeItemFromCart(itemId: String!): BooleanResponse!
@@ -241,9 +249,12 @@ type Mutation {
   removeUser: BooleanResponse!
   removeVendor: BooleanResponse!
   seedAdmin: StringResponse!
+  sendPushToToken(body: String, data: JSON, title: String, token: String!): Boolean!
+  sendPushToUser(body: String, data: JSON, title: String, userId: String!): Boolean!
   sendVerificationCode(email: String!): String!
   signupUser(input: CreateUserInput!): UserSignUp!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
+  subscribeUserToTopic(topic: String!, userId: String!): Boolean!
   updateAddress(addressId: String!, input: UpdateAddressInput!): AddressBoolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategryItem!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): BooleanResponse!
@@ -406,6 +417,8 @@ type Query {
   getVendor(vendorId: String!): VendorItem!
   getVendorFollowers(skip: Int!, sortByCreated: Sort!, take: Int!): FollowingsAndCountResponse!
   getVendors: VendorList!
+  me: String!
+  searchProducts(order: JSON!, search: String!): ProductsList!
 }
 
 """Role Enum"""

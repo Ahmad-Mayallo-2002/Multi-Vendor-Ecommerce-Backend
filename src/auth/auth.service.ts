@@ -37,6 +37,41 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private readonly cache: Cache,
   ) {}
 
+  async validateGoogleUser(profile: any) {
+    // Check if user exists
+    let user = await this.userRepo.findOne({ where: { email: profile.email } });
+
+    // If not, create a new one
+    if (!user) {
+      user = this.userRepo.create({
+        username: profile.firstName + ' ' + profile.lastName,
+        email: profile.email,
+        password: '',
+      });
+      await this.userRepo.save(user);
+    }
+
+    let cart = await this.cartRepo.findOneBy({userId: user.id});
+    if (!cart) {
+      cart = this.cartRepo.create({
+        totalPrice: 0,
+        cartItems: []
+      });
+      await this.cartRepo.save(cart);
+    }
+
+    // Create JWT payload
+    const payload: Payload = {
+      sub: {
+        userId: user.id,
+        role: user.role,
+      },
+    };
+    const token = this.jwtService.sign(payload);
+
+    return { user, token };
+  }
+
   async signupUser(input: CreateUserInput, role?: Role): Promise<User> {
     const existingUser = await this.userRepo.findOne({
       where: { email: input.email },

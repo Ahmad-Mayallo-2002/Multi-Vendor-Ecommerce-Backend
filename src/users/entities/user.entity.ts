@@ -29,7 +29,7 @@ export class User extends IdClass {
   @Field()
   email: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   password: string;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
@@ -50,9 +50,7 @@ export class User extends IdClass {
   @Field(() => Cart)
   cart: Relation<Cart>;
 
-  @OneToMany(() => Order, (order) => order.user, {
-    
-  })
+  @OneToMany(() => Order, (order) => order.user, {})
   @Field(() => [Order])
   order: Relation<Order[]>;
 

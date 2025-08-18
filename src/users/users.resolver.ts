@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Mutation, Context } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UseGuards } from '@nestjs/common';
@@ -57,5 +57,13 @@ export class UsersResolver {
   ) {
     const { sub } = currentUser;
     return { data: await this.usersService.updateUser(sub.userId, input) };
+  }
+
+  @Query(() => String, { name: 'me' })
+  @UseGuards(AuthGuard)
+  async me(@Context() ctx: any) {
+    console.log(ctx.req.user);
+
+    return 'You are authenticated!';
   }
 }

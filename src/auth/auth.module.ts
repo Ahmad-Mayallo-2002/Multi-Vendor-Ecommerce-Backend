@@ -8,9 +8,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { Cart } from '../cart/entities/cart.entity';
+import { GoogleStrategy } from './google.strategy';
 
 @Module({
-  providers: [AuthResolver, AuthService, CloudinaryService],
+  providers: [AuthResolver, AuthService, CloudinaryService, GoogleStrategy],
   imports: [
     TypeOrmModule.forFeature([User, Vendor, Cart]),
     JwtModule.registerAsync({

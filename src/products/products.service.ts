@@ -3,11 +3,12 @@ import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { v2 } from 'cloudinary';
 import { Following } from '../following/entities/following.entity';
 import { SortEnum } from '../common/enum/sort.enum';
+import { GraphQLJSON } from 'graphql-type-json';
 
 @Injectable()
 export class ProductsService {
@@ -85,6 +86,25 @@ export class ProductsService {
       products: allProducts,
       counts,
     };
+  }
+
+  async searchProduct(
+    search: string,
+    order: Record<keyof Product, SortEnum>,
+  ) {
+    const rowSearch = Raw((alias) => `${alias} ~* :search`, { search });
+    const products = await this.productRepo.find({
+      where: [
+        { title: rowSearch },
+        { description: rowSearch },
+        {
+          category: [{ name: rowSearch }, { description: rowSearch }],
+        },
+      ],
+      order: order,
+    });
+    if (!products.length) throw new NotFoundException('Products not Found');
+    return products;
   }
 
   async getAllByCategoryId(categoryId: string) {

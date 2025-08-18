@@ -33,8 +33,10 @@ import { ProductReviewModule } from './product-review/product-review.module';
 import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook/webhook.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { redisStore } from 'cache-manager-ioredis-yet';
 import { CacheModule } from '@nestjs/cache-manager';
+import { FirebaseAdminModule } from './firebase/firebase-admin.module';
+import GraphQLJSON from 'graphql-type-json';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { CacheModule } from '@nestjs/cache-manager';
         };
       },
       context: ({ req, res }) => ({ req, res }),
+      resolvers: { JSON: GraphQLJSON },
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
@@ -93,8 +96,9 @@ import { CacheModule } from '@nestjs/cache-manager';
     ProductReviewModule,
     WebhookModule,
     CloudinaryModule,
+    FirebaseAdminModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PriceScalar],
+  providers: [AppService, PriceScalar, JwtService],
 })
 export class AppModule {}

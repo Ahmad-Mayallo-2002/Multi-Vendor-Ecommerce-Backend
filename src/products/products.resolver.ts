@@ -23,8 +23,13 @@ import { VendorIsApprovedGuard } from '../common/guards/vendorIsApproved.guard';
 import { Product } from './entities/product.entity';
 import { Category } from '../categories/entities/category.entity';
 import { ProductsAndCategories } from '../common/dataloader/products-category.loader';
-import { BooleanResponse, ProductResponse, ProductsResponse, StringResponse } from '../common/responses/entities-responses.response';
-
+import {
+  BooleanResponse,
+  ProductResponse,
+  ProductsResponse,
+  StringResponse,
+} from '../common/responses/entities-responses.response';
+import GraphQLJSON from 'graphql-type-json';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -110,6 +115,18 @@ export class ProductsResolver {
   @Query(() => ProductResponse, { name: 'getProductById' })
   async product(@Args('id') id: string) {
     return { data: await this.productsService.getById(id) };
+  }
+
+  // Search Products
+  @Query(() => ProductsResponse, { name: 'searchProducts' })
+  async searchProducts(
+    @Args('search') search: string,
+    @Args('order', { type: () => GraphQLJSON })
+    order: Record<keyof Product, SortEnum>,
+  ) {
+    return {
+      data: await this.productsService.searchProduct(search, order),
+    };
   }
 
   // Update Product

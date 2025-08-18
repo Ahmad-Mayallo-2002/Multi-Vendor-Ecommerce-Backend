@@ -17,7 +17,6 @@ import { CartItem } from './entities/cart-item.entity';
 import { UpdateCartItemInput } from './dto/update-cart-item.input';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { CartExistPipes } from '../common/pipes/cart-exist.pipe';
 import { Cart } from './entities/cart.entity';
 import { CartAndItemsAndProducts } from '../common/dataloader/cart-cart-items-products.loader';
 import { BooleanResponse, CartItemResponse, CartListResponse, CartResponse } from '../common/responses/entities-responses.response';
@@ -57,7 +56,7 @@ export class CartResolver {
   @Roles(Role.SUPER_ADMIN)
   @Query(() => CartResponse, { name: 'getCart' })
   async getCart(
-    @Args('id', { type: () => String }, CartExistPipes) id: string,
+    @Args('id', { type: () => String }) id: string,
   ) {
     return { data: await this.cartService.getCart(id) };
   }

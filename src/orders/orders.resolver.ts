@@ -16,7 +16,6 @@ import { RolesGuard } from '../common/guards/role.guard';
 import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { OrderExistPipes } from '../common/pipes/order-exist.pipe';
 import { CreateOrderInput } from './dto/create-order.input';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
@@ -79,7 +78,7 @@ export class OrdersResolver {
   @Roles(Role.SUPER_ADMIN, Role.USER)
   @Query(() => OrderItemResponse, { name: 'getSingleOrder' })
   async getSingleOrder(
-    @Args('orderId', { type: () => String }, OrderExistPipes) orderId: string,
+    @Args('orderId', { type: () => String }) orderId: string,
   ) {
     return { data: await this.ordersService.getSingleOrder(orderId) };
   }

@@ -13,7 +13,6 @@ import { Cart } from '../../cart/entities/cart.entity';
 import { Following } from '../../following/entities/following.entity';
 import { Vendor } from '../../vendors/entities/vendor.entity';
 import { Address } from '../../addresses/entities/address.entity';
-import { Category } from '../../categories/entities/category.entity';
 import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
 import { ProductReview } from '../../product-review/entities/product-review.entity';
 import { Order } from '../../orders/entities/order.entity';

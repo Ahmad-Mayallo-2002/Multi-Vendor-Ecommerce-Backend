@@ -15,9 +15,7 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { VendorExistsPipe } from '../common/pipes/vendor-exists.pipe';
 import { Vendor } from './entities/vendor.entity';
-import { BaseResponse } from '../common/responses/base-response.object';
 import { Product } from '../products/entities/product.entity';
 import { ProductsLoader } from '../common/dataloader/products-vendor.loader';
 import { BooleanResponse, StringResponse, VendorItem, VendorList } from '../common/responses/entities-responses.response';
@@ -41,7 +39,7 @@ export class VendorsResolver {
   // Get Vendor By Id
   @Query(() => VendorItem, { name: 'getVendor' })
   async getVendor(
-    @Args('vendorId', { type: () => String }, VendorExistsPipe)
+    @Args('vendorId', { type: () => String })
     vendorId: string,
   ) {
     return { data: await this.vendorsService.getVendor(vendorId) };

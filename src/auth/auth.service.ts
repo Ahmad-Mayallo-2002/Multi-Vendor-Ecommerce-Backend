@@ -49,15 +49,14 @@ export class AuthService {
         password: '',
       });
       await this.userRepo.save(user);
-    }
-
-    let cart = await this.cartRepo.findOneBy({userId: user.id});
-    if (!cart) {
-      cart = this.cartRepo.create({
-        totalPrice: 0,
-        cartItems: []
-      });
-      await this.cartRepo.save(cart);
+      let cart = await this.cartRepo.findOneBy({ userId: user.id });
+      if (!cart) {
+        cart = this.cartRepo.create({
+          totalPrice: 0,
+          cartItems: [],
+        });
+        await this.cartRepo.save(cart);
+      }
     }
 
     // Create JWT payload

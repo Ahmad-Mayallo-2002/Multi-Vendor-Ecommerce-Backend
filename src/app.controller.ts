@@ -1,6 +1,16 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import axios from 'axios';
 
 @Controller()
 export class AppController {
@@ -19,10 +29,18 @@ export class AppController {
     };
   }
 
-  @Get('logout')
-  logout(@Req() req) {
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) return { message: 'No token provided' };
-    return { message: 'Logged out successfully' };
+  @Post('logout')
+  async logout(@Query('accessToken') accessToken: string) {
+    try {
+      await axios.post('https://oauth2.googleapis.com/revoke', null, {
+        params: {
+          token: accessToken,
+        },
+      });
+      return 'Logout is Done';
+    } catch (err: any) {
+      console.log(err);
+      return err;
+    }
   }
 }

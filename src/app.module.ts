@@ -34,9 +34,9 @@ import { ProductReview } from './product-review/entities/product-review.entity';
 import { WebhookModule } from './webhook/webhook.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { FirebaseAdminModule } from './firebase/firebase-admin.module';
 import GraphQLJSON from 'graphql-type-json';
 import { JwtService } from '@nestjs/jwt';
+import { NotificaitonModule } from './notifications/notification.module';
 
 @Module({
   imports: [
@@ -96,7 +96,7 @@ import { JwtService } from '@nestjs/jwt';
     ProductReviewModule,
     WebhookModule,
     CloudinaryModule,
-    FirebaseAdminModule,
+    NotificaitonModule,
   ],
   controllers: [AppController],
   providers: [AppService, PriceScalar, JwtService],

@@ -240,7 +240,6 @@ type Mutation {
   getGoogleAuthUrl: StringResponse!
   googleAuthCallback(code: String!): StringResponse!
   login(input: LoginInput!): Login!
-  registerFcmToken(platform: String, token: String!): Boolean!
   removeAddress(addressId: String!): AddressBoolean!
   removeCategory(categoryId: String!): BooleanResponse!
   removeItemFromCart(itemId: String!): BooleanResponse!
@@ -249,12 +248,9 @@ type Mutation {
   removeUser: BooleanResponse!
   removeVendor: BooleanResponse!
   seedAdmin: StringResponse!
-  sendPushToToken(body: String, data: JSON, title: String, token: String!): Boolean!
-  sendPushToUser(body: String, data: JSON, title: String, userId: String!): Boolean!
   sendVerificationCode(email: String!): String!
   signupUser(input: CreateUserInput!): UserSignUp!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
-  subscribeUserToTopic(topic: String!, userId: String!): Boolean!
   updateAddress(addressId: String!, input: UpdateAddressInput!): AddressBoolean!
   updateCategory(categoryId: String!, input: UpdateCategoryInput!): CategryItem!
   updateItemCart(input: UpdateCartItemInput!, itemId: String!): BooleanResponse!

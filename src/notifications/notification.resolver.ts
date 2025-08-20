@@ -17,8 +17,8 @@ import {
 export class NotificationResolver {
   constructor(private notificationService: NotificationsService) {}
 
-  // @UseGuards(AuthGuard, RolesGuard)
-  // @Roles(Role.SUPER_ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   @Mutation(() => NotificationResponses, { name: 'sendNotification' })
   async sendNotification(@Args('input') notificationBody: NotificationInput) {
     return {
@@ -29,6 +29,8 @@ export class NotificationResolver {
     };
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   @Query(() => NotificationsResponse, { name: 'getNotifications' })
   async getAll(
     @Args('take', { type: () => Int }) take: number,
@@ -50,6 +52,8 @@ export class NotificationResolver {
     };
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   @Query(() => NotificationResponse, { name: 'getNotificationById' })
   async getById(@Args('id') id: string) {
     return {
@@ -57,6 +61,8 @@ export class NotificationResolver {
     };
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   @Mutation(() => BooleanResponse, { name: 'deleteNotification' })
   async deleteNotification(@Args('id') id: string) {
     return {

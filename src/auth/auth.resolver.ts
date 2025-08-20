@@ -9,9 +9,6 @@ import {
   UserSignUp,
   VendorSignUp,
 } from '../common/responses/entities-responses.response';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import axios from 'axios';
 import { OAuth2Client } from 'google-auth-library';
 import { AuthResponse } from '../common/objectTypes/google-auth.object';
 

@@ -24,7 +24,7 @@ async function bootstrap() {
   app.use(graphqlUploadExpress({ maxFieldSize: 5_000_000, maxFiles: 100000 }));
   app.use(
     cors({
-      methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+      origin: 'http://localhost:5173',
       credentials: true,
     }),
   );

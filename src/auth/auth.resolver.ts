@@ -1,4 +1,4 @@
-import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { CreateUserInput } from '../users/dto/create-user.input';
 import { LoginInput } from '../common/inputTypes/login.input';
@@ -9,50 +9,43 @@ import {
   UserSignUp,
   VendorSignUp,
 } from '../common/responses/entities-responses.response';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import axios from 'axios';
+import { OAuth2Client } from 'google-auth-library';
+import { AuthResponse } from '../common/objectTypes/google-auth.object';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
-
-  // Step 1: Get Google login URL
-  @Mutation(() => StringResponse)
-  async getGoogleAuthUrl() {
-    const client_id = '';
-    const redirect_uri = '';
-    const scope = ['email', 'profile'].join(' ');
-    const response_type = 'code';
-
-    return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=${response_type}&scope=${scope}`;
+  private oauthClient: OAuth2Client;
+  constructor(private readonly authService: AuthService) {
+    this.oauthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
   }
 
-  // Step 2: Handle callback with code
-  @Mutation(() => StringResponse)
-  async googleAuthCallback(@Args('code') code: string, @Context() ctx: any) {
-    // Exchange code for tokens
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        client_id: process.env.GOOGLE_CLIENT_ID as string,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
-        redirect_uri: process.env.GOOGLE_CALLBACK_URL as string,
-        grant_type: 'authorization_code',
-      }),
+  @Mutation(() => AuthResponse, { name: 'googleSignIn' })
+  async googleSignIn(@Args('idToken') idToken: string): Promise<AuthResponse> {
+    const ticket = await this.oauthClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    const tokens = await tokenRes.json();
+    const payload = ticket.getPayload();
+    if (!payload) throw new Error('Invalid Google Token');
 
-    // Decode User Info From Google
-    const userInfoRes = await fetch(
-      'https://www.googleapis.com/oauth2/v3/userinfo',
-      { headers: { Authorization: `Bearer ${tokens.access_token}` } },
-    );
-    const profile = await userInfoRes.json();
+    const userProfile = {
+      email: payload.email,
+      firstName: payload.given_name,
+      lastName: payload.family_name,
+      picture: payload.picture,
+    };
 
-    // Save/Find User in DB Then Return JWT
-    const jwt = '';
-    return jwt;
+    const { user, token } =
+      await this.authService.validateGoogleUser(userProfile);
+
+    return {
+      user,
+      token,
+    };
   }
 
   @Mutation(() => UserSignUp, { name: 'signupUser' })

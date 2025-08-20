@@ -1,17 +1,18 @@
 import { User } from '../../users/entities/user.entity';
-import { BaseResponse } from './base-response.object';
+import { BaseResponse } from './base-response.response';
 import { Vendor } from '../../vendors/entities/vendor.entity';
-import { AccessToken } from '../objectTypes/accessToken.type';
+import { AccessToken } from '../objectTypes/accessToken.object';
 import { Category } from '../../categories/entities/category.entity';
 import { Cart } from '../../cart/entities/cart.entity';
 import { CartItem } from '../../cart/entities/cart-item.entity';
 import { Following } from '../../following/entities/following.entity';
-import { FollowingsAndCount } from '../objectTypes/following.type';
+import { FollowingsAndCount } from '../objectTypes/following.object';
 import { Order } from '../../orders/entities/order.entity';
-import { OrderResponse } from '../objectTypes/orderResponse.type';
+import { OrderResponse } from '../objectTypes/orderResponse.object';
 import { ProductReview } from '../../product-review/entities/product-review.entity';
 import { Product } from '../../products/entities/product.entity';
 import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
+import { NotificationResponse } from './notification.response';
 
 // Auth Responses
 export const UserSignUp = BaseResponse(User, false, 'UserSignUp');
@@ -82,8 +83,12 @@ export const VendorReviewResponse = BaseResponse(
 export const VendorList = BaseResponse(Vendor, true, 'VendorList');
 export const VendorItem = BaseResponse(Vendor, false, 'VendorItem');
 
-
 // Primitive Data Responses
 export const BooleanResponse = BaseResponse(Boolean, false, 'BooleanResponse');
 export const StringResponse = BaseResponse(String, false, 'StringResponse');
 export const NumberResponse = BaseResponse(Number, false, 'NumberResponse');
+export const NotificationResponses = BaseResponse(
+  NotificationResponse,
+  false,
+  'NotificationResponses',
+);

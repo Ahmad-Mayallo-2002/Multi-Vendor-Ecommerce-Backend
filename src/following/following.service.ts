@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Following } from './entities/following.entity';
 import { Repository } from 'typeorm';
-import { FollowingsAndCount } from 'src/common/objectTypes/following.type';
+import { FollowingsAndCount } from 'src/common/objectTypes/following.object';
 import { SortEnum } from '../common/enum/sort.enum';
 
 @Injectable()

@@ -42,6 +42,11 @@ type AddressesList {
   statusCode: Int!
 }
 
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
 type BooleanResponse {
   data: Boolean!
   message: String!
@@ -225,6 +230,17 @@ input LoginInput {
   password: String!
 }
 
+input Message {
+  message: String!
+  title: String!
+  token: String!
+}
+
+type MessageResponse {
+  messageId: String!
+  success: Boolean!
+}
+
 type Mutation {
   addFollowing(vendorId: String!): FollowingResponse!
   addItemToCart(input: CreateCartItemInput!): CartItemResponse!
@@ -237,8 +253,7 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): CategryItem!
   createOrder(input: CreateOrderInput!): CreateOrderResponse!
   createProduct(input: CreateProductInput!): ProductItem!
-  getGoogleAuthUrl: StringResponse!
-  googleAuthCallback(code: String!): StringResponse!
+  googleSignIn(idToken: String!): AuthResponse!
   login(input: LoginInput!): Login!
   removeAddress(addressId: String!): AddressBoolean!
   removeCategory(categoryId: String!): BooleanResponse!
@@ -248,6 +263,7 @@ type Mutation {
   removeUser: BooleanResponse!
   removeVendor: BooleanResponse!
   seedAdmin: StringResponse!
+  sendNotification(input: NotificationInput!): NotificationResponses!
   sendVerificationCode(email: String!): String!
   signupUser(input: CreateUserInput!): UserSignUp!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
@@ -258,6 +274,22 @@ type Mutation {
   updateProduct(input: UpdateProductInput!, productId: String!): StringResponse!
   updateUser(input: UpdateUserInput!): BooleanResponse!
   updateVendor(input: UpdateVendorInput!): BooleanResponse!
+}
+
+input NotificationInput {
+  dryRun: Boolean! = false
+  messages: [Message!]!
+}
+
+type NotificationResponse {
+  responses: [MessageResponse!]!
+}
+
+type NotificationResponses {
+  data: NotificationResponse!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
 }
 
 type NumberResponse {

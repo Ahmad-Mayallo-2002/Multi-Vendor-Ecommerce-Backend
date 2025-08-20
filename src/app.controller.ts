@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Param,
   Post,
   Query,
   Req,
@@ -9,12 +8,11 @@ import {
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import axios from 'axios';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor() {}
   @Get()
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req) {}

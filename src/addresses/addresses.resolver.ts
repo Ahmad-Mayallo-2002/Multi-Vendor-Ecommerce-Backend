@@ -9,7 +9,7 @@ import { Roles } from '../common/decorators/role.decorator';
 import { Role } from '../common/enum/role.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { BaseResponse } from '../common/responses/base-response.object';
+import { BaseResponse } from '../common/responses/base-response.response';
 import { Address } from './entities/address.entity';
 
 const AddressListResponse = BaseResponse(Address, true, 'AddressesList');

@@ -14,7 +14,7 @@ import { CreateUserInput } from '../users/dto/create-user.input';
 import { Role } from '../common/enum/role.enum';
 import { Payload } from '../common/types/payload.type';
 import { JwtService } from '@nestjs/jwt';
-import { AccessToken } from 'src/common/objectTypes/accessToken.type';
+import { AccessToken } from 'src/common/objectTypes/accessToken.object';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { Vendor } from '../vendors/entities/vendor.entity';
 import { CreateVendorInput } from '../vendors/dto/create-vendor.input';

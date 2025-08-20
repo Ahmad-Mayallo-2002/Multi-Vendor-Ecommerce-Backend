@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { FollowingService } from './following.service';
 import { Following } from './entities/following.entity';
-import { FollowingsAndCount } from '../common/objectTypes/following.type';
+import { FollowingsAndCount } from '../common/objectTypes/following.object';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
@@ -10,8 +10,11 @@ import { Roles } from '../common/decorators/role.decorator';
 import { SortEnum } from '../common/enum/sort.enum';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Payload } from '../common/types/payload.type';
-import { BooleanResponse, FollowingResponse, FollowingsAndCountResponse } from '../common/responses/entities-responses.response';
-
+import {
+  BooleanResponse,
+  FollowingResponse,
+  FollowingsAndCountResponse,
+} from '../common/responses/entities-responses.response';
 
 @Resolver(() => Following)
 export class FollowingResolver {

@@ -7,7 +7,7 @@ export class MessageResponse {
 }
 
 @ObjectType()
-export class NotificationResponse {
+export class NotificationMessagesResponse {
   @Field(() => [MessageResponse])
   responses: MessageResponse[];
 }

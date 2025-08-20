@@ -253,6 +253,7 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): CategryItem!
   createOrder(input: CreateOrderInput!): CreateOrderResponse!
   createProduct(input: CreateProductInput!): ProductItem!
+  deleteNotification(id: String!): BooleanResponse!
   googleSignIn(idToken: String!): AuthResponse!
   login(input: LoginInput!): Login!
   removeAddress(addressId: String!): AddressBoolean!
@@ -276,17 +277,40 @@ type Mutation {
   updateVendor(input: UpdateVendorInput!): BooleanResponse!
 }
 
+type Notification {
+  createdAt: DateTime!
+  id: String!
+  message: String!
+  title: String!
+  token_device: String!
+  updatedAt: DateTime!
+}
+
 input NotificationInput {
   dryRun: Boolean! = false
   messages: [Message!]!
 }
 
-type NotificationResponse {
+type NotificationItem {
+  data: Notification!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
+type NotificationList {
+  data: [Notification!]!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
+type NotificationMessagesResponse {
   responses: [MessageResponse!]!
 }
 
 type NotificationResponses {
-  data: NotificationResponse!
+  data: NotificationMessagesResponse!
   message: String!
   pagination: Pagination
   statusCode: Int!
@@ -432,6 +456,8 @@ type Query {
   getCart(id: String!): CartResponse!
   getCategories: CategoryList!
   getCategory(categoryId: String!): CategryItem!
+  getNotificationById(id: String!): NotificationItem!
+  getNotifications(page: Int!, take: Int!): NotificationList!
   getProductById(id: String!): ProductItem!
   getProducts(page: Int!, sortByCreated: Sort, sortByFollowings: Boolean = false, sortByPrice: Sort, take: Int!): ProductsList!
   getProductsByCategory(category: String!): ProductsList!

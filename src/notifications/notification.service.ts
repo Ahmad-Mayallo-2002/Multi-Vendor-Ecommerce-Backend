@@ -1,14 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { mapLimit } from 'async';
 import * as firebase from 'firebase-admin';
 import { BatchResponse } from 'firebase-admin/lib/messaging/messaging-api';
 import { chunk } from 'lodash';
 import * as shell from 'shelljs';
 import { ISendFirebaseMessages } from '../common/interfaces/firebase-message.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Notification } from './entity/notification.entity';
 
 @Injectable()
 export class NotificationsService {
-  constructor() {
+  constructor(
+    @InjectRepository(Notification)
+    private readonly notificationRepo: Repository<Notification>,
+  ) {
     // For simplicity these credentials are just stored in the environment
     // However these should be stored in a key management system
     const firebaseAdmin = process.env.FIREBASE_ADMIN;
@@ -47,6 +53,14 @@ export class NotificationsService {
                 },
               },
             }));
+          groupedFirebaseMessages.forEach(async (message) => {
+            const newMessage = this.notificationRepo.create({
+              title: message.title,
+              message: message.message,
+              token_device: message.token,
+            });
+            await this.notificationRepo.save(newMessage);
+          });
 
           return await this.sendAll(tokenMessages, dryRun);
         } catch (error) {
@@ -90,5 +104,30 @@ export class NotificationsService {
       }
     }
     return firebase.messaging().sendEach(messages, dryRun);
+  }
+
+  async getAll(take: number, page: number) {
+    const skip = (page - 1) * take;
+    const notifications = await this.notificationRepo.find({
+      take,
+      skip,
+    });
+    if (!notifications.length)
+      throw new NotFoundException('No Notifications Found');
+    const counts = await this.notificationRepo.count();
+    if (skip > counts) throw new NotFoundException('No Notifications Found');
+    return { notifications, counts };
+  }
+
+  async getById(id: string): Promise<Notification> {
+    const notification = await this.notificationRepo.findOne({ where: { id } });
+    if (!notification) throw new NotFoundException('Notification is not Found');
+    return notification;
+  }
+
+  async deleteById(id: string): Promise<Boolean> {
+    const notification = await this.getById(id);
+    await this.notificationRepo.remove(notification);
+    return true;
   }
 }

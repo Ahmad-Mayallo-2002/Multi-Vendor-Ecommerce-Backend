@@ -37,6 +37,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import GraphQLJSON from 'graphql-type-json';
 import { JwtService } from '@nestjs/jwt';
 import { NotificaitonModule } from './notifications/notification.module';
+import { Notification } from './notifications/entity/notification.entity';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { NotificaitonModule } from './notifications/notification.module';
         Vendor,
         VendorReview,
         ProductReview,
+        Notification
       ],
     }),
     CacheModule.register({ isGlobal: true }),

@@ -12,7 +12,8 @@ import { OrderResponse } from '../objectTypes/orderResponse.object';
 import { ProductReview } from '../../product-review/entities/product-review.entity';
 import { Product } from '../../products/entities/product.entity';
 import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
-import { NotificationResponse } from './notification.response';
+import { NotificationMessagesResponse } from './notification.response';
+import { Notification } from '../../notifications/entity/notification.entity';
 
 // Auth Responses
 export const UserSignUp = BaseResponse(User, false, 'UserSignUp');
@@ -88,7 +89,18 @@ export const BooleanResponse = BaseResponse(Boolean, false, 'BooleanResponse');
 export const StringResponse = BaseResponse(String, false, 'StringResponse');
 export const NumberResponse = BaseResponse(Number, false, 'NumberResponse');
 export const NotificationResponses = BaseResponse(
-  NotificationResponse,
+  NotificationMessagesResponse,
   false,
   'NotificationResponses',
+);
+export const NotificationsResponse = BaseResponse(
+  Notification,
+  true,
+  'NotificationList',
+  true
+);
+export const NotificationResponse = BaseResponse(
+  Notification,
+  false,
+  'NotificationItem',
 );

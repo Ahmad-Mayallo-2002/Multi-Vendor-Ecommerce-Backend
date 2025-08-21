@@ -54,6 +54,7 @@
     "graphql": "^16.11.0",
     "graphql-type-json": "^0.3.2",
     "graphql-upload-ts": "^2.1.2",
+    "helmet": "^8.1.0",
     "ioredis": "^5.7.0",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",

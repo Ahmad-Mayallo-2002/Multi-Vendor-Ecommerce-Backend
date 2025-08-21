@@ -14,6 +14,7 @@ import { Product } from '../../products/entities/product.entity';
 import { VendorReview } from '../../vendor-review/entities/vendor-review.entity';
 import { NotificationMessagesResponse } from './notification.response';
 import { Notification } from '../../notifications/entity/notification.entity';
+import { DeviceToken } from '../../device-token/entity/device-token.entity';
 
 // Auth Responses
 export const UserSignUp = BaseResponse(User, false, 'UserSignUp');
@@ -97,10 +98,20 @@ export const NotificationsResponse = BaseResponse(
   Notification,
   true,
   'NotificationList',
-  true
+  true,
 );
 export const NotificationResponse = BaseResponse(
   Notification,
   false,
   'NotificationItem',
+);
+export const DevicesTokensResponse = BaseResponse(
+  DeviceToken,
+  true,
+  'DevicesTokens',
+);
+export const DeviceTokenResponse = BaseResponse(
+  DeviceToken,
+  false,
+  'DeviceTokenItem',
 );

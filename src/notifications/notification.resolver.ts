@@ -1,6 +1,5 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { NotificationsService } from './notification.service';
-import { NotificationInput } from '../common/inputTypes/notification.input';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../common/guards/auth.guard';
 import { RolesGuard } from '../common/guards/role.guard';
@@ -12,22 +11,23 @@ import {
   NotificationResponses,
   NotificationsResponse,
 } from '../common/responses/entities-responses.response';
+import { SendNotificationsDto } from './dto/create-notification.dto';
 
 @Resolver()
 export class NotificationResolver {
   constructor(private notificationService: NotificationsService) {}
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN)
-  @Mutation(() => NotificationResponses, { name: 'sendNotification' })
-  async sendNotification(@Args('input') notificationBody: NotificationInput) {
-    return {
-      data: await this.notificationService.sendFirebaseMessages(
-        notificationBody.messages,
-        notificationBody.dryRun,
-      ),
-    };
-  }
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(Role.SUPER_ADMIN)
+  // @Mutation(() => NotificationResponses, { name: 'sendNotification' })
+  // async sendNotification(
+  //   @Args('input', { type: () => SendNotificationsDto })
+  //   input: SendNotificationsDto,
+  // ) {
+  //   return {
+  //     data: await this.notificationService.sendUserMessages(input),
+  //   };
+  // }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)

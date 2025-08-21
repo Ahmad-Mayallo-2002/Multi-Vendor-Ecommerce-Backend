@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 import axios from 'axios';
 

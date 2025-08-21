@@ -38,6 +38,8 @@ import GraphQLJSON from 'graphql-type-json';
 import { JwtService } from '@nestjs/jwt';
 import { NotificaitonModule } from './notifications/notification.module';
 import { Notification } from './notifications/entity/notification.entity';
+import { DeviceTokenModule } from './device-token/device-token.module';
+import { DeviceToken } from './device-token/entity/device-token.entity';
 
 @Module({
   imports: [
@@ -81,7 +83,8 @@ import { Notification } from './notifications/entity/notification.entity';
         Vendor,
         VendorReview,
         ProductReview,
-        Notification
+        Notification,
+        DeviceToken,
       ],
     }),
     CacheModule.register({ isGlobal: true }),
@@ -99,6 +102,7 @@ import { Notification } from './notifications/entity/notification.entity';
     WebhookModule,
     CloudinaryModule,
     NotificaitonModule,
+    DeviceTokenModule,
   ],
   controllers: [AppController],
   providers: [AppService, PriceScalar, JwtService],

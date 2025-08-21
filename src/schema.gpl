@@ -134,6 +134,11 @@ input CreateCategoryInput {
   name: String!
 }
 
+input CreateDeviceTokenInput {
+  token: String!
+  userId: String!
+}
+
 input CreateOrderInput {
   addressId: String!
   paymentMethod: Payment!
@@ -184,6 +189,28 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DeviceToken {
+  createdAt: DateTime!
+  id: String!
+  token: String!
+  updatedAt: DateTime!
+  userId: String!
+}
+
+type DeviceTokenItem {
+  data: DeviceToken!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
+type DevicesTokens {
+  data: [DeviceToken!]!
+  message: String!
+  pagination: Pagination
+  statusCode: Int!
+}
+
 type Following {
   createdAt: DateTime!
   id: String!
@@ -230,12 +257,6 @@ input LoginInput {
   password: String!
 }
 
-input Message {
-  message: String!
-  title: String!
-  token: String!
-}
-
 type MessageResponse {
   messageId: String!
   success: Boolean!
@@ -248,9 +269,11 @@ type Mutation {
   addVendorReview(input: CreateVendorReviewInput!, vendorId: String!): VendorReviewResponse!
   approveVendor(approve: Boolean!, vendorId: String!): StringResponse!
   cancelFollowing(vendorId: String!): BooleanResponse!
+  changeDeviceToken(input: UpdateDeviceTokenInput!): DeviceTokenItem!
   compareVerificationCode(code: String!): Boolean!
   createAddress(input: CreateAddressInput!): AddressItem!
   createCategory(input: CreateCategoryInput!): CategryItem!
+  createDeviceToken(input: CreateDeviceTokenInput!): DeviceTokenItem!
   createOrder(input: CreateOrderInput!): CreateOrderResponse!
   createProduct(input: CreateProductInput!): ProductItem!
   deleteNotification(id: String!): BooleanResponse!
@@ -264,7 +287,6 @@ type Mutation {
   removeUser: BooleanResponse!
   removeVendor: BooleanResponse!
   seedAdmin: StringResponse!
-  sendNotification(input: NotificationInput!): NotificationResponses!
   sendVerificationCode(email: String!): String!
   signupUser(input: CreateUserInput!): UserSignUp!
   signupVendor(user: CreateUserInput!, vendor: CreateVendorInput!): VendorSignUp!
@@ -286,11 +308,6 @@ type Notification {
   updatedAt: DateTime!
 }
 
-input NotificationInput {
-  dryRun: Boolean! = false
-  messages: [Message!]!
-}
-
 type NotificationItem {
   data: Notification!
   message: String!
@@ -307,13 +324,6 @@ type NotificationList {
 
 type NotificationMessagesResponse {
   responses: [MessageResponse!]!
-}
-
-type NotificationResponses {
-  data: NotificationMessagesResponse!
-  message: String!
-  pagination: Pagination
-  statusCode: Int!
 }
 
 type NumberResponse {
@@ -446,6 +456,9 @@ type ProductsList {
 }
 
 type Query {
+  deviceTokenByUserId(userId: String!): DeviceTokenItem!
+  deviceTokens: DevicesTokens!
+  deviceTokensByUserIds(userIds: [String!]!): DevicesTokens!
   getAddress(addressId: String!): AddressItem!
   getAddresses: AddressesList!
   getAllCarts: CartList!
@@ -517,6 +530,11 @@ input UpdateCartItemInput {
 input UpdateCategoryInput {
   description: String
   name: String
+}
+
+input UpdateDeviceTokenInput {
+  token: String!
+  userId: String!
 }
 
 input UpdateProductInput {

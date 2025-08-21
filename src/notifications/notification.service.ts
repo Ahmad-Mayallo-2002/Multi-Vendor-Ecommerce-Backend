@@ -8,12 +8,16 @@ import { ISendFirebaseMessages } from '../common/interfaces/firebase-message.int
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from './entity/notification.entity';
+import { DeviceTokenService } from '../device-token/device-token.service';
+import { SendNotificationsDto } from './dto/create-notification.dto';
+import { DeviceToken } from '../device-token/entity/device-token.entity';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepo: Repository<Notification>,
+    private readonly deviceTokenService: DeviceTokenService,
   ) {
     // For simplicity these credentials are just stored in the environment
     // However these should be stored in a key management system
@@ -53,14 +57,15 @@ export class NotificationsService {
                 },
               },
             }));
-          groupedFirebaseMessages.forEach(async (message) => {
+
+          for (const message of groupedFirebaseMessages) {
             const newMessage = this.notificationRepo.create({
               title: message.title,
               message: message.message,
               token_device: message.token,
             });
             await this.notificationRepo.save(newMessage);
-          });
+          }
 
           return await this.sendAll(tokenMessages, dryRun);
         } catch (error) {
@@ -88,8 +93,34 @@ export class NotificationsService {
         responses: [],
         successCount: 0,
         failureCount: 0,
-      } as unknown as BatchResponse,
+      } as BatchResponse,
     );
+  }
+
+  public async sendUserMessages(
+    inputs: SendNotificationsDto,
+  ): Promise<BatchResponse> {
+    const userIds = inputs.messages.map((m) => m.userId);
+    const tokens = (await this.deviceTokenService.getDevicesTokensByUsersIds(
+      userIds,
+    )) as DeviceToken[];
+
+    const tokenMap: Record<string, string[]> = {};
+    for (const dt of tokens) {
+      if (!tokenMap[dt.userId]) tokenMap[dt.userId] = [];
+      tokenMap[dt.userId].push(dt.token);
+    }
+
+    const firebaseMessages: ISendFirebaseMessages[] = inputs.messages.flatMap(
+      (input) =>
+        (tokenMap[input.userId] || []).map((token) => ({
+          title: input.title,
+          message: input.message,
+          token,
+        })),
+    );
+
+    return await this.sendFirebaseMessages(firebaseMessages, inputs.dryRun);
   }
 
   public async sendAll(
